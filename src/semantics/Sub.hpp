@@ -10,6 +10,7 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
 
+    virtual ~Sub() = default;
 private:
     std::shared_ptr<ASTNode> firstExp_;
     std::shared_ptr<ASTNode> secExp_;

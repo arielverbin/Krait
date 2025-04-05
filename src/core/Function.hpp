@@ -27,6 +27,8 @@ public:
                                  const std::vector<std::shared_ptr<Object>>& args);
 
     virtual std::string _str_() override;
+
+    virtual ~Function() = default;
     
 private:
     bool isBuiltIn_;

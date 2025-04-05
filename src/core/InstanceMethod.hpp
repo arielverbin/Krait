@@ -17,6 +17,9 @@ public:
         args.insert(args.begin(), instance_);
         return function_->_call_(state, args);
     }
+
+    virtual ~InstanceMethod() = default;
+
 private:
     std::shared_ptr<Object> instance_;
     std::shared_ptr<Function> function_;

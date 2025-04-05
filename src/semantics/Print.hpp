@@ -10,6 +10,8 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
 
+    virtual ~Print() = default;
+    
 private:
     std::shared_ptr<ASTNode> expression_;
 };

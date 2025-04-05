@@ -16,6 +16,8 @@ public:
     std::shared_ptr<Object> _sub_(Object& another) override;
 
     std::string _str_() override;
+
+    virtual ~String() = default;
 };
 
 } // namespace core

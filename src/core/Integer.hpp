@@ -16,6 +16,7 @@ public:
 
     std::string _str_() override;
 
+    virtual ~Integer() = default;
 };
 } // namespace core
 

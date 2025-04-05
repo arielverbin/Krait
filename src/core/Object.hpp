@@ -18,6 +18,8 @@ public:
     virtual std::shared_ptr<Object> _sub_(Object& another);
 
     virtual std::shared_ptr<Object> _att_(std::string varName);
+
+    virtual ~Object() = default;
 };
 
 } // namespace core

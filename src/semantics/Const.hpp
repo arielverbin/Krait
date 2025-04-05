@@ -10,6 +10,7 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
 
+    virtual ~Const() = default;
 private:
     std::shared_ptr<core::Object> obj_;
 };

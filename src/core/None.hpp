@@ -21,6 +21,8 @@ public:
         }
         return none_;
     }
+
+    virtual ~None() = default;
 };
 
 std::shared_ptr<None> None::none_ = nullptr;

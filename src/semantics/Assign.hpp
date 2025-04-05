@@ -12,6 +12,8 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
 
+    virtual ~Assign() = default;
+
 private:
     std::string targetVar_;
     std::shared_ptr<ASTNode> source_;

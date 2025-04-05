@@ -10,6 +10,8 @@ namespace semantics {
 class ASTNode {
 public:
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) = 0;
+
+    virtual ~ASTNode() = default;
 };
 
 } // namespace semantics

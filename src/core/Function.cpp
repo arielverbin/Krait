@@ -9,6 +9,9 @@ Function::Function(semantics::ASTNode* body, std::vector<std::string> params, st
 
 std::shared_ptr<Object> Function::_call_(runtime::GlobalState& state, 
                                  const std::vector<std::shared_ptr<Object>>& args) {
+    
+    UNREFERENCED(body_);
+
     if (isBuiltIn_) {
         return nativeFunc_(state, args);
     }

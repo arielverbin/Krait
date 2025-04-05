@@ -11,6 +11,8 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
 
+    virtual ~Variable() = default;
+
 private:
     std::string targetVar_;
 };
