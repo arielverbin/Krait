@@ -29,9 +29,6 @@ public:
     virtual ~None() = default;
 };
 
-std::shared_ptr<None> None::none_ = nullptr;
-
 } // namespace core
-
 
 #endif // CORE_NONE_HPP

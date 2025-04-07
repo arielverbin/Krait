@@ -1,6 +1,4 @@
 #include "String.hpp"
-#include "../utils/utils.hpp"
-
 using namespace core;
 
 String::String(std::string value) : value_(value) {}

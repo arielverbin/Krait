@@ -7,7 +7,7 @@ using namespace core;
 Integer::Integer(long value) : value_(value) {}
 
 std::string Integer::_type_() {
-    return "String";
+    return "Integer";
 }
 
 std::shared_ptr<Object> Integer::_add_(Object& another) {

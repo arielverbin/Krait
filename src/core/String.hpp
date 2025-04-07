@@ -12,8 +12,9 @@ private:
 
 public:
     String(std::string str);
+
+    std::string _type_() override;
     std::shared_ptr<Object> _add_(Object& another) override;
-    std::shared_ptr<Object> _sub_(Object& another) override;
 
     std::string _str_() override;
 
