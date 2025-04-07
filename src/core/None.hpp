@@ -15,6 +15,10 @@ public:
         return "None";
     }
 
+    std::string _type_() override {
+        return "None";
+    }
+
     static std::shared_ptr<None> none() {
         if (none_ == nullptr) {
             none_ = std::make_shared<None>(None());

@@ -15,17 +15,21 @@ std::string Object::_str_() {
     return oss.str();
 }
 
+std::string Object::_type_() {
+    return "Object";
+}
+
 std::shared_ptr<Object> Object::_add_(Object& another) {
     UNREFERENCED(another);
 
-    throw std::runtime_error("[EXCEPTION] Type 'object' does not support addition.");
+    throw std::runtime_error("[EXCEPTION] Type '" + self->_type_() + "' does not support addition.");
 }
 
 
 std::shared_ptr<Object> Object::_sub_(Object& another) {
     UNREFERENCED(another);
 
-    throw std::runtime_error("[EXCEPTION] Type 'object' does not support subtraction.");
+    throw std::runtime_error("[EXCEPTION] Type '" + self->_type_() + "' does not support subtraction.");
 }
 
 std::shared_ptr<Object> Object::_att_(std::string varName) {

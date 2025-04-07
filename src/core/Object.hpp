@@ -14,6 +14,7 @@ public:
     void* _loc_();
 
     virtual std::string _str_();
+    virtual std::string _type_();
     virtual std::shared_ptr<Object> _add_(Object& another);
     virtual std::shared_ptr<Object> _sub_(Object& another);
 
