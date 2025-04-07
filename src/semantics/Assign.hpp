@@ -10,7 +10,7 @@ class Assign : public ASTNode {
 public:
     Assign(std::string targetVar, std::shared_ptr<ASTNode> source);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Assign() = default;
 

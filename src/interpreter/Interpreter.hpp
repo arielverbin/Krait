@@ -3,12 +3,18 @@
 
 #include <vector>
 #include "../semantics/ASTNode.hpp"
-#include "../runtime/GlobalState.hpp"
+#include "../semantics/Code.hpp"
+#include "../runtime/Environment.hpp"
 
 namespace interpreter {
 class Interpreter {
 public:
-    static runtime::GlobalState& interpret(runtime::GlobalState& state, std::vector<std::shared_ptr<semantics::ASTNode>> code);
+    Interpreter(std::vector<std::shared_ptr<semantics::ASTNode>> commands);
+    runtime::Environment& interpret();
+
+private:
+    std::shared_ptr<runtime::Environment> state_;
+    std::vector<std::shared_ptr<semantics::ASTNode>> commands_;
 };
 
 } // namespace interpreter

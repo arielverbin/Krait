@@ -8,7 +8,7 @@ class Sum : public ASTNode {
 public:
     Sum(std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Sum() = default;
 private:

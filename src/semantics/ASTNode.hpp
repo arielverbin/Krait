@@ -1,7 +1,7 @@
 #ifndef SEMANTICS_AST_NODE_HPP
 #define SEMANTICS_AST_NODE_HPP
 
-#include "../runtime/GlobalState.hpp"
+#include "../runtime/Environment.hpp"
 #include "../core/Object.hpp"
 #include "../utils/utils.hpp"
 #include <iostream>
@@ -9,7 +9,7 @@
 namespace semantics {
 class ASTNode {
 public:
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) = 0;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) = 0;
 
     virtual ~ASTNode() = default;
 };

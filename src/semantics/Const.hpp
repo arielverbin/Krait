@@ -8,7 +8,7 @@ class Const : public ASTNode {
 public:
     Const(std::shared_ptr<core::Object> obj);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Const() = default;
 private:

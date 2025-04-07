@@ -8,7 +8,7 @@ class Sub : public ASTNode {
 public:
     Sub(std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Sub() = default;
 private:

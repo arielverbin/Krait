@@ -9,7 +9,7 @@ class Variable : public ASTNode {
 public:
     Variable(std::string targetVar);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::GlobalState& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Variable() = default;
 

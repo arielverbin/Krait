@@ -10,7 +10,7 @@ std::shared_ptr<Object> String::_add_(Object& another) {
         return std::make_shared<String>(String(value_ + i->value_));
     }
 
-    throw std::runtime_error("[EXCEPTION] Type 'String' does not support subtraction.");
+    throw std::runtime_error("[EXCEPTION] Type 'String' does not support addition.");
 }
 
 std::shared_ptr<Object> String::_sub_(Object& another) {

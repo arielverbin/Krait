@@ -1,12 +1,17 @@
 #include "Interpreter.hpp"
+#include <iostream>
 using namespace interpreter;
 
-runtime::GlobalState& Interpreter::interpret(runtime::GlobalState& state,
-                                std::vector<std::shared_ptr<semantics::ASTNode>> code) {
-                                    
-    for (std::shared_ptr<semantics::ASTNode> command : code) {
-        command->evaluate(state);
+Interpreter::Interpreter(std::vector<std::shared_ptr<semantics::ASTNode>> commands) 
+    : state_(std::make_shared<runtime::Environment>()), commands_(commands) {
+        // Initialize the global scope.
+        state_->pushNewScope();
     }
 
-    return state;
+runtime::Environment& Interpreter::interpret() {
+    for (auto& command : commands_) {
+        command->evaluate(*state_);
+    }
+
+    return *state_;
 }

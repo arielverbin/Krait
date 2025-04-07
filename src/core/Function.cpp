@@ -4,10 +4,10 @@ using namespace core;
 Function::Function(NativeFunc nativeFunc) 
         : isBuiltIn_(true), nativeFunc_(nativeFunc) {}
 
-Function::Function(semantics::ASTNode* body, std::vector<std::string> params, std::shared_ptr<runtime::GlobalState> closure) 
+Function::Function(semantics::ASTNode* body, std::vector<std::string> params, std::shared_ptr<runtime::Environment> closure) 
     : isBuiltIn_(false), body_(body), params_(params), closure_(closure) {}
 
-std::shared_ptr<Object> Function::_call_(runtime::GlobalState& state, 
+std::shared_ptr<Object> Function::_call_(runtime::Environment& state, 
                                  const std::vector<std::shared_ptr<Object>>& args) {
     
     UNREFERENCED(body_);
