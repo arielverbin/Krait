@@ -12,6 +12,8 @@ private:
 public:
     Boolean(bool value);
 
+    operator bool() const;
+
     std::string _type_() override;
     std::string _str_() override;
 
