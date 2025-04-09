@@ -3,7 +3,7 @@
 
 #include "Object.hpp"
 #include "Function.hpp"
-#include "../runtime/GlobalState.hpp"
+#include "../runtime/Environment.hpp"
 
 namespace core {
 
@@ -12,7 +12,7 @@ public:
     InstanceMethod(std::shared_ptr<Object> instance, std::shared_ptr<Function> function)
         : instance_(instance), function_(function) {}
 
-    std::shared_ptr<Object> _call_(runtime::GlobalState& state, std::vector<std::shared_ptr<Object>> args) {
+    std::shared_ptr<Object> _call_(runtime::Environment& state, std::vector<std::shared_ptr<Object>> args) {
         // Prepend the instance (self) as the first argument for the bound method
         args.insert(args.begin(), instance_);
         return function_->_call_(state, args);

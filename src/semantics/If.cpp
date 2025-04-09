@@ -11,13 +11,13 @@ std::shared_ptr<core::Object> If::evaluate(runtime::Environment& state) {
     std::shared_ptr<core::Object> computed_condition = condition_->evaluate(state);
 
     if (auto condition = std::dynamic_pointer_cast<core::Boolean>(computed_condition)) {
-        state.pushNewScope();
+        // state.pushNewScope();
         if (*condition) {
             trueBlock_->evaluate(state);
         } else {
             falseBlock_->evaluate(state);
         }
-        state.popLastScope();
+        // state.popLastScope();
     } else {
         throw std::runtime_error("[EXCEPTION] Computed condition for If statement is not of type Boolean.");
     }

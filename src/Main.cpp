@@ -4,6 +4,7 @@
 #include "core/Integer.hpp"
 #include "core/String.hpp"
 #include "core/None.hpp"
+#include "core/Boolean.hpp"
 
 #include "semantics/Assign.hpp"
 #include "semantics/Print.hpp"
@@ -11,6 +12,7 @@
 #include "semantics/Variable.hpp"
 #include "semantics/Sum.hpp"
 #include "semantics/Sub.hpp"
+#include "semantics/If.hpp"
 
 #include "interpreter/Interpreter.hpp"
 #include "runtime/Environment.hpp"
@@ -23,27 +25,14 @@ using namespace interpreter;
 
 int main() {    
     std::vector<std::shared_ptr<ASTNode>> commands = {
-
-        // myvar = 10
-        p(Assign)("myvar", p(Const)(p(Integer)(10))), 
-
-        // myvar2 = myvar
-        p(Assign)("myvar2", p(Variable)("myvar")),
-        
-        // myvar = 6
-        p(Assign)("myvar", p(Const)(p(Integer)(6))), 
-
-        // print myvar + (myvar2 + 10)
-        p(Print)(p(Sum)(p(Variable)("myvar"), p(Sum)(p(Variable)("myvar2"), p(Const)(p(Integer)(10))))),
-
-        // x = "hello, "
-        p(Assign)("x", p(Const)(p(Integer)(3))),
-
-        // y = " world!"
         p(Assign)("y", p(Const)(p(Integer)(10))),
+        p(If)(p(Const)(p(Boolean)(false)),
+            p(Code)( (std::vector<std::shared_ptr<ASTNode>>){ p(Assign)("xoxo", p(Const)(p(Integer)(10))), p(Print)(p(Variable)("xoxo"))} ),
+            p(Code)( (std::vector<std::shared_ptr<ASTNode>>){ p(Assign)("aaa", p(Const)(p(Integer)(20))), p(Print)(p(Variable)("aaa"))} )
+        ),
 
         // print x + y
-        p(Print)(p(Sum)(p(Variable)("x"), p(Variable)("y"))),
+        p(Print)(p(Sum)(p(Variable)("xoxo"), p(Variable)("y"))),
 
     };
 
