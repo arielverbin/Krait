@@ -14,5 +14,6 @@ std::shared_ptr<core::Object> Function::evaluate(runtime::Environment& state) {
     // Store the function in the environment
     state.setVariable(funcName_, func);
 
+    // return None as function definitions do not return a value
     return core::None::getNone();
 }
