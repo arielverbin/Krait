@@ -2,7 +2,7 @@
 #define SEMANTICS_ASSIGN_HPP
 
 #include "core/Object.hpp"
-#include "ASTNode.hpp"
+#include "semantics/ASTNode.hpp"
 
 namespace semantics {
 

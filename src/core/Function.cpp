@@ -1,26 +1,32 @@
 #include "Function.hpp"
 #include "String.hpp"
+#include "exceptions/exceptions.hpp"
 using namespace core;
 
 Function::Function(NativeFunc nativeFunc) 
         : isBuiltIn_(true), nativeFunc_(nativeFunc) {}
 
-Function::Function(semantics::ASTNode* body, std::vector<std::string> params, runtime::Environment closure) 
+Function::Function(std::shared_ptr<semantics::ASTNode> body, std::vector<std::string> params, runtime::Environment closure) 
     : isBuiltIn_(false), body_(body), params_(params), closure_(std::move(closure)) {}
 
 std::shared_ptr<Object> Function::_call_(std::vector<std::shared_ptr<Object>> args) {
-    
     UNREFERENCED(body_);
-    // TODO: argument check here.
 
     if (isBuiltIn_) {
         return nativeFunc_(args);
     }
-    // Otherwise, set up a new local scope, bind parameters, and evaluate the body.
-    // This is where you’d save the current state/return address if using a call stack.
-    // ...
-    return nullptr; // placeholder
 
+    if (args.size() != params_.size()) {
+        throw except::InvalidArgumentException("Function call with incorrect number of arguments (expected " +
+            std::to_string(params_.size()) + ", got " + std::to_string(args.size()) + ").");
+    }
+
+    runtime::Environment evalScope = closure_.createChildEnvironment();
+    for (size_t i = 0; i < params_.size(); ++i) {
+        closure_.setVariable(params_[i], args[i]);
+    }
+
+    return body_->evaluate(evalScope);
 }
 
 std::shared_ptr<Object> Function::_str_() {

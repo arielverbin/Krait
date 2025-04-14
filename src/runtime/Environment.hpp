@@ -21,12 +21,15 @@ private:
 
 public:
     Environment() = default;
+    Environment(const Environment&) = default;
 
     std::shared_ptr<Scope> pushNewScope();
     void popLastScope();
 
     std::shared_ptr<core::Object> getVariable(std::string varName);
     void setVariable(std::string varName, std::shared_ptr<core::Object> value);
+
+    Environment createChildEnvironment();
 };
 }
 

@@ -23,7 +23,7 @@ public:
     Function(NativeFunc nativeFunc);
 
     // Constructors for user-defined functions would store an AST node, parameter list, etc.
-    Function(semantics::ASTNode* body, std::vector<std::string> params, runtime::Environment closure);
+    Function(std::shared_ptr<semantics::ASTNode> body, std::vector<std::string> params, runtime::Environment closure);
 
     std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args) override;
 
@@ -36,7 +36,7 @@ private:
     NativeFunc nativeFunc_;
 
     // For user-defined functions:
-    semantics::ASTNode* body_;
+    std::shared_ptr<semantics::ASTNode> body_;
     std::vector<std::string> params_;
     runtime::Environment closure_;
 };
