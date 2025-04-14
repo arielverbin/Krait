@@ -18,6 +18,8 @@
 #include "semantics/flow_semantics/While.hpp"
 #include "semantics/flow_semantics/Pass.hpp"
 #include "semantics/signal_semantics/Return.hpp"
+#include "semantics/signal_semantics/Break.hpp"
+#include "semantics/signal_semantics/Continue.hpp"
 
 #include "interpreter/Interpreter.hpp"
 #include "runtime/Environment.hpp"
@@ -45,12 +47,18 @@ int main() {
         // while not (currentNumber >= limit):
         WHILE(NOT(GEQ(VAR("currentNumber"), VAR("limit"))),
             CODE(
+                // currentNumber = currentNumber + 1
+                ASSIGNVAR("currentNumber", ADD(VAR("currentNumber"), INT(1))),
+
                 // currentLine = "currentNumber=" + currentNumber
                 ASSIGNVAR("currentLine", ADD(STR("currentNumber is "), VAR("currentNumber"))),
                 PRINT(VAR("currentLine")),
                 
                 IF(EQ(VAR("currentLine"), STR("currentNumber is 5")), 
-                    PRINT(STR("Reached 5!")), 
+                    CODE(
+                        PRINT(STR("Reached 5!")),
+                        CONTINUE()
+                    ), 
                     PASS()
                 ),
                 
@@ -60,10 +68,8 @@ int main() {
                 ASSIGNVAR("reachedEnd", EQ(VAR("currentNumber"), SUB(VAR("limit"), INT(1)))),
                 
                 PRINT(ADD(STR("reachedEnd="), VAR("reachedEnd"))),
-                PRINT(MULT(STR("-"), INT(5))),
+                PRINT(MULT(STR("-"), INT(5)))
 
-                // currentNumber = currentNumber + 1
-                ASSIGNVAR("currentNumber", ADD(VAR("currentNumber"), INT(1)))
             )
         )
         

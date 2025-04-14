@@ -33,6 +33,7 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 #define CALL(func, args)                p(Call)(func, args)
 #define ARGS(...)                       make_ast_vector(__VA_ARGS__)
 #define RETURN(expr)                    p(Return)(expr)
-
+#define BREAK()                         p(Break)()
+#define CONTINUE()                      p(Continue)()
 
 #endif // TESTS_SHORTCUTS_HPP
