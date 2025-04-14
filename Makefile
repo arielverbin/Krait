@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude -g
+CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc
 
 # Directories
 SRC_DIR := src
@@ -33,3 +33,6 @@ run: all
 	./$(BIN)
 
 .PHONY: all clean run
+
+# Include automatically generated dependency files
+-include $(OBJS:.o=.d)

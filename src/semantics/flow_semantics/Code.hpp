@@ -2,7 +2,7 @@
 #define SEMANTICS_CODE_HPP
 
 #include <vector>
-#include "ASTNode.hpp"
+#include "semantics/ASTNode.hpp"
 
 namespace semantics {
 class Code : public ASTNode {

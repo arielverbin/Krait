@@ -1,5 +1,5 @@
-#include "Interpreter.hpp"
 #include <iostream>
+#include "Interpreter.hpp"
 using namespace interpreter;
 
 Interpreter::Interpreter(std::vector<std::shared_ptr<semantics::ASTNode>> commands) 

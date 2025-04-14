@@ -1,7 +1,7 @@
 #ifndef RUNTIME_ENVIRONMENT_HPP
 #define RUNTIME_ENVIRONMENT_HPP
 
-#include "../core/Object.hpp"
+#include "core/Object.hpp"
 #include <map>
 #include <stack>
 
