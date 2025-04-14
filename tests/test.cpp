@@ -6,7 +6,9 @@
 #include "core/None.hpp"
 #include "core/Boolean.hpp"
 
-#include "semantics/Assign.hpp"
+#include "semantics/define_semantics/Assign.hpp"
+#include "semantics/define_semantics/Function.hpp"
+#include "semantics/flow_semantics/Call.hpp"
 #include "semantics/Print.hpp"
 #include "semantics/Const.hpp"
 #include "semantics/Variable.hpp"
@@ -28,8 +30,16 @@ using namespace interpreter;
 int main() {   
     std::vector<std::shared_ptr<ASTNode>> commands = {
         ASSIGNVAR("currentNumber", INT(0)),
-        ASSIGNVAR("limit", INT(20)),
+        ASSIGNVAR("limit", INT(10)),
         ASSIGNVAR("reachedEnd", BOOL(false)),
+        
+        FUNC("myFunction", STRARR("arg1", "arg2"), 
+            CODE(
+                ASSIGNVAR("result", ADD(VAR("arg1"), VAR("arg2"))),
+                ASSIGNVAR("final", ADD(VAR("result"), VAR("limit"))),
+                PRINT(ADD(STR("final is "), VAR("final")))
+            )
+        ),
 
         // while not (currentNumber >= limit):
         WHILE(NOT(GEQ(VAR("currentNumber"), VAR("limit"))),
@@ -38,10 +48,12 @@ int main() {
                 ASSIGNVAR("currentLine", ADD(STR("currentNumber is "), VAR("currentNumber"))),
                 PRINT(VAR("currentLine")),
                 
-                IF(EQ(VAR("currentLine"), STR("currentNumber=5")), 
+                IF(EQ(VAR("currentLine"), STR("currentNumber is 5")), 
                     PRINT(STR("Reached 5!")), 
                     PASS()
                 ),
+                
+                CALL(VAR("myFunction"), ARGS(VAR("currentNumber"), ADD(INT(5), INT(5)))),
 
                 // reachedEnd = (currentNumber == limit - 1)
                 ASSIGNVAR("reachedEnd", EQ(VAR("currentNumber"), SUB(VAR("limit"), INT(1)))),

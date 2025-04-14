@@ -35,3 +35,9 @@ void Environment::setVariable(std::string varName, std::shared_ptr<core::Object>
         throw except::RuntimeException("Program runs without a scope.");
     }
 }
+
+Environment Environment::createChildEnvironment() {
+    Environment childEnv(*this);
+    childEnv.pushNewScope();
+    return childEnv;
+}
