@@ -1,7 +1,7 @@
 #ifndef SEMANTICS_IF_HPP
 #define SEMANTICS_IF_HPP
 
-#include "ASTNode.hpp"
+#include "semantics/ASTNode.hpp"
 
 namespace semantics {
 

@@ -7,24 +7,17 @@ namespace core {
 
 class None : public Object {
 private:
-    static std::shared_ptr<None> none_;
-public:
     None() = default;
+    friend std::shared_ptr<None> std::make_shared<None>();
 
-    virtual std::string _str_() override {
-        return "None";
-    }
+public:
+    std::shared_ptr<Object> _str_() override;
+    operator bool() const override;
+    std::shared_ptr<Object> _bool_() override;
 
-    std::string _type_() override {
-        return "None";
-    }
+    std::string _type_() override;
 
-    static std::shared_ptr<None> none() {
-        if (none_ == nullptr) {
-            none_ = std::make_shared<None>(None());
-        }
-        return none_;
-    }
+    static std::shared_ptr<None> getNone();
 
     virtual ~None() = default;
 };

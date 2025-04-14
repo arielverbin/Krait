@@ -2,9 +2,9 @@
 #define INTERPRETER_HPP
 
 #include <vector>
-#include "../semantics/ASTNode.hpp"
-#include "../semantics/Code.hpp"
-#include "../runtime/Environment.hpp"
+#include "semantics/ASTNode.hpp"
+#include "semantics/flow_semantics/Code.hpp"
+#include "runtime/Environment.hpp"
 
 namespace interpreter {
 class Interpreter {

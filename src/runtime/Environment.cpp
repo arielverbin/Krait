@@ -1,5 +1,6 @@
-#include "Environment.hpp"
 #include <iostream>
+#include "Environment.hpp"
+#include "exceptions/exceptions.hpp"
 using namespace runtime;
 
 std::shared_ptr<Scope> Environment::pushNewScope() {
@@ -31,6 +32,6 @@ void Environment::setVariable(std::string varName, std::shared_ptr<core::Object>
         // Variable does not exists, create a new one inside the top scope.
         scopeStack_.back()->map[varName] = value;
     } else {
-        throw std::runtime_error("[EXCEPTION] Program runs without scope.");
+        throw except::RuntimeException("Program runs without scope.");
     }
 }

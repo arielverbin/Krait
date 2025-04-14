@@ -1,5 +1,5 @@
 #include "Const.hpp"
-#include "../utils/utils.hpp"
+#include "utils/utils.hpp"
 using namespace semantics;
 
 Const::Const(std::shared_ptr<core::Object> obj) : obj_(obj) {}
