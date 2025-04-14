@@ -17,6 +17,7 @@
 #include "semantics/flow_semantics/If.hpp"
 #include "semantics/flow_semantics/While.hpp"
 #include "semantics/flow_semantics/Pass.hpp"
+#include "semantics/signal_semantics/Return.hpp"
 
 #include "interpreter/Interpreter.hpp"
 #include "runtime/Environment.hpp"
@@ -37,7 +38,7 @@ int main() {
             CODE(
                 ASSIGNVAR("result", ADD(VAR("arg1"), VAR("arg2"))),
                 ASSIGNVAR("final", ADD(VAR("result"), VAR("limit"))),
-                PRINT(ADD(STR("final is "), VAR("final")))
+                RETURN(VAR("final"))
             )
         ),
 
@@ -53,7 +54,7 @@ int main() {
                     PASS()
                 ),
                 
-                CALL(VAR("myFunction"), ARGS(VAR("currentNumber"), ADD(INT(5), INT(5)))),
+                PRINT(ADD(STR("RES="), CALL(VAR("myFunction"), ARGS(VAR("currentNumber"), ADD(INT(5), INT(5)))))),
 
                 // reachedEnd = (currentNumber == limit - 1)
                 ASSIGNVAR("reachedEnd", EQ(VAR("currentNumber"), SUB(VAR("limit"), INT(1)))),
