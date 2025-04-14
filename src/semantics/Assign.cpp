@@ -10,6 +10,6 @@ std::shared_ptr<core::Object> Assign::evaluate(runtime::Environment& state) {
     std::shared_ptr<core::Object> source = source_->evaluate(state);
     target_->assign(state, source);
 
-    // Assignment return the assigned value as a return value.
+    // Assignment returns the assigned value as a return value.
     return source;
 }

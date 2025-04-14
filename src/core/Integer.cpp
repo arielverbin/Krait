@@ -20,7 +20,6 @@ std::shared_ptr<Object> Integer::_add_(Object& another) {
                 "does not support addition with type '" + another._type_() +"'.");
 }
 
-
 std::shared_ptr<Object> Integer::_sub_(Object& another) {
     if (Integer* i = dynamic_cast<Integer*>(&another)) {
         return std::make_shared<Integer>(value_ - i->value_);

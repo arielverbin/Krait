@@ -32,6 +32,6 @@ void Environment::setVariable(std::string varName, std::shared_ptr<core::Object>
         // Variable does not exists, create a new one inside the top scope.
         scopeStack_.back()->map[varName] = value;
     } else {
-        throw except::RuntimeException("Program runs without scope.");
+        throw except::RuntimeException("Program runs without a scope.");
     }
 }
