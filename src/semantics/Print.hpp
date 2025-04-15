@@ -8,7 +8,7 @@ class Print : public ASTNode {
 public:
     Print(std::shared_ptr<ASTNode> expression);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Print() = default;
 

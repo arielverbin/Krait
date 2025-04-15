@@ -9,7 +9,7 @@
 namespace semantics {
 class ASTNode {
 public:
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) = 0;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const = 0;
 
     virtual ~ASTNode() = default;
 };

@@ -21,7 +21,7 @@ class BinaryOp : public ASTNode {
 public:
     BinaryOp(BinaryOpType type, std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~BinaryOp() = default;
 private:

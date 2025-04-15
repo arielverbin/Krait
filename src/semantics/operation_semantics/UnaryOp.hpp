@@ -15,11 +15,11 @@ class UnaryOp : public ASTNode {
 public:
     UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~UnaryOp() = default;
 private:
-UnaryOpType type_;
+    UnaryOpType type_;
     std::shared_ptr<ASTNode> exp_;
 
     static std::map<UnaryOpType, std::string> functionTypeMap_;

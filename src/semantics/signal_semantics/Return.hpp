@@ -9,7 +9,7 @@ class Return : public ASTNode {
 public:
     Return(std::shared_ptr<ASTNode> returnValue);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Return() = default;
 

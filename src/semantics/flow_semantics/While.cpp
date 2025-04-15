@@ -5,10 +5,10 @@
 using namespace semantics;
 
 While::While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block)
-    : condition_(cond), block_(block) {}
+    : condition_(std::move(cond)), block_(std::move(block)) {}
 
 
-std::shared_ptr<core::Object> While::evaluate(runtime::Environment& state) {
+std::shared_ptr<core::Object> While::evaluate(runtime::Environment& state) const {
     while (*condition_->evaluate(state)->_bool_()) {
         try {
             block_->evaluate(state);

@@ -9,9 +9,9 @@ std::map<UnaryOpType, std::string> UnaryOp::functionTypeMap_ = {
 };
 
 UnaryOp::UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp)
-    : type_(type), exp_(exp) {}
+    : type_(type), exp_(std::move(exp)) {}
 
-std::shared_ptr<core::Object> UnaryOp::evaluate(runtime::Environment& state) {
+std::shared_ptr<core::Object> UnaryOp::evaluate(runtime::Environment& state) const {
     std::shared_ptr<core::Object> firstValue = exp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.

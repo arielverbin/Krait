@@ -59,6 +59,21 @@ public:
         : RuntimeException("Not Implemented: " + msg) {}
 };
 
+class LexicalError : public KraitException {
+public:
+    explicit LexicalError(const std::string& msg, size_t line, size_t column)
+        : KraitException("Lexical Error at line " + std::to_string(line) +
+                         ", column " + std::to_string(column) + ": " + msg) {}
+};
+
+class SyntaxError : public KraitException {
+public:
+    explicit SyntaxError(const std::string& msg, size_t line, size_t column)
+        : KraitException("Syntax Error at line " + std::to_string(line) +
+                         ", column " + std::to_string(column) + ": " + msg) {}
+};
+
+
 } // namespace except
 
 #endif // KRAIT_EXCEPTIONS_HPP

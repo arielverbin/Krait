@@ -9,9 +9,10 @@ class Code : public ASTNode {
 public:
     std::vector<std::shared_ptr<ASTNode>> statements;
 
+    Code() = default;
     Code(std::vector<std::shared_ptr<ASTNode>> stmts);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Code() = default;
 };

@@ -8,7 +8,7 @@ namespace semantics {
 class Continue : public ASTNode {
 public:
     Continue() = default;
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Continue() = default;
 };

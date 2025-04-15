@@ -7,7 +7,7 @@ namespace semantics {
 
 class Pass : public ASTNode {
 public:
-    std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Pass() = default;
 };

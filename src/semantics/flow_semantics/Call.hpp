@@ -9,7 +9,7 @@ class Call : public ASTNode {
 public:
     Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Call() = default;
 

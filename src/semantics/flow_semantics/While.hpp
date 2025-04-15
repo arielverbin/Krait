@@ -9,7 +9,7 @@ class While : public ASTNode {
 public:
     While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~While() = default;
 
