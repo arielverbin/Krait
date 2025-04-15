@@ -28,36 +28,47 @@ int main() {
     streamTokens(lex);
     std::cout << "=================== Test Commands 2 ===================" << std::endl;
     lexer::Lexer lex2(
-R"(def myFunc():
-    print("hello")
-    if True:
-        print("inner")
-        continue
-    else:
-        print("else")
-        break
-        def hello():
-            print("hello")
-
-myFunc()
-print("done"))"
-);
+        "def myFunc():\n"
+            "    print(\"hello\")\n"
+            "        if True:\n"
+            "            print(\"inner\")\n"
+            "            continue\n"
+            "        else:\n"
+            "            print(\"else\")\n"
+            "            break\n\n"
+            "            def hello():\n"
+            "                print(\"hello\")\n"
+            "    func(1, 2\n"
+            "              , 3)\n"
+            "\n"
+            "\n"
+            "myFunc()\n"
+            "print(\"done\")\n"
+    );
         
     streamTokens(lex2);
 
     std::cout << "=================== Test Commands 3 ===================" << std::endl;
     lexer::Lexer lex3(
-R"(while i <= 10:
-    if (i * 2) + 5 / 2 == 8 - 1:
-        print(i)
-    else: 
-        print("odd")
-        i = i +   1
+        " print(\n"
+        "    \"hello\"\n"
+        "       'world'\n"
+        " )\n"
+        "if True:\n"
+        "    print(arg1, arg2\n"
+        " ,arg3)\n"
+        "print(1, 2, 3)\n"
 
-print("done")
-)");
+    );
         
     streamTokens(lex3);
 
+    std::cout << "=================== Test Commands 4 ===================" << std::endl;
+    lexer::Lexer lex4(
+        "print(\"hello this is a very long string\"\n"
+		"   \" this is more of this string\")"
+    );
+        
+    streamTokens(lex4);
     return 0;
 }

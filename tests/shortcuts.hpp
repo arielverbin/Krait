@@ -84,8 +84,8 @@ std::string tokenTypeToString(lexer::TokenType type) {
 void streamTokens(lexer::Lexer& lex) {
     while (true) {
         lexer::Token t = lex.next();
-        std::cout << "Token(" << tokenTypeToString(t.type).c_str() << ": " << t.value << ")\n";
-        if (t.type == lexer::TokenType::END_OF_FILE) {
+        std::cout << "Token(" << tokenTypeToString(t.type()).c_str() << ": " << t.value() << ")\n";
+        if (t.type() == lexer::TokenType::END_OF_FILE) {
             break;
         }
     }

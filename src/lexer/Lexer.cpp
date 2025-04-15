@@ -21,25 +21,6 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords_ = {
     {"None", TokenType::NONE},
 };
 
-const std::unordered_map<char, Lexer::TokenHandler> Lexer::tokenHandlers_ = {
-    {'\n', [](Lexer& l) { return l.handleNewlineAndIndent(); }},
-    {'(', [](Lexer& l) { return l.makeToken(TokenType::LPAREN, "("); }},
-    {')', [](Lexer& l) { return l.makeToken(TokenType::RPAREN, ")"); }},
-    {'+', [](Lexer& l) { return l.makeToken(TokenType::PLUS, "+"); }},
-    {'-', [](Lexer& l) { return l.makeToken(TokenType::MINUS, "-"); }},
-    {'*', [](Lexer& l) { return l.makeToken(TokenType::STAR, "*"); }},
-    {'/', [](Lexer& l) { return l.makeToken(TokenType::SLASH, "/"); }},
-    {':', [](Lexer& l) { return l.makeToken(TokenType::COLON, ":"); }},
-    {'=', [](Lexer& l) { return l.match('=') ? l.makeToken(TokenType::EQ, "==") : l.makeToken(TokenType::ASSIGN, "="); }},
-    {'!', [](Lexer& l) { return l.match('=') ? l.makeToken(TokenType::NEQ, "!=") : l.makeToken(TokenType::END_OF_FILE, "!"); }},
-    {'<', [](Lexer& l) { return l.match('=') ? l.makeToken(TokenType::LTE, "<=") : l.makeToken(TokenType::LT, "<"); }},
-    {'>', [](Lexer& l) { return l.match('=') ? l.makeToken(TokenType::GTE, ">=") : l.makeToken(TokenType::GT, ">"); }},
-    {'"', [](Lexer& l) { return l.string(); }},
-    {'\'', [](Lexer& l) { return l.string(); }},
-    {',', [](Lexer& l) { return l.makeToken(TokenType::COMMA, ","); }},
-    {'.', [](Lexer& l) { return l.makeToken(TokenType::DOT, "."); }},
-};
-
 Lexer::Lexer(const std::string& source) : source_(source) {}
 
 
@@ -48,37 +29,66 @@ Token Lexer::peek() {
 }
 
 Token Lexer::next() {
-    if (!m_bufferedTokens.empty()) {
-        Token t = m_bufferedTokens.back();
-        m_bufferedTokens.pop_back();
+    if (!pendingTokens_.empty()) {
+        Token t = pendingTokens_.back();
+        pendingTokens_.pop_back();
         return t;
     }
 
-    skipWhitespace();
+    // ignore newlines if we are inside parentheses
+    skipWhitespace(groupingLevel_ != 0);
 
     if (isAtEnd()) {
-        return makeToken(TokenType::END_OF_FILE, "");
+        return Token(TokenType::END_OF_FILE, "", lexerPosition_);
     }
 
     char c = nextChar();
 
-    auto it = tokenHandlers_.find(c);
-    if (it != tokenHandlers_.end()) {
-        return it->second(*this);
-    }
-
     if (std::isdigit(c)) {
-        lexerPosition_.prevChar();
+        lexerPosition_.backwards();
         return number();
     }
 
     if (std::isalpha(c) || c == '_') {
-        lexerPosition_.prevChar();
+        lexerPosition_.backwards();
         return identifier();
     }
 
-    throw except::LexicalError("Unexpected character (" + std::string(1, c) + ")",
-        lexerPosition_.line, lexerPosition_.column);
+    if (c == '\'' || c == '"') {
+        return string();
+    }
+
+    return handleOperatorOrPunct(c);
+}
+
+Token Lexer::handleOperatorOrPunct(char c) {
+    LexerPosition& pos = lexerPosition_;
+    switch (c) {
+        case '+': return Token(TokenType::PLUS, "+", pos);
+        case '-': return Token(TokenType::MINUS, "-", pos);
+        case '*': return Token(TokenType::STAR, "*", pos);
+        case '/': return Token(TokenType::SLASH, "/", pos);
+
+        case '(': groupingLevel_++; return Token(TokenType::LPAREN, "(", pos);
+        case ')': groupingLevel_--; return Token(TokenType::RPAREN, ")", pos);
+        case ':': return Token(TokenType::COLON, ":", pos);
+
+        case '=': return match('=') ? Token(TokenType::EQ, "==", pos) : Token(TokenType::ASSIGN, "=", pos);
+        case '!': return match('=') ? Token(TokenType::NEQ, "!=", pos) : Token(TokenType::NOT, "!", pos);
+        case '<': return match('=') ? Token(TokenType::LTE, "<=", pos) : Token(TokenType::LT, "<", pos);
+        case '>': return match('=') ? Token(TokenType::GTE, ">=", pos) : Token(TokenType::GT, ">", pos);
+
+        case ',': return Token(TokenType::COMMA, ",", pos);
+        case '.': return Token(TokenType::DOT, ".", pos);
+
+        case '"': return string();
+        case '\'': return string();
+
+        case '\n': return handleNewlineAndIndent();
+        default: 
+            throw except::LexicalError("Unexpected character (" + std::string(1, c) + ")",
+                lexerPosition_.line, lexerPosition_.column);
+    }
 }
 
 
@@ -93,21 +103,21 @@ char Lexer::peekChar() const {
 char Lexer::nextChar() {
     if (isAtEnd()) return '\0';
     char c = source_[lexerPosition_.position];
-    lexerPosition_.nextChar(c);
+    lexerPosition_.forwards(c);
     return c;
 }
 
 bool Lexer::match(char expected) {
     if (isAtEnd()) return false;
     if (source_[lexerPosition_.position] != expected) return false;
-    lexerPosition_.nextChar(expected);
+    lexerPosition_.forwards(expected);
     return true;
 }
 
-void Lexer::skipWhitespace() {
+void Lexer::skipWhitespace(bool skipNewLine) {
     while (!isAtEnd()) {
         char c = peekChar();
-        if (c == ' ' || c == '\t' || c == '\r') {
+        if (c == ' ' || c == '\t' || c == '\r' || (skipNewLine && c == '\n')) {
             nextChar();
         } else {
             break;
@@ -134,22 +144,18 @@ Token Lexer::handleNewlineAndIndent() {
             lexerPosition_.line, lexerPosition_.column);
     }
 
-    if (indent > m_indentStack.back()) {
-        m_indentStack.push_back(indent);
-        m_bufferedTokens.push_back(makeToken(TokenType::INDENT, ""));
+    
+    if (indent > indentStack_.back()) {
+        indentStack_.push_back(indent);
+        pendingTokens_.push_back(Token(TokenType::INDENT, "", lexerPosition_));
     } else {
-        while (indent < m_indentStack.back()) {
-            m_indentStack.pop_back();
-            m_bufferedTokens.push_back(makeToken(TokenType::DEDENT, ""));
+        while (indent < indentStack_.back()) {
+            indentStack_.pop_back();
+            pendingTokens_.push_back(Token(TokenType::DEDENT, "", lexerPosition_));
         }
     }
 
-    return makeToken(TokenType::NEWLINE, "\\n");
-}
-
-
-Token Lexer::makeToken(TokenType type, const std::string& value) {
-    return Token{type, value, lexerPosition_.line, lexerPosition_.column};
+    return Token(TokenType::NEWLINE, "\\n", lexerPosition_);
 }
 
 Token Lexer::identifier() {
@@ -160,25 +166,48 @@ Token Lexer::identifier() {
     // try to resolve it as a keyword
     auto it = keywords_.find(text);
     if (it != keywords_.end()) {
-        return makeToken(it->second, text);
+        return Token(it->second, text, lexerPosition_);
     }
     // fallback - its a normal identifier
-    return makeToken(TokenType::IDENTIFIER, text);
+    return Token(TokenType::IDENTIFIER, text, lexerPosition_);
 }
 
 Token Lexer::number() {
     size_t start = lexerPosition_.position;
     while (std::isdigit(peekChar())) nextChar();
     std::string digits = source_.substr(start, lexerPosition_.position - start);
-    return makeToken(TokenType::INT, digits);
+    return Token(TokenType::INT, digits, lexerPosition_);
 }
 
 Token Lexer::string() {
-    char quote = source_[lexerPosition_.position - 1];  // ' or "
+    char quote = source_[lexerPosition_.position - 1];  // opening quote
     std::string result;
-    while (!isAtEnd() && peekChar() != quote) {
+    size_t startingLine = lexerPosition_.line;
+
+    while (true) {
+        if (isAtEnd()) {
+            throw except::LexicalError("Unterminated string literal", startingLine, lexerPosition_.column);
+        }
+
         char c = nextChar();
-        if (c == '\\') {  // Handle escape characters
+
+        if (c == '\n') {
+            throw except::LexicalError("Unterminated string literal before newline", startingLine, lexerPosition_.column);
+        }
+
+        if (c == quote) {
+            // Check if there's another string following
+            skipWhitespace(true);
+            if (!isAtEnd() && (peekChar() == '"' || peekChar() == '\'')) {
+                // Start new string continuation
+                quote = nextChar(); // consume opening quote
+                continue;
+            } else {
+                break; // string ended normally
+            }
+        }
+
+        if (c == '\\') {
             char next = nextChar();
             switch (next) {
                 case 'n': result += '\n'; break;
@@ -193,7 +222,7 @@ Token Lexer::string() {
         }
     }
 
-    if (!isAtEnd()) nextChar();  // consume closing quote
-    return makeToken(TokenType::STRING, result);
+    return Token(TokenType::STRING, result, lexerPosition_);
 }
+
 

@@ -90,7 +90,7 @@ std::vector<std::shared_ptr<ASTNode>> testCommands2 = {
     ),
 
     ASSIGNVAR("sumWith3", CALL(VAR("getSummer"), ARGS(INT(3)))),
-
+    PRINT(VAR("sumWith3")),
     PRINT(ADD(STR("sumWith3(5) = "), CALL(VAR("sumWith3"), ARGS(INT(5))))),
     PRINT(ADD(STR("sumWith3(10) = "), CALL(VAR("sumWith3"), ARGS(INT(10))))),
 
