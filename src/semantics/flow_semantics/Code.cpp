@@ -2,9 +2,9 @@
 #include "core/None.hpp"
 using namespace semantics;
 
-Code::Code(std::vector<std::unique_ptr<ASTNode>> stmts) : statements(std::move(stmts)) {}
+Code::Code(std::vector<std::shared_ptr<ASTNode>> stmts) : statements(std::move(stmts)) {}
 
-std::shared_ptr<core::Object> Code::evaluate(runtime::Environment& state) {
+std::shared_ptr<core::Object> Code::evaluate(runtime::Environment& state) const {
     for (auto& stmt : statements) {
         stmt->evaluate(state);
     }

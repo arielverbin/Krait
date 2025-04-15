@@ -7,15 +7,15 @@
 namespace semantics {
 class Call : public ASTNode {
 public:
-    Call(std::unique_ptr<ASTNode> callee, std::vector<std::unique_ptr<ASTNode>> args);
+    Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Call() = default;
 
 private:
-    std::unique_ptr<ASTNode> callee_;
-    std::vector<std::unique_ptr<ASTNode>> args_;
+    std::shared_ptr<ASTNode> callee_;
+    std::vector<std::shared_ptr<ASTNode>> args_;
 };
 
 }  // namespace semantics

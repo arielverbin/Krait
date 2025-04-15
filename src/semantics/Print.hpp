@@ -6,14 +6,14 @@
 namespace semantics {
 class Print : public ASTNode {
 public:
-    Print(std::unique_ptr<ASTNode> expression);
+    Print(std::shared_ptr<ASTNode> expression);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Print() = default;
 
 private:
-    std::unique_ptr<ASTNode> expression_;
+    std::shared_ptr<ASTNode> expression_;
 };
 
 } // namespace semantics

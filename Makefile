@@ -6,16 +6,14 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests
 SRC_DIR := src
 BUILD_DIR := build
 BIN := $(BUILD_DIR)/krait
-TEST_DIR := tests
 MAIN_SRC := Main.cpp        # Main program entry point
-TEST_SRC := $(TEST_DIR)/test.cpp  # Test program entry point
+TEST_DIR := tests
+TEST_MODULES := interpreter parser
+TEST_EXECUTABLES := $(foreach mod,$(TEST_MODULES),$(BUILD_DIR)/test_$(mod))
 
-# Find all .cpp source files recursively in src/
+# Find all .cpp source files recursively in src/ (excluding Main.cpp)
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp' ! -name 'Main.cpp')
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-
-# Find all .cpp test files recursively in tests/
-TEST_OBJS := $(BUILD_DIR)/test.o
 
 # Default target
 all: $(BIN)
@@ -35,37 +33,40 @@ $(BUILD_DIR)/Main.o: $(MAIN_SRC)
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Link the test program
-tests: $(OBJS) $(TEST_OBJS)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $^ -o $(BUILD_DIR)/test_program
+# === TESTS ===
+# Run all tests
+test: $(TEST_EXECUTABLES)
+	@for t in $(TEST_EXECUTABLES); do \
+		echo "Running $$t"; \
+		$$t || exit 1; \
+	done
 
-# Compile test.cpp into an object file
-$(BUILD_DIR)/test.o: $(TEST_SRC)
+# Pattern rule to build each test module executable
+$(BUILD_DIR)/test_%: $(OBJS) $(TEST_DIR)/%/tests.cpp
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-# Clean build files (both main and test)
+# Run a specific test module
+run_test_%: $(BUILD_DIR)/test_%
+	./$(BUILD_DIR)/test_$*
+
+
+# === CLEANING ===
+
+# Remove everything
 clean:
 	rm -rf $(BUILD_DIR)
 
-# Clean only main program build files
+# Remove only output of `run`
 clean_run:
-	rm -rf $(BUILD_DIR)/Main.o $(BUILD_DIR)/$(notdir $(BIN)) $(BUILD_DIR)/Main.d
+	rm -f $(BUILD_DIR)/Main.o $(BIN)
 
-# Clean only test program build files
-clean_test:
-	rm -rf $(BUILD_DIR)/test.o $(BUILD_DIR)/test_program $(BUILD_DIR)/test.d
-
-# Run the compiled main program
+# Run the main program
 run: $(BIN)
 	./$(BIN)
 
-# Run the compiled test program
-test: tests
-	./$(BUILD_DIR)/test_program
+.PHONY: all clean clean_run run test tests $(addprefix test_, $(TEST_MODULES))
+.PHONY: run_test_%
 
-.PHONY: all clean clean_run clean_test run test
-
-# Include automatically generated dependency files
--include $(OBJS:.o=.d) $(TEST_OBJS:.o=.d)
+# Include auto-generated dependency files
+-include $(OBJS:.o=.d)

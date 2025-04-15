@@ -7,9 +7,9 @@
 
 using namespace semantics;
 
-Print::Print(std::unique_ptr<ASTNode> expression): expression_(std::move(expression)) {}
+Print::Print(std::shared_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
-std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) {
+std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) const {
     std::shared_ptr<core::Object> string = expression_->evaluate(state)->_str_();
 
     if (std::shared_ptr<core::String> s = std::dynamic_pointer_cast<core::String>(string)) {

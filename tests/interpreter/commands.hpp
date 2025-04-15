@@ -24,12 +24,12 @@
 
 #include <vector>
 
-#include "shortcuts.hpp"
+#include "utils.hpp"
 
 using namespace semantics;
 using namespace core;
 
-std::vector<std::shared_ptr<ASTNode>> testCommands1 = {
+std::vector<std::shared_ptr<ASTNode>> normalFlow = {
     ASSIGNVAR("currentNumber", INT(0)),
     ASSIGNVAR("limit", INT(10)),
     ASSIGNVAR("reachedEnd", BOOL(false)),
@@ -72,7 +72,7 @@ std::vector<std::shared_ptr<ASTNode>> testCommands1 = {
     )
 };
 
-std::vector<std::shared_ptr<ASTNode>> testCommands2 = {
+std::vector<std::shared_ptr<ASTNode>> functionClosures = {
     ASSIGNVAR("numCalls", INT(0)),
     
     FUNC("getSummer", STRARR("value"), 
@@ -90,7 +90,6 @@ std::vector<std::shared_ptr<ASTNode>> testCommands2 = {
     ),
 
     ASSIGNVAR("sumWith3", CALL(VAR("getSummer"), ARGS(INT(3)))),
-    PRINT(VAR("sumWith3")),
     PRINT(ADD(STR("sumWith3(5) = "), CALL(VAR("sumWith3"), ARGS(INT(5))))),
     PRINT(ADD(STR("sumWith3(10) = "), CALL(VAR("sumWith3"), ARGS(INT(10))))),
 

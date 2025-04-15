@@ -7,14 +7,14 @@ namespace semantics {
 
 class Return : public ASTNode {
 public:
-    Return(std::unique_ptr<ASTNode> returnValue);
+    Return(std::shared_ptr<ASTNode> returnValue);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~Return() = default;
 
 private:
-    std::unique_ptr<ASTNode> returnValue_;
+    std::shared_ptr<ASTNode> returnValue_;
 };
 
 } // namespace semantics

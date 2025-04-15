@@ -7,16 +7,16 @@ namespace semantics {
 
 class If : public ASTNode {
 public:
-    If(std::unique_ptr<ASTNode> cond, std::unique_ptr<ASTNode> trueBlock, std::unique_ptr<ASTNode> falseBlock);
+    If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::shared_ptr<ASTNode> falseBlock);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
+    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     virtual ~If() = default;
 
 private:
-    std::unique_ptr<ASTNode> condition_;
-    std::unique_ptr<ASTNode> trueBlock_;
-    std::unique_ptr<ASTNode> falseBlock_;
+    std::shared_ptr<ASTNode> condition_;
+    std::shared_ptr<ASTNode> trueBlock_;
+    std::shared_ptr<ASTNode> falseBlock_;
 };
 }
 
