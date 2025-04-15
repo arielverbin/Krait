@@ -41,6 +41,7 @@ public:
     virtual std::shared_ptr<Object> _sub_(Object& another);
     virtual std::shared_ptr<Object> _mult_(Object& another);
     virtual std::shared_ptr<Object> _div_(Object& another);
+    virtual std::shared_ptr<Object> _mod_(Object& another);
     virtual std::shared_ptr<Object> _neg_();
 
     virtual std::shared_ptr<Object> _bool_();

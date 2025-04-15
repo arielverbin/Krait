@@ -6,6 +6,7 @@ std::map<BinaryOpType, std::string> BinaryOp::functionTypeMap_ = {
     { BinaryOpType::Sub,  "_sub_"  },
     { BinaryOpType::Mult, "_mult_" },
     { BinaryOpType::Div,  "_div_"  },
+    { BinaryOpType::Mod,  "_mod_" },
     { BinaryOpType::GreaterEqual, "_ge_" },
     { BinaryOpType::LesserEqual, "_le_" },
     { BinaryOpType::Equal, "_eq_" },

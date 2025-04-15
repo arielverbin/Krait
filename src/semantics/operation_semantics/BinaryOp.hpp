@@ -10,6 +10,7 @@ enum BinaryOpType {
     Sub,
     Mult,
     Div,
+    Mod,
     GreaterEqual,
     LesserEqual,
     Equal,

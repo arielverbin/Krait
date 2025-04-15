@@ -86,6 +86,13 @@ std::shared_ptr<Object> Object::_div_(Object& another) {
         " does not support division.");
 }
 
+std::shared_ptr<Object> Object::_mod_(Object& another) {
+    UNREFERENCED(another);
+
+    throw except::NotImplementedException("Object of type " + this->_type_() +
+        " does not support modulo.");
+}
+
 std::shared_ptr<Object> Object::_neg_() {
     throw except::NotImplementedException("Object of type " + this->_type_() +
         " does not support negation.");

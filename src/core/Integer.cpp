@@ -51,6 +51,19 @@ std::shared_ptr<Object> Integer::_div_(Object& another) {
                 "does not support division with type '" + another._type_() +"'.");
 }
 
+std::shared_ptr<Object> Integer::_mod_(Object& another) {
+    if (Integer* i = dynamic_cast<Integer*>(&another)) {
+        if (i->value_ != 0) {
+            return std::make_shared<Integer>(value_ % i->value_);
+        }
+
+        throw std::runtime_error("[EXCEPTION] Division by zero.");
+    }
+
+    throw except::InvalidArgumentException("Type '" + this->_type_() + "' "
+                "does not support modulo with type '" + another._type_() +"'.");
+}
+
 std::shared_ptr<Object> Integer::_neg_() {
     return std::make_shared<Integer>(-value_);
 }
