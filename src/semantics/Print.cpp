@@ -7,7 +7,7 @@
 
 using namespace semantics;
 
-Print::Print(std::shared_ptr<ASTNode> expression): expression_(expression) {}
+Print::Print(std::unique_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
 std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) {
     std::shared_ptr<core::Object> string = expression_->evaluate(state)->_str_();

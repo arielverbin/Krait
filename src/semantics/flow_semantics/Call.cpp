@@ -3,7 +3,7 @@
 #include "core/None.hpp"
 using namespace semantics;
 
-Call::Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args)
+Call::Call(std::unique_ptr<ASTNode> callee, std::vector<std::unique_ptr<ASTNode>> args)
     : callee_(std::move(callee)), args_(std::move(args)) {}
 
 std::shared_ptr<core::Object> Call::evaluate(runtime::Environment& state) {

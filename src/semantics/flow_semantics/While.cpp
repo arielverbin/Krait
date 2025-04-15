@@ -4,8 +4,8 @@
 #include "semantics/signal_semantics/Signal.hpp"
 using namespace semantics;
 
-While::While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block)
-    : condition_(cond), block_(block) {}
+While::While(std::unique_ptr<ASTNode> cond, std::unique_ptr<ASTNode> block)
+    : condition_(std::move(cond)), block_(std::move(block)) {}
 
 
 std::shared_ptr<core::Object> While::evaluate(runtime::Environment& state) {

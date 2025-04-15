@@ -13,14 +13,14 @@ enum UnaryOpType {
 
 class UnaryOp : public ASTNode {
 public:
-    UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp);
+    UnaryOp(UnaryOpType type, std::unique_ptr<ASTNode> exp);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~UnaryOp() = default;
 private:
-UnaryOpType type_;
-    std::shared_ptr<ASTNode> exp_;
+    UnaryOpType type_;
+    std::unique_ptr<ASTNode> exp_;
 
     static std::map<UnaryOpType, std::string> functionTypeMap_;
 };

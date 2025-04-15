@@ -3,8 +3,8 @@
 #include "core/None.hpp"
 using namespace semantics;
 
-If::If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::shared_ptr<ASTNode> falseBlock)
-    : condition_(cond), trueBlock_(trueBlock), falseBlock_(falseBlock) {}
+If::If(std::unique_ptr<ASTNode> cond, std::unique_ptr<ASTNode> trueBlock, std::unique_ptr<ASTNode> falseBlock)
+    : condition_(std::move(cond)), trueBlock_(std::move(trueBlock)), falseBlock_(std::move(falseBlock)) {}
 
 
 std::shared_ptr<core::Object> If::evaluate(runtime::Environment& state) {

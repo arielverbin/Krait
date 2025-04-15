@@ -8,15 +8,15 @@ namespace semantics {
 
 class Assign : public ASTNode {
 public:
-    Assign(std::shared_ptr<AssignableASTNode> target, std::shared_ptr<ASTNode> source);
+    Assign(std::unique_ptr<AssignableASTNode> target, std::unique_ptr<ASTNode> source);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~Assign() = default;
 
 private:
-    std::shared_ptr<AssignableASTNode> target_;
-    std::shared_ptr<ASTNode> source_;
+    std::unique_ptr<AssignableASTNode> target_;
+    std::unique_ptr<ASTNode> source_;
 };
 
 } // namespace semantics

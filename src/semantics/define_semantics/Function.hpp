@@ -8,7 +8,7 @@ namespace semantics {
 
 class Function : public ASTNode {
 public:
-    Function(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code);
+    Function(std::string funcName, std::vector<std::string> params, std::unique_ptr<ASTNode> code);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
@@ -17,7 +17,7 @@ public:
 private:
     std::string funcName_;
     std::vector<std::string> params_;
-    std::shared_ptr<ASTNode> code_;
+    std::unique_ptr<ASTNode> code_;
 };
 
 } // namespace semantics

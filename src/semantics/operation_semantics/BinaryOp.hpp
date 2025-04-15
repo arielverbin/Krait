@@ -19,15 +19,15 @@ enum BinaryOpType {
 
 class BinaryOp : public ASTNode {
 public:
-    BinaryOp(BinaryOpType type, std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp);
+    BinaryOp(BinaryOpType type, std::unique_ptr<ASTNode> firstExp, std::unique_ptr<ASTNode> secExp);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~BinaryOp() = default;
 private:
     BinaryOpType type_;
-    std::shared_ptr<ASTNode> firstExp_;
-    std::shared_ptr<ASTNode> secExp_;
+    std::unique_ptr<ASTNode> firstExp_;
+    std::unique_ptr<ASTNode> secExp_;
 
     static std::map<BinaryOpType, std::string> functionTypeMap_;
 };

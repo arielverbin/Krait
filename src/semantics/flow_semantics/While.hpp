@@ -7,15 +7,15 @@ namespace semantics {
 
 class While : public ASTNode {
 public:
-    While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block);
+    While(std::unique_ptr<ASTNode> cond, std::unique_ptr<ASTNode> block);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
     virtual ~While() = default;
 
 private:
-    std::shared_ptr<ASTNode> condition_;
-    std::shared_ptr<ASTNode> block_;
+    std::unique_ptr<ASTNode> condition_;
+    std::unique_ptr<ASTNode> block_;
 };
 }
 

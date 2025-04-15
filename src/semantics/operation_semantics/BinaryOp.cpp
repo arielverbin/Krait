@@ -13,8 +13,8 @@ std::map<BinaryOpType, std::string> BinaryOp::functionTypeMap_ = {
     { BinaryOpType::Or, "_or_" },
 };
 
-BinaryOp::BinaryOp(BinaryOpType type, std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp)
-    : type_(type), firstExp_(firstExp), secExp_(secExp) {}
+BinaryOp::BinaryOp(BinaryOpType type, std::unique_ptr<ASTNode> firstExp, std::unique_ptr<ASTNode> secExp)
+    : type_(type), firstExp_(std::move(firstExp)), secExp_(std::move(secExp)) {}
 
 std::shared_ptr<core::Object> BinaryOp::evaluate(runtime::Environment& state) {
     std::shared_ptr<core::Object> firstValue = firstExp_->evaluate(state);

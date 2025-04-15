@@ -7,9 +7,9 @@
 namespace semantics {
 class Code : public ASTNode {
 public:
-    std::vector<std::shared_ptr<ASTNode>> statements;
+    std::vector<std::unique_ptr<ASTNode>> statements;
 
-    Code(std::vector<std::shared_ptr<ASTNode>> stmts);
+    Code(std::vector<std::unique_ptr<ASTNode>> stmts);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) override;
 
