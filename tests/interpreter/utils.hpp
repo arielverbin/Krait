@@ -1,5 +1,6 @@
-#ifndef TESTS_UTILS_HPP
-#define TESTS_UTILS_HPP
+#ifdef KRAIT_TESTING
+#ifndef TESTS_INTERPRETER_UTILS_HPP
+#define TESTS_INTERPRETER_UTILS_HPP
 
 #include <vector>
 #include "semantics/ASTNode.hpp"
@@ -44,5 +45,5 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 #define BREAK()                         ms(Break)()
 #define CONTINUE()                      ms(Continue)()
 
-
-#endif // TESTS_UTILS_HPP
+#endif // TESTS_INTERPRETER_UTILS_HPP
+#endif // KRAIT_TESTING

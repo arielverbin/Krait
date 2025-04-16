@@ -12,9 +12,17 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "Assign(" + target_->stringify() + ", " + source_->stringify() + ")";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~Assign() = default;
 
+#ifndef KRAIT_TESTING
 private:
+#endif // KRAIT_TESTING
     std::shared_ptr<AssignableASTNode> target_;
     std::shared_ptr<ASTNode> source_;
 };

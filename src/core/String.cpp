@@ -41,9 +41,7 @@ std::shared_ptr<Object> String::_eq_(Object& another) {
     if (String* i = dynamic_cast<String*>(&another)) {
         return Boolean::get(value_ == i->value_);
     }
-
-    throw except::InvalidArgumentException("Type '" + this->_type_() + "' "
-                    "does not support equality comparison with type '" + another._type_() +"'.");
+    return Boolean::get(false);
 }
 
 std::shared_ptr<Object> String::_bool_() {

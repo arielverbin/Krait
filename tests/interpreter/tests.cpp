@@ -1,3 +1,5 @@
+#ifdef KRAIT_TESTING
+
 #include <iostream>
 #include <vector>
 
@@ -5,7 +7,7 @@
 #include "interpreter/Interpreter.hpp"
 #define CATCH_CONFIG_MAIN
 
-#include "../lib/catch.hpp"
+#include "tests/lib/catch.hpp"
 
 TEST_CASE("Interprets while loops and normal flow correctly") {
     // Redirect std::cout
@@ -149,4 +151,4 @@ TEST_CASE("Interprets functions without arguments correctly") {
     REQUIRE(buffer.str() == "Hello, world!\n");
 }
 
-
+#endif // KRAIT_TESTING

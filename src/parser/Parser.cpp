@@ -134,9 +134,9 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
         return std::make_shared<semantics::Const>(std::make_shared<core::String>(value));
     }
 
-    expect(lexer::TokenType::LPAREN, "Expected '(' after expression");
+    expect(lexer::TokenType::LPAREN, "Expected '(' before expression (got: " + tokens_[current_ - 1].value() + ")");
     auto expr = parseExpression();
-    expect(lexer::TokenType::RPAREN, "Expected ')' after expression");
+    expect(lexer::TokenType::RPAREN, "Expected ')' after expression (got: " + tokens_[current_ - 1].value() + ")");
     return expr;
 }
 

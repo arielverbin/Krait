@@ -1,3 +1,4 @@
+#ifdef KRAIT_TESTING
 #ifndef TESTS_COMMANDS_HPP
 #define TESTS_COMMANDS_HPP
 
@@ -348,3 +349,4 @@ std::vector<std::shared_ptr<ASTNode>> noArgFunctionTest = {
 };
 
 #endif // TESTS_COMMANDS_HPP
+#endif // KRAIT_TESTING

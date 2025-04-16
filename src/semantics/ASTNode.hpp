@@ -11,6 +11,10 @@ class ASTNode {
 public:
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const = 0;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const = 0;
+    #endif // KRAIT_TESTING
+
     virtual ~ASTNode() = default;
 };
 

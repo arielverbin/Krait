@@ -10,6 +10,12 @@ public:
     Break() = default;
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "Break()";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~Break() = default;
 };
 

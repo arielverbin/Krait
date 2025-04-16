@@ -1,5 +1,6 @@
 #include "Lexer.hpp"
 #include <cctype>
+#include <iostream>
 #include "exceptions/exceptions.hpp"
 using namespace lexer;
 
@@ -16,8 +17,8 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords_ = {
     {"and", TokenType::AND},
     {"or", TokenType::OR},
     {"not", TokenType::NOT},
-    {"True", TokenType::TRUE},
-    {"False", TokenType::FALSE},
+    {"True", TokenType::TRU},
+    {"False", TokenType::FALS},
     {"None", TokenType::NONE},
 };
 
@@ -28,19 +29,29 @@ Token Lexer::peek() {
     return next();  // for now, no lookahead
 }
 
+void Lexer::init() {
+    lexerPosition_ = LexerPosition();
+    pendingTokens_.clear();
+    indentLevel_ = 0;
+    groupingLevel_ = 0;
+
+    if(std::isspace(peekChar())) {
+        handleNewlineAndIndent();
+    }
+}
+
 Token Lexer::next() {
     if (!pendingTokens_.empty()) {
-        Token t = pendingTokens_.back();
-        pendingTokens_.pop_back();
-        return t;
+        return emitPending();
+    }
+
+    if (isAtEnd()) {
+        emitCleanups();        
+        return emitPending();
     }
 
     // ignore newlines if we are inside parentheses
     skipWhitespace(groupingLevel_ != 0);
-
-    if (isAtEnd()) {
-        return Token(TokenType::END_OF_FILE, "", lexerPosition_);
-    }
 
     char c = nextChar();
 
@@ -63,6 +74,7 @@ Token Lexer::next() {
 
 Token Lexer::handleOperatorOrPunct(char c) {
     LexerPosition& pos = lexerPosition_;
+
     switch (c) {
         case '+': return Token(TokenType::PLUS, "+", pos);
         case '-': return Token(TokenType::MINUS, "-", pos);
@@ -126,7 +138,7 @@ void Lexer::skipWhitespace(bool skipNewLine) {
 }
 
 Token Lexer::handleNewlineAndIndent() {
-    int indent = 0;
+    size_t indent = 0;
     while (!isAtEnd()) {
         char ch = peekChar();
         if (ch == ' ') { nextChar(); indent++; }
@@ -144,16 +156,18 @@ Token Lexer::handleNewlineAndIndent() {
             lexerPosition_.line, lexerPosition_.column);
     }
 
-    
-    if (indent > indentStack_.back()) {
-        indentStack_.push_back(indent);
-        pendingTokens_.push_back(Token(TokenType::INDENT, "", lexerPosition_));
+    indent = indent / 4;
+
+    if (indent > indentLevel_) {
+        for (size_t i = indentLevel_; i < indent; ++i) {
+            pendingTokens_.push_back(Token(TokenType::INDENT, "", lexerPosition_));
+        }
     } else {
-        while (indent < indentStack_.back()) {
-            indentStack_.pop_back();
+        for (size_t i = indentLevel_; i > indent; --i) {
             pendingTokens_.push_back(Token(TokenType::DEDENT, "", lexerPosition_));
         }
     }
+    indentLevel_ = indent;
 
     return Token(TokenType::NEWLINE, "\\n", lexerPosition_);
 }
@@ -196,6 +210,7 @@ Token Lexer::string() {
         }
 
         if (c == quote) {
+            LexerPosition loc = lexerPosition_;
             // Check if there's another string following
             skipWhitespace(true);
             if (!isAtEnd() && (peekChar() == '"' || peekChar() == '\'')) {
@@ -203,6 +218,8 @@ Token Lexer::string() {
                 quote = nextChar(); // consume opening quote
                 continue;
             } else {
+                // Restore previous location.
+                lexerPosition_ = loc;
                 break; // string ended normally
             }
         }
@@ -225,4 +242,30 @@ Token Lexer::string() {
     return Token(TokenType::STRING, result, lexerPosition_);
 }
 
+std::vector<Token> Lexer::tokenize(std::string source) {
+    Lexer lexer(source);
+    lexer.init();
+    std::vector<Token> tokens;
+    do {
+        tokens.push_back(lexer.next());
+    } while (tokens.back().type() != TokenType::END_OF_FILE);
+    return tokens;
+}
 
+void Lexer::emitCleanups() {
+    // For indentation
+    for (size_t i = 0; i < indentLevel_; ++i) {
+        pendingTokens_.push_back(Token(TokenType::DEDENT, "", lexerPosition_));
+    }
+
+    pendingTokens_.push_back(Token(TokenType::END_OF_FILE, "", lexerPosition_));
+}
+
+Token Lexer::emitPending() {
+    if (pendingTokens_.empty()) {
+        return Token(TokenType::END_OF_FILE, "", lexerPosition_);
+    }
+    Token t = pendingTokens_.back();
+    pendingTokens_.pop_back();
+    return t;
+}

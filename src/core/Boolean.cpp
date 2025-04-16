@@ -1,5 +1,6 @@
 #include "Boolean.hpp"
 #include "String.hpp"
+#include "exceptions/exceptions.hpp"
 using namespace core;
 
 std::shared_ptr<Boolean> Boolean::true_(new Boolean(true));
@@ -29,6 +30,13 @@ bool Boolean::_or_(Boolean& other) const {
 
 bool Boolean::_not_() const {
     return !value_;
+}
+
+std::shared_ptr<Object> Boolean::_eq_(Object& another) {
+    if (Boolean* i = dynamic_cast<Boolean*>(&another)) {
+        return Boolean::get(value_ == i->value_);
+    }
+    return Boolean::get(false);
 }
 
 std::string Boolean::_type_() {

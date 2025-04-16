@@ -98,9 +98,7 @@ std::shared_ptr<Object> Integer::_eq_(Object& another) {
     if (Integer* i = dynamic_cast<Integer*>(&another)) {
         return Boolean::get(value_ == i->value_);
     }
-
-    throw except::InvalidArgumentException("Type '" + this->_type_() + "' "
-                "does not support comparison with type '" + another._type_() +"'.");
+    return Boolean::get(false);
 }
 
 std::shared_ptr<Object> Integer::_str_() {

@@ -10,6 +10,12 @@ public:
     Continue() = default;
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "Continue()";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~Continue() = default;
 };
 
