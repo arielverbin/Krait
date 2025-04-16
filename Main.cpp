@@ -1,6 +1,8 @@
 #include <iostream>
+#include "tests/interpreter/commands.hpp"
+#include "interpreter/Interpreter.hpp"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    interpreter::Interpreter i(recursionTest);
+    i.interpret();
 }

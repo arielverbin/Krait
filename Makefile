@@ -49,10 +49,10 @@ $(BUILD_DIR)/test_%: $(OBJS) $(TEST_DIR)/%/tests.cpp
 # Run a specific test module
 run_test_%: $(BUILD_DIR)/test_%
 	./$(BUILD_DIR)/test_$*
+	rm -f $(BUILD_DIR)/test_$*
 
 
 # === CLEANING ===
-
 # Remove everything
 clean:
 	rm -rf $(BUILD_DIR)
