@@ -1,10 +1,11 @@
 #include <iostream>
 #include "Environment.hpp"
 #include "exceptions/exceptions.hpp"
+#include "core/Integer.hpp"
 using namespace runtime;
 
 std::shared_ptr<Scope> Environment::pushNewScope() {
-    scopeStack_.emplace_back(std::make_shared<Scope>());
+    scopeStack_.push_back(std::make_shared<Scope>());
     return scopeStack_.back();
 }
 
@@ -34,6 +35,14 @@ void Environment::setVariable(std::string varName, std::shared_ptr<core::Object>
     } else {
         throw except::RuntimeException("Program runs without a scope.");
     }
+}
+
+void Environment::defineVariable(std::string varName, std::shared_ptr<core::Object> value) {
+    if (scopeStack_.empty()) {
+        throw except::RuntimeException("Program runs without a scope.");
+    }
+
+    scopeStack_.back()->map[varName] = value;
 }
 
 Environment Environment::createChildEnvironment() {

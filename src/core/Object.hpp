@@ -53,9 +53,7 @@ public:
 
     virtual std::shared_ptr<Object> _att_(std::string varName);
 
-    virtual ~Object() {
-        
-    }
+    virtual ~Object() = default;
 };
 
 } // namespace core
