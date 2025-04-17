@@ -1,72 +1,115 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests
+CXXFLAGS_BASE := -std=c++17 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I.
+RUN_CXXFLAGS := $(CXXFLAGS_BASE)
+TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING
 
 # Directories
 SRC_DIR := src
-BUILD_DIR := build
-BIN := $(BUILD_DIR)/krait
-MAIN_SRC := Main.cpp        # Main program entry point
-TEST_DIR := tests
-TEST_MODULES := interpreter parser
-TEST_EXECUTABLES := $(foreach mod,$(TEST_MODULES),$(BUILD_DIR)/test_$(mod))
+RUN_BUILD_DIR := build/run
+TEST_BUILD_DIR := build/tests
+RUN_OBJ_DIR := $(RUN_BUILD_DIR)/obj
+TEST_OBJ_DIR := $(TEST_BUILD_DIR)/obj
 
-# Find all .cpp source files recursively in src/ (excluding Main.cpp)
-SRCS := $(shell find $(SRC_DIR) -name '*.cpp' ! -name 'Main.cpp')
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+# Prevent auto-deletion of object files
+.PRECIOUS: $(TEST_OBJ_DIR)/%.o
 
-# Default target
-all: $(BIN)
+# Executable output
+RUN_BIN := $(RUN_BUILD_DIR)/krait
 
-# Link the final main program
-$(BIN): $(OBJS) $(BUILD_DIR)/Main.o
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Source files for run build (all files from src)
+RUN_SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+RUN_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(RUN_OBJ_DIR)/%.o,$(RUN_SRCS))
+# The main program is in the project root
+RUN_MAIN := Main.cpp
+RUN_MAIN_OBJ := $(RUN_OBJ_DIR)/Main.o
 
-# Compile .cpp files to .o object files for source code (excluding Main.cpp)
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Source files for tests build (same src files as in run)
+TEST_SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+TEST_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(TEST_OBJ_DIR)/%.o,$(TEST_SRCS))
+
+# Discover all test modules automatically (directories under tests/)
+ALL_TEST_MODULES := $(filter-out lib, $(notdir $(wildcard tests/*)))
+ALL_TEST_BINS  := $(foreach mod,$(ALL_TEST_MODULES),$(TEST_BUILD_DIR)/test_$(mod))
+
+# Determine requested test modules (passed as extra targets besides the primary ones)
+IGNORED_GOALS := test run clean clean_run clean_test
+REQUESTED_TEST_MODULES := $(filter-out $(IGNORED_GOALS), $(MAKECMDGOALS))
+
+
+# ============================================================================
+# Build rules for tests
+# ----------------------------------------------------------------------------
+# Build object file for a given test's tests.cpp
+$(TEST_OBJ_DIR)/%_test.o: tests/%/tests.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(TEST_CXXFLAGS) -c $< -o $@
 
-# Compile Main.cpp into an object file
-$(BUILD_DIR)/Main.o: $(MAIN_SRC)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Link a test executable for a given module using the test objects (compiled from src)
+# and the test module's object (compiled from tests/<module>/tests.cpp).
+$(TEST_BUILD_DIR)/test_%: $(TEST_OBJS) $(TEST_OBJ_DIR)/%_test.o
+	@mkdir -p $(TEST_BUILD_DIR)
+	$(CXX) $(TEST_CXXFLAGS) $^ -o $@
 
-# === TESTS ===
-# Run all tests
-test: $(TEST_EXECUTABLES)
-	@for t in $(TEST_EXECUTABLES); do \
-		echo "Running $$t"; \
-		$$t || exit 1; \
-	done
+# ============================================================================
+# Build rules for run target
+# ----------------------------------------------------------------------------
+# Link the main executable from Main.cpp and the sources from src.
+$(RUN_BIN): $(RUN_OBJS) $(RUN_MAIN_OBJ)
+	@mkdir -p $(dir $@)
+	$(CXX) $(RUN_CXXFLAGS) $^ -o $@
 
-# Pattern rule to build each test module executable
-$(BUILD_DIR)/test_%: $(OBJS) $(TEST_DIR)/%/tests.cpp
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Compile .cpp files from src/ for run build
+$(RUN_OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(RUN_CXXFLAGS) -c $< -o $@
 
-# Run a specific test module
-run_test_%: $(BUILD_DIR)/test_%
-	./$(BUILD_DIR)/test_$*
+# Compile Main.cpp for run build
+$(RUN_OBJ_DIR)/Main.o: Main.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(RUN_CXXFLAGS) -c $< -o $@
 
+# Compile .cpp files from src/ for tests build
+$(TEST_OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(TEST_CXXFLAGS) -c $< -o $@
 
-# === CLEANING ===
+# ============================================================================
+# Phony Targets
+# ----------------------------------------------------------------------------
+.PHONY: run test clean clean_run clean_test
 
-# Remove everything
+# Default target for running the main program
+run: $(RUN_BIN)
+	./$(RUN_BIN)
+
+# Test target: if any modules are provided (e.g. "make test parser interpreter"),
+# depend on those test executables; otherwise build all test executables.
+test: $(if $(REQUESTED_TEST_MODULES), \
+         $(foreach mod,$(REQUESTED_TEST_MODULES),$(TEST_BUILD_DIR)/test_$(mod)), \
+         $(ALL_TEST_BINS))
+	@if [ -n "$(REQUESTED_TEST_MODULES)" ]; then \
+	  for mod in $(REQUESTED_TEST_MODULES); do \
+	     echo "Running test for module '$$mod':"; \
+	     ./$(TEST_BUILD_DIR)/test_$$mod || exit 1; \
+	  done; \
+	else \
+	  for testexe in $(ALL_TEST_BINS); do \
+	     echo "Running test '$$testexe':"; \
+	     ./$$testexe || exit 1; \
+	  done; \
+	fi
+
+# Cleaning targets
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf build
 
-# Remove only output of `run`
 clean_run:
-	rm -f $(BUILD_DIR)/Main.o $(BIN)
+	rm -rf $(RUN_BUILD_DIR)/run
 
-# Run the main program
-run: $(BIN)
-	./$(BIN)
+clean_test:
+	rm -rf $(TEST_BUILD_DIR)/tests
 
-.PHONY: all clean clean_run run test tests $(addprefix test_, $(TEST_MODULES))
-.PHONY: run_test_%
-
-# Include auto-generated dependency files
--include $(OBJS:.o=.d)
+# Prevent make from treating extra test module names as files
+%:
+	@:

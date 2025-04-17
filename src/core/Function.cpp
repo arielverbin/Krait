@@ -1,6 +1,7 @@
 #include "Function.hpp"
 #include "String.hpp"
 #include "exceptions/exceptions.hpp"
+#include <iostream>
 using namespace core;
 
 Function::Function(NativeFunc nativeFunc) 
@@ -23,7 +24,7 @@ std::shared_ptr<Object> Function::_call_(std::vector<std::shared_ptr<Object>> ar
 
     runtime::Environment evalScope = closure_.createChildEnvironment();
     for (size_t i = 0; i < params_.size(); ++i) {
-        closure_.setVariable(params_[i], args[i]);
+        evalScope.defineVariable(params_[i], args[i]);
     }
 
     return body_->evaluate(evalScope);

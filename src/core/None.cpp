@@ -20,6 +20,10 @@ std::shared_ptr<Object> None::_bool_() {
     return Boolean::get(false);
 }
 
+std::shared_ptr<Object> None::_eq_(Object& another) {
+    return dynamic_cast<None*>(&another) == nullptr ? Boolean::get(false) : Boolean::get(false);
+}
+
 std::shared_ptr<None> None::getNone() {
     static std::shared_ptr<None> none_(new None());
     return none_;

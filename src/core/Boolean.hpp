@@ -21,6 +21,7 @@ public:
     bool _and_(Boolean& other) const;
     bool _or_(Boolean& other) const;
     bool _not_() const;
+    std::shared_ptr<Object> _eq_(Object& another) override;
 
     std::string _type_() override;
     std::shared_ptr<Object> _str_() override;

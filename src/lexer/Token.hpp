@@ -11,7 +11,7 @@ enum class TokenType {
     // data types
     INT,
     STRING,
-    TRUE, FALSE,
+    TRU, FALS,
     NONE,
 
     // keywords

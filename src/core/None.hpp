@@ -14,6 +14,7 @@ public:
     std::shared_ptr<Object> _str_() override;
     operator bool() const override;
     std::shared_ptr<Object> _bool_() override;
+    std::shared_ptr<Object> _eq_(Object& another) override;
 
     std::string _type_() override;
 

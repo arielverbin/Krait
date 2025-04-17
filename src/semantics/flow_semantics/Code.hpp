@@ -14,6 +14,17 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        std::string result = "Code(";
+        for (const auto& stmt : statements) {
+            result += stmt->stringify() + ", ";
+        }
+        result += ")";
+        return result;
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~Code() = default;
 };
 

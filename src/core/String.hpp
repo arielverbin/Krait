@@ -7,9 +7,6 @@
 namespace core {
 
 class String: public Object {
-private:
-    std::string value_;
-
 public:
     String(std::string str);
 
@@ -28,6 +25,10 @@ public:
     }
 
     virtual ~String() = default;
+
+private:
+    std::string value_;
+
 };
 
 } // namespace core

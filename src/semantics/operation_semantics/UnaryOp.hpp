@@ -17,7 +17,14 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "UnaryOp(" + functionTypeMap_[type_] + ", " + exp_->stringify() + ")";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~UnaryOp() = default;
+    
 private:
     UnaryOpType type_;
     std::shared_ptr<ASTNode> exp_;

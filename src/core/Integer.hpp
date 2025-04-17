@@ -20,6 +20,7 @@ public:
     std::shared_ptr<Object> _sub_(Object& another) override;
     std::shared_ptr<Object> _mult_(Object& another) override;
     std::shared_ptr<Object> _div_(Object& another) override;
+    std::shared_ptr<Object> _mod_(Object& another) override;
     std::shared_ptr<Object> _neg_() override;
 
     std::shared_ptr<Object> _bool_() override;

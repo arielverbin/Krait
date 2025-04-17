@@ -11,6 +11,12 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "If(" + condition_->stringify() + ", " + trueBlock_->stringify() + ", " + falseBlock_->stringify() + ")";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~If() = default;
 
 private:

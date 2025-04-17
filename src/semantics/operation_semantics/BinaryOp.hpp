@@ -10,6 +10,7 @@ enum BinaryOpType {
     Sub,
     Mult,
     Div,
+    Mod,
     GreaterEqual,
     LesserEqual,
     Equal,
@@ -23,7 +24,14 @@ public:
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
+    #ifdef KRAIT_TESTING
+    virtual std::string stringify() const override {
+        return "BinaryOp(" + functionTypeMap_[type_] + ", " + firstExp_->stringify() + ", " + secExp_->stringify() + ")";
+    }
+    #endif // KRAIT_TESTING
+
     virtual ~BinaryOp() = default;
+    
 private:
     BinaryOpType type_;
     std::shared_ptr<ASTNode> firstExp_;
