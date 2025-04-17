@@ -105,10 +105,10 @@ clean:
 	rm -rf build
 
 clean_run:
-	rm -rf $(RUN_BUILD_DIR)
+	rm -rf $(RUN_BUILD_DIR)/run
 
 clean_test:
-	rm -rf $(TEST_BUILD_DIR)
+	rm -rf $(TEST_BUILD_DIR)/tests
 
 # Prevent make from treating extra test module names as files
 %:

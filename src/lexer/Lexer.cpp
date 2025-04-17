@@ -55,6 +55,11 @@ Token Lexer::next() {
 
     char c = nextChar();
 
+    if (c == '\\') {
+        handleLineSplit();
+        c = nextChar();
+    }
+
     if (std::isdigit(c)) {
         lexerPosition_.backwards();
         return number();
@@ -71,6 +76,7 @@ Token Lexer::next() {
 
     return handleOperatorOrPunct(c);
 }
+
 
 Token Lexer::handleOperatorOrPunct(char c) {
     LexerPosition& pos = lexerPosition_;
@@ -131,6 +137,9 @@ void Lexer::skipWhitespace(bool skipNewLine) {
         char c = peekChar();
         if (c == ' ' || c == '\t' || c == '\r' || (skipNewLine && c == '\n')) {
             nextChar();
+        } else if (c == '#') {
+            // handle comment as whitespace
+            handleComment();
         } else {
             break;
         }
@@ -268,4 +277,25 @@ Token Lexer::emitPending() {
     Token t = pendingTokens_.back();
     pendingTokens_.pop_back();
     return t;
+}
+
+void Lexer::handleLineSplit() {
+    skipWhitespace(false);
+    if (peekChar() == '\n') {
+        // we verified that the rest of the line was empty
+        // now we can skip all preceding whitespace
+        skipWhitespace(true);
+    } else {
+        throw except::LexicalError("Expected newline after line continuation", lexerPosition_.line, lexerPosition_.column);
+    }
+}
+
+void Lexer::handleComment() {
+    while (!isAtEnd()) {
+        char c = nextChar();
+        if (c == '\n') {
+            lexerPosition_.backwards();
+            break;
+        }
+    }
 }

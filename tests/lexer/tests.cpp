@@ -161,20 +161,68 @@ TEST_CASE("Handles leading indentation on first line") {
         "INDENT(), IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), DEDENT(), EOF()");
 }
 
-// // Tests that comments are ignored during tokenisation (assuming comment lines are skipped).
-// TEST_CASE("Ignores comments") {
-//     const std::string code = "x = 1 # initialize x\n";
-//     auto tokens = lexer::Lexer::tokenize(code);
-//     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), EOF()");
-// }
+// Tests that comments are ignored during tokenisation (assuming comment lines are skipped).
+TEST_CASE("Ignores comments") {
+    const std::string code = "x = 1 # initialize x\nx=x  + 1";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), "
+        "IDENTIFIER(x), ASSIGN(=), IDENTIFIER(x), PLUS(+), NUMBER(1), EOF()");
+}
 
-// // Tests line continuation using the backslash to ignore the newline.
-// TEST_CASE("Line continuation with backslash") {
-//     const std::string code = "x = 1 + \\\n2\n";
-//     auto tokens = lexer::Lexer::tokenize(code);
-//     REQUIRE(stringifyTokens(tokens) ==
-//         "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
-// }
+// Tests line continuation using the backslash to ignore the newline.
+TEST_CASE("Line continuation with backslash") {
+    const std::string code = "x = 1 + \\\n2\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
+}
+
+// Tests that a backslash continuation skips over multiple blank/whitespace-only lines.
+TEST_CASE("Continuation over multiple blank and whitespace lines") {
+    const std::string code =
+        "x = 1 + \\\n"
+        "\n"
+        "   \n"
+        "\t\n"
+        "2\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
+}
+
+// Tests that comment-only lines between a backslash and the continued line are skipped.
+TEST_CASE("Continuation skips comment-only lines") {
+    const std::string code =
+        "y = 10 - \\\n"
+        "# this is a comment\n"
+        "# another comment\n"
+        "5\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(y), ASSIGN(=), NUMBER(10), MINUS(-), NUMBER(5), NEWLINE(\\n), EOF()");
+}
+
+// Tests multi‑segment continuation (two backslashes), joining three physical lines.
+TEST_CASE("Multiple consecutive backslashes for multi‑segment continuation") {
+    const std::string code =
+        "z = a + \\\n"
+        "    b + \\\n"
+        "c\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(z), ASSIGN(=), IDENTIFIER(a), PLUS(+), IDENTIFIER(b), PLUS(+), IDENTIFIER(c), NEWLINE(\\n), EOF()");
+}
+
+// Tests that a backslash inside a comment does NOT trigger continuation.
+TEST_CASE("Backslash in comment does not trigger continuation") {
+    const std::string code =
+        "x = 3 # comment with backslash \\\n"
+        "+ 4\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(x), ASSIGN(=), NUMBER(3), NEWLINE(\\n), PLUS(+), NUMBER(4), NEWLINE(\\n), EOF()");
+}
+
 
 // Tests string literals that include escaped quotes.
 TEST_CASE("String literal with escaped quotes") {

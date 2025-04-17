@@ -43,6 +43,9 @@ private:
     char peekChar() const;
     char nextChar();
 
+    void handleLineSplit();
+    void handleComment();
+
     void emitCleanups();
     Token emitPending();
 };
