@@ -20,6 +20,7 @@ Krait/
 ```bash
 git clone https://github.com/arielverbin/Krait.git
 cd krait
-make test  # For running tests/test.cpp
+make test  # For running tests/*/tests.cpp
+make test parser interpreter # For running tests/parser/tests.cpp and then tests/interpreter/tests.cpp
 make run   # For running Main.cpp (Empty for now)
 ```
