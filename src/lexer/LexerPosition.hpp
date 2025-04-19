@@ -14,13 +14,11 @@ public:
     std::stack<size_t> lineLengths;
 
     void forwards(char c) {
-        column++;
         position++;
         if (c == '\n') {
             lineLengths.push(column);
-            line++;
-            column = 1;
-        }
+            line++; column = 1;
+        } else { column++; }
     }
 
     void backwards() {

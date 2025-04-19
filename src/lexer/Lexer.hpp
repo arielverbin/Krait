@@ -1,54 +1,34 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
-#include <string>
 #include <vector>
-#include <optional>
-#include <unordered_map>
+#include <memory>
 #include <functional>
+#include <optional>
+#include <string>
+
 #include "Token.hpp"
+#include "LexerContext.hpp"
+#include "lexer/token_handlers/TokenHandler.hpp"
 
 namespace lexer {
 
-class Lexer { 
+class Lexer {
 public:
-    explicit Lexer(const std::string& source);
+    using Handler = std::function<std::optional<Token>(Lexer&)>;
 
-    Token peek();             // look at current token without consuming it
-    void init();              // Initializes the lexer
-    Token next();             // consume current token
-    bool isAtEnd() const;
+    explicit Lexer(const std::string& input);
 
-    static std::vector<Token> tokenize(std::string source);
+    bool isAtEnd();
+    Token nextToken();
+
+    static std::vector<Token> tokenize(const std::string& code);
 
 private:
-    const std::string source_;
-    LexerPosition lexerPosition_;
-
-    bool match(char expected);
-    Token identifier();
-    Token number();
-    Token string();
-    
-    Token handleOperatorOrPunct(char c); // handles operators and punctuation
-
-    static const std::unordered_map<std::string, TokenType> keywords_;
-    
-    std::vector<Token> pendingTokens_; // queue of tokens to return
-    size_t indentLevel_ = 0; // indentation levels (starts with 0)
-    size_t groupingLevel_ = 0;
-    
-    void skipWhitespace(bool skipNewLine=false);
-    Token handleNewlineAndIndent();
-    char peekChar() const;
-    char nextChar();
-
-    void handleLineSplit();
-    void handleComment();
-
-    void emitCleanups();
-    Token emitPending();
+    LexerContext context_;
+    std::vector<std::unique_ptr<TokenHandler>> handlers_;
 };
 
 } // namespace lexer
+
 #endif // LEXER_HPP

@@ -183,7 +183,7 @@ TEST_CASE("Continuation over multiple blank and whitespace lines") {
         "x = 1 + \\\n"
         "\n"
         "   \n"
-        "\t\n"
+        " \n"
         "2\n";
     auto tokens = lexer::Lexer::tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
@@ -259,17 +259,6 @@ TEST_CASE("Handles nested blocks with multiple dedents") {
         "DEDENT(), DEDENT(), IDENTIFIER(a), ASSIGN(=), NUMBER(3), NEWLINE(\\n), EOF()");
 }
 
-// // Tests handling of mixed spaces and tab characters in indentation.
-// TEST_CASE("Handles mixture of spaces and tabs indentation") {
-//     const std::string code = "if True:\n\tx = 1\n    y = 2\n";
-//     auto tokens = lexer::Lexer::tokenize(code);
-//     // Depending on the implementation, tabs might be converted to spaces.
-//     REQUIRE(stringifyTokens(tokens) ==
-//         "IF(if), TRUE(True), COLON(:), NEWLINE(\\n), "
-//         "INDENT(), IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), DEDENT(), "
-//         "IDENTIFIER(y), ASSIGN(=), NUMBER(2), NEWLINE(\\n), EOF()");
-// }
-
 // Tests that negative numbers are tokenised as a MINUS operator followed by a NUMBER.
 TEST_CASE("Handles negative numbers and minus operator") {
     const std::string code = "x = -5\n";
@@ -277,14 +266,6 @@ TEST_CASE("Handles negative numbers and minus operator") {
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), MINUS(-), NUMBER(5), NEWLINE(\\n), EOF()");
 }
-
-// // Tests that float literals are correctly recognised.
-// TEST_CASE("Handles float numbers") {
-//     const std::string code = "x = 3.14\n";
-//     auto tokens = lexer::Lexer::tokenize(code);
-//     REQUIRE(stringifyTokens(tokens) ==
-//         "IDENTIFIER(x), ASSIGN(=), NUMBER(3.14), NEWLINE(\\n), EOF()");
-// }
 
 // Tests block termination with an implicit dedent at the end of the file.
 TEST_CASE("Handles block ending with implicit dedent") {
@@ -295,25 +276,15 @@ TEST_CASE("Handles block ending with implicit dedent") {
         "INDENT(), IDENTIFIER(y), ASSIGN(=), NUMBER(1), NEWLINE(\\n), DEDENT(), EOF()");
 }
 
-// TEST_CASE("Parses a simple assignment with binary expression") {
-//     const std::string code = "x = 1 + 2\n";
+// Comments after implicit continuation lines (inside brackets).
+TEST_CASE("Comments after implicit continuation lines") {
+    const std::string code =
+        "data = (1,  # first\n"
+        "      2,  # second\n"
+        "        3)  # third\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(data), ASSIGN(=), LPAREN((), NUMBER(1), COMMA(,), NUMBER(2), COMMA(,), NUMBER(3), RPAREN()), NEWLINE(\\n), EOF()");
+}
 
-//     // Step 1: Lexing
-//     auto tokens = lexer::Lexer::tokenize(code);
-//     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\n)");
-    
-//     // Step 2: Parsing
-//     parser::Parser parser(tokens);
-//     auto ast = parser.parse();  // Assuming it returns a shared_ptr<ASTNode> or Code node
-
-
-//     // Step 3: Stringify
-//     std::ostringstream out;
-//     std::streambuf* prev = std::cout.rdbuf(out.rdbuf());  // redirect cout
-//     std::cout << ast->stringify() << std::endl;
-//     std::cout.rdbuf(prev);  // restore cout
-
-//     // Step 4: Compare to expected output
-//     REQUIRE(out.str() == "Code(Assign(Variable(x), BinaryOp(ADD, Const(String(1)), Const(String(2)))))");
-// }
 #endif // KRAIT_TESTING

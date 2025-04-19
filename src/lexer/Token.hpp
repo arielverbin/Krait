@@ -39,7 +39,10 @@ enum class TokenType {
     // special tokens
     INDENT, DEDENT,
     NEWLINE,
-    END_OF_FILE
+    END_OF_FILE,
+
+    // unknown token, used for error handling
+    UNKNOWN
 };
 
 class Token {

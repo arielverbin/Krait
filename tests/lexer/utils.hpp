@@ -75,7 +75,7 @@ std::string tokenTypeToString(lexer::TokenType type) {
 
 std::string stringifyTokens(std::vector<lexer::Token> tokens) {
     return utils::join(utils::map<std::string, lexer::Token>(tokens,
-        [](const auto& n) { return tokenTypeToString(n.type()) + "(" + n.value() + ")"; }), ", ");
+        [](const auto& n) { return tokenTypeToString(n.type()) + "(" + std::string(n.value()) + ")"; }), ", ");
 }
 
 #endif // TESTS_PARSER_UTILS_HPP
