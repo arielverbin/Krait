@@ -18,6 +18,7 @@ std::optional<Token> NewlineHandler::emit() const {
     size_t indent = skipWhitespace();
 
     if (context_.currentGroupingLevel > 0 || context_.lineBroke) {
+        // Skip newlines and whitespace, but don't emit a NEWLINE or INDENT's.
         context_.lineBroke = false;
         return std::nullopt;
     }

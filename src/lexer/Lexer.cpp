@@ -6,6 +6,7 @@
 namespace lexer {
 
 Lexer::Lexer(const std::string& input) : context_(input) {
+    // The order of these is important and sets the priorities.
     handlers_.emplace_back(std::make_unique<IdentifierHandler>(context_));
     handlers_.emplace_back(std::make_unique<NumberHandler>(context_));
     handlers_.emplace_back(std::make_unique<StringHandler>(context_));
@@ -14,10 +15,6 @@ Lexer::Lexer(const std::string& input) : context_(input) {
     handlers_.emplace_back(std::make_unique<NewlineHandler>(context_));
     handlers_.emplace_back(std::make_unique<WhitespaceHandler>(context_));
     handlers_.emplace_back(std::make_unique<CleanupHandler>(context_));
-}
-
-bool Lexer::isAtEnd() {
-    return context_.pos.position >= context_.source.size();
 }
 
 Token Lexer::nextToken() {

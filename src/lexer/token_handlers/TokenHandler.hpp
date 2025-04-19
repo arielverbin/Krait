@@ -91,7 +91,6 @@ public:
     std::optional<Token> emit() const override;
 private:
     char parseEscapeSequence() const;
-    bool shouldContinueString() const;
 };
 
 /**

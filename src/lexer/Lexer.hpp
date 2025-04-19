@@ -16,10 +16,7 @@ namespace lexer {
 class Lexer {
 public:
     using Handler = std::function<std::optional<Token>(Lexer&)>;
-
     explicit Lexer(const std::string& input);
-
-    bool isAtEnd();
     Token nextToken();
 
     static std::vector<Token> tokenize(const std::string& code);

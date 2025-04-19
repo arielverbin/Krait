@@ -17,25 +17,11 @@ std::optional<Token> StringHandler::emit() const {
 
     char openingQuote = nextChar(); // consume opening quote
 
-    while (true) {
-        if (isAtEnd()) {
-            throw except::LexicalError("Unterminated string literal", start.line, start.column);
-        }
-
+    while (!isAtEnd()) {
         char c = nextChar();
 
-        if (c == '\n') {
-            throw except::LexicalError("Unterminated string literal before newline", start.line, start.column);
-        }
-
-        if (c == openingQuote) {
-            // Peek for continuation
-            if (shouldContinueString()) {
-                openingQuote = nextChar(); // consume new quote
-                continue;
-            }
-            break; // end of string
-        }
+        if (c == '\n') throw except::LexicalError("Unterminated string literal before newline", start.line, start.column);
+        if (c == openingQuote) return Token(TokenType::STRING, value, start);
 
         if (c == '\\') {
             value += parseEscapeSequence();
@@ -44,7 +30,8 @@ std::optional<Token> StringHandler::emit() const {
         }
     }
 
-    return Token(TokenType::STRING, value, start);
+    throw except::LexicalError("Unterminated string literal", start.line, start.column);
+    
 }
 
 char StringHandler::parseEscapeSequence() const {
@@ -58,29 +45,6 @@ char StringHandler::parseEscapeSequence() const {
         case '\'': return '\'';
         default: return next; // unknown escapes are just passed through
     }
-}
-
-
-bool StringHandler::shouldContinueString() const {
-    const std::string& source = context_.source;
-    LexerPosition& pos = context_.pos;
-    LexerPosition lookahead = pos;
-
-    // Skip whitespace and newlines
-    while (!isAtEnd(lookahead) && std::isspace(source[lookahead.position])) {
-        lookahead.forwards(source[lookahead.position]);
-    }
-
-    if (isAtEnd(lookahead)) return false;
-
-    char next = source[lookahead.position];
-    if (next == '"' || next == '\'') {
-        // valid continuation, update original pos
-        pos = lookahead;
-        return true;
-    }
-
-    return false;
 }
 
 } // namespace lexer

@@ -14,10 +14,12 @@
 #include "lexer/Lexer.hpp"
 
 TEST_CASE("Tokenises expressions correctly") {
-    const std::string code = "x = 1 + 2\n";
+    const std::string code = "x = 21 + (1 + 23) * (1   / (5 - 4)) \\\n + 22\n";
     auto tokens = lexer::Lexer::tokenize(code);
 
-    REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
+    REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(21), PLUS(+), LPAREN((), NUMBER(1), PLUS(+), "
+                                       "NUMBER(23), RPAREN()), STAR(*), LPAREN((), NUMBER(1), SLASH(/), LPAREN((), NUMBER(5), "
+                                       "MINUS(-), NUMBER(4), RPAREN()), RPAREN()), PLUS(+), NUMBER(22), NEWLINE(\\n), EOF()");
 }
 
 TEST_CASE("Tokenises keywords correctly") {
@@ -31,12 +33,20 @@ TEST_CASE("Tokenises keywords correctly") {
         "INDENT(), PRINT(print), LPAREN((), IDENTIFIER(x), RPAREN()), NEWLINE(\\n), DEDENT(), EOF()");
 }
 
-TEST_CASE("Tokenises multiline strings split by newline") {
-    const std::string code = "x = \"start of string\"\n\" continues here\"\n";
+TEST_CASE("Tokenises multiline strings split by newline using a backlash") {
+    const std::string code = "x = \"start of string\"  \\ \n\" continues here\"\n";
     auto tokens = lexer::Lexer::tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
-        "IDENTIFIER(x), ASSIGN(=), STRING(start of string continues here), NEWLINE(\\n), EOF()");
+        "IDENTIFIER(x), ASSIGN(=), STRING(start of string), STRING( continues here), NEWLINE(\\n), EOF()");
+}
+
+TEST_CASE("Tokenises multiline strings split by newline using parentheses") {
+    const std::string code = "x = (\"start of string\"  \n\" continues here\")\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(x), ASSIGN(=), LPAREN((), STRING(start of string), STRING( continues here), RPAREN()), NEWLINE(\\n), EOF()");
 }
 
 TEST_CASE("Ignores indentation and newline inside parentheses") {
@@ -285,6 +295,15 @@ TEST_CASE("Comments after implicit continuation lines") {
     auto tokens = lexer::Lexer::tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(data), ASSIGN(=), LPAREN((), NUMBER(1), COMMA(,), NUMBER(2), COMMA(,), NUMBER(3), RPAREN()), NEWLINE(\\n), EOF()");
+}
+
+// Empty strings with splits.
+TEST_CASE("Empty strings") {
+    const std::string code =
+        "one\t= ''\ndata = \"x\"\\\n''\\\n # More empty string\n\n\"\"\n";
+    auto tokens = lexer::Lexer::tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(one), ASSIGN(=), STRING(), NEWLINE(\\n), IDENTIFIER(data), ASSIGN(=), STRING(x), STRING(), STRING(), NEWLINE(\\n), EOF()");
 }
 
 #endif // KRAIT_TESTING
