@@ -106,6 +106,11 @@ std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
 std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minBp) {
     auto left = parsePrimary();
 
+    // Postfix operators (like function calling or member lookup)
+    // This layout keeps posfix operators at the correct precedence -- tighter
+    // than any binary operator but looser than grouping​.
+    left = parsePostfix(left);
+
     // While there’s an infix whose lbp >= minBp
     while (!isAtEnd()) {
         auto tok = peek();
@@ -122,6 +127,14 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
     if (match(lexer::TokenType::INT)) {
         const auto& number = previous().value();
         return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(number)));
+    }
+
+    if (match(lexer::TokenType::TRU)) {
+        return std::make_shared<semantics::Const>(core::Boolean::get(true));
+    }
+
+    if (match(lexer::TokenType::FALS)) {
+        return std::make_shared<semantics::Const>(core::Boolean::get(false));
     }
 
     if (match(lexer::TokenType::STRING)) {
@@ -144,7 +157,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
         auto op = previous();
         int r_bp = getUnaryPrecedence(op.type());
         auto rhs = parseExpression(r_bp);
-        return std::make_shared<semantics::UnaryOp>(mapUnaryOp(op.type()), rhs);
+        return std::make_shared<semantics::UnaryOp>(mapUnaryOp(op), rhs);
     }
 
     throw except::SyntaxError("Unexpected token in expression", peek().line(), peek().column());
@@ -156,7 +169,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parseInfix(
     int lbp
 ) {
     // Right‑assoc: reduce next call’s minBp by 1
-    int nextMinBp = lbp - (isRightAssociative(op.type()) ? 1 : 0);
+    int nextMinBp = lbp - (isRightAssociative(op) ? 1 : 0);
     auto right = parseExpression(nextMinBp);
 
     // Handle special binary operators (like assignment) here
@@ -164,11 +177,40 @@ std::shared_ptr<semantics::ASTNode> Parser::parseInfix(
         auto assignableExpr = std::dynamic_pointer_cast<semantics::AssignableASTNode>(left);
         if (!assignableExpr) {
             throw except::SyntaxError("Left-hand side of assignment must be an assignable expression",
-                tokens_[current_].line(), tokens_[current_].column());
+                op.line(), op.column());
         }
         return std::make_shared<semantics::Assign>(assignableExpr, right);
     }
-    return std::make_shared<semantics::BinaryOp>(mapBinaryOp(op.type()), left, right);
+    return std::make_shared<semantics::BinaryOp>(mapBinaryOp(op), left, right);
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parsePostfix(std::shared_ptr<semantics::ASTNode> left) {
+    while (true) {
+        if (match(lexer::TokenType::LPAREN)) {
+            // Function call
+            std::vector<std::shared_ptr<semantics::ASTNode>> args;
+            if (!check(lexer::TokenType::RPAREN)) {
+                do {
+                    args.push_back(parseExpression(0));
+                } while (match(lexer::TokenType::COMMA));
+            }
+            expect(lexer::TokenType::RPAREN, "Expect ')' after arguments");
+            left = std::make_shared<semantics::Call>(left, std::move(args));
+        }
+
+        /** TODO: Member lookup :) */
+        // else if (match(TokenType::DOT)) {
+        //     // Member access
+        //     expect(TokenType::IDENTIFIER, "Expect property name after '.'");
+        //     Token name = previous();
+        //     left = std::make_shared<GetProperty>(left, name);
+        // }
+
+        else {
+            break;
+        }
+    }
+    return left;
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parseWhile() {
@@ -317,16 +359,16 @@ int Parser::getUnaryPrecedence(const lexer::TokenType& type) const {
     return it != prefixTable_.end()? it->second : -1;
 }
 
-bool Parser::isRightAssociative(const lexer::TokenType& type) const {
-    auto it = infixTable_.find(type);
+bool Parser::isRightAssociative(const lexer::Token& token) const {
+    auto it = infixTable_.find(token.type());
     if (it == infixTable_.end()) {
-        throw except::SyntaxError("Incorrect use of operator", previous().line(), previous().column());
+        throw except::SyntaxError("Incorrect use of operator", token.line(), token.column());
     }
     return it->second.associativity == Associativity::RIGHT;
 }
 
-semantics::BinaryOpType Parser::mapBinaryOp(const lexer::TokenType& type) const {
-    switch (type) {
+semantics::BinaryOpType Parser::mapBinaryOp(const lexer::Token& token) const {
+    switch (token.type()) {
         case lexer::TokenType::OR: return semantics::BinaryOpType::Or;
         case lexer::TokenType::AND: return semantics::BinaryOpType::And;
 
@@ -345,18 +387,16 @@ semantics::BinaryOpType Parser::mapBinaryOp(const lexer::TokenType& type) const 
         case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
 
         default:
-            throw except::SyntaxError("Unexpected token type for binary operator",
-                previous().line(), previous().column());
+            throw except::SyntaxError("Unexpected token type for binary operator", token.line(), token.column());
     }
 }
 
-semantics::UnaryOpType Parser::mapUnaryOp(const lexer::TokenType& type) const {
-    switch (type) {
+semantics::UnaryOpType Parser::mapUnaryOp(const lexer::Token& token) const {
+    switch (token.type()) {
         case lexer::TokenType::NOT: return semantics::UnaryOpType::Not;
         case lexer::TokenType::MINUS: return semantics::UnaryOpType::Neg;
         default:
-            throw except::SyntaxError("Unexpected token type for unary operator",
-                previous().line(), previous().column());
+            throw except::SyntaxError("Unexpected token type for unary operator", token.line(), token.column());
     }
 }
 

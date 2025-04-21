@@ -208,6 +208,9 @@ std::string expressionTest24 = R"(
 def test(x):
     if x * 2 == 10 or x + 3 == 8:
         print("valid")
+    else:
+        x = x + 1
+        print "inc!"
 )";
 std::shared_ptr<ASTNode> expressionTest24Result = CODE(
     FUNC("test", STRARR("x"),
@@ -217,7 +220,11 @@ std::shared_ptr<ASTNode> expressionTest24Result = CODE(
                     EQ(MULT(VAR("x"), INT(2)), INT(10)),
                     EQ(ADD(VAR("x"), INT(3)), INT(8))
                 ),
-                CODE(PRINT(STR("valid"))), CODE()
+                CODE(PRINT(STR("valid"))),
+                CODE(
+                    ASSIGNVAR("x", ADD(VAR("x"), INT(1))),
+                    PRINT(STR("inc!"))
+                )
             )
         )
     )
@@ -246,6 +253,8 @@ def nested():
         while 1:
             if 2 + 2 == 4:
                 return "ok"
+            else:
+                print("wow")
     return inner
 )";
 std::shared_ptr<ASTNode> expressionTest26Result = CODE(
@@ -257,7 +266,10 @@ std::shared_ptr<ASTNode> expressionTest26Result = CODE(
                         CODE(
                             IF(
                                 EQ(ADD(INT(2), INT(2)), INT(4)),
-                                CODE(RETURN(STR("ok"))), CODE()
+                                CODE(RETURN(STR("ok"))),
+                                CODE(
+                                    PRINT(STR("wow"))
+                                )
                             )
                         )
                     )
@@ -267,6 +279,134 @@ std::shared_ptr<ASTNode> expressionTest26Result = CODE(
         )
     )
 );
+
+// 27) Simple no‑arg call in return
+std::string expressionTest27 = R"(
+def greet():
+    return greetUser()
+)";
+std::shared_ptr<ASTNode> expressionTest27Result = CODE(
+    FUNC("greet", STRARR(),
+        CODE(
+            RETURN(
+                CALL(VAR("greetUser"), ARGS())
+            )
+        )
+    )
+);
+
+// 28) Call inside arithmetic mixed with other calls
+std::string expressionTest28 = R"(
+def compute(x):
+    return foo(x) + bar(2, 3) * baz()
+)";
+std::shared_ptr<ASTNode> expressionTest28Result = CODE(
+    FUNC("compute", STRARR("x"),
+        CODE(
+            RETURN(
+                ADD(
+                    CALL(VAR("foo"), ARGS(VAR("x"))),
+                    MULT(
+                        CALL(VAR("bar"), ARGS(INT(2), INT(3))),
+                        CALL(VAR("baz"), ARGS())
+                    )
+                )
+            )
+        )
+    )
+);
+
+// 29) Nested call as single argument
+std::string expressionTest29 = R"(
+def nest(a):
+    return outer(inner(1))
+)";
+std::shared_ptr<ASTNode> expressionTest29Result = CODE(
+    FUNC("nest", STRARR("a"),
+        CODE(
+            RETURN(
+                CALL(
+                    VAR("outer"),
+                    ARGS(
+                        CALL(VAR("inner"), ARGS(INT(1)))
+                    )
+                )
+            )
+        )
+    )
+);
+
+// 30) Chained calls on same value
+std::string expressionTest30 = R"(
+def chain(a):
+    return a(1)(2)
+)";
+std::shared_ptr<ASTNode> expressionTest30Result = CODE(
+    FUNC("chain", STRARR("a"),
+        CODE(
+            RETURN(
+                CALL(
+                    CALL(VAR("a"), ARGS(INT(1))),
+                    ARGS(INT(2))
+                )
+            )
+        )
+    )
+);
+
+// 31) Call precedence over comparison
+std::string expressionTest31 = R"(
+def check(x):
+    return f(x) >= g(x)
+)";
+std::shared_ptr<ASTNode> expressionTest31Result = CODE(
+    FUNC("check", STRARR("x"),
+        CODE(
+            RETURN(
+                GEQ(
+                    CALL(VAR("f"), ARGS(VAR("x"))),
+                    CALL(VAR("g"), ARGS(VAR("x")))
+                )
+            )
+        )
+    )
+);
+
+// 32) Unary minus applied to a call
+std::string expressionTest32 = R"(
+def neg(x):
+    return -f(x)
+)";
+std::shared_ptr<ASTNode> expressionTest32Result = CODE(
+    FUNC("neg", STRARR("x"),
+        CODE(
+            RETURN(
+                NEG(
+                    CALL(VAR("f"), ARGS(VAR("x")))
+                )
+            )
+        )
+    )
+);
+
+// 33) Chained no‑arg calls
+std::string expressionTest33 = R"(
+def outer():
+    return inner()()
+)";
+std::shared_ptr<ASTNode> expressionTest33Result = CODE(
+    FUNC("outer", STRARR(),
+        CODE(
+            RETURN(
+                CALL(
+                    CALL(VAR("inner"), ARGS()),
+                    ARGS()
+                )
+            )
+        )
+    )
+);
+    
 
 #endif // TESTS_PARSER_SNIPPETS_HPP
 #endif // KRAIT_TESTING

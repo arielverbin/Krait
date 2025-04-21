@@ -50,6 +50,7 @@ private:
         const lexer::Token& op,
         int lbp
     );
+    std::shared_ptr<semantics::ASTNode> parsePostfix(std::shared_ptr<semantics::ASTNode> left);
 
     // Prase statements starting with a keyword
     std::shared_ptr<semantics::ASTNode> parseWhile();
@@ -73,11 +74,11 @@ private:
     // Binding power / precedence & associativity
     int getBinaryPrecedence(const lexer::TokenType& type) const;
     int getUnaryPrecedence(const lexer::TokenType& type) const;
-    bool isRightAssociative(const lexer::TokenType& type) const;
+    bool isRightAssociative(const lexer::Token& type) const;
 
     // Map between tokens and operator types
-    semantics::BinaryOpType mapBinaryOp(const lexer::TokenType& type) const;
-    semantics::UnaryOpType mapUnaryOp(const lexer::TokenType& type) const;
+    semantics::BinaryOpType mapBinaryOp(const lexer::Token& type) const;
+    semantics::UnaryOpType mapUnaryOp(const lexer::Token& type) const;
 };
 
 } // namespace parser
