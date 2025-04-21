@@ -78,5 +78,33 @@ std::string stringifyTokens(std::vector<lexer::Token> tokens) {
         [](const auto& n) { return tokenTypeToString(n.type()) + "(" + n.value() + ")"; }), ", ");
 }
 
+void printSyntaxError(const except::SyntaxError& e, const std::string& source) {
+    int lineNumber = e.line();
+    int column     = e.column();
+    
+    // Split source into lines
+    std::istringstream stream(source);
+    std::string line;
+    int currentLine = 1;
+    
+    while (std::getline(stream, line)) {
+        if (currentLine == lineNumber) {
+            break;
+        }
+        ++currentLine;
+    }
+
+    // Print the error header
+    std::cerr << "SyntaxError at line " << lineNumber << ": " << e.what() << "\n";
+    
+    // Print the line with the error
+    std::cerr << lineNumber << " | " << line << "\n";
+
+    // Print the caret (^) under the right column
+    std::cerr << std::string(std::to_string(lineNumber).size(), ' ') << " | "
+              << std::string(column - 1, ' ') << "^\n";
+}
+
+
 #endif // TESTS_PARSER_UTILS_HPP
 #endif // KRAIT_TESTING

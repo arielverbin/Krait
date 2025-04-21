@@ -69,8 +69,14 @@ public:
 class SyntaxError : public KraitException {
 public:
     explicit SyntaxError(const std::string& msg, size_t line, size_t column)
-        : KraitException("Syntax Error at line " + std::to_string(line) +
-                         ", column " + std::to_string(column) + ": " + msg) {}
+        : KraitException(msg), line_(line), column_(column) {}
+    
+    size_t line() const { return line_; }
+    size_t column() const { return column_; }
+
+private:
+    size_t line_;
+    size_t column_;
 };
 
 

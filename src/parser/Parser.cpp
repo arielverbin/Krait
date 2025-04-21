@@ -25,57 +25,58 @@
 
 #include "semantics/operation_semantics/UnaryOp.hpp"
 #include "semantics/operation_semantics/BinaryOp.hpp"
-using namespace parser;
 
-semantics::BinaryOpType Parser::mapBinaryOp(lexer::TokenType type) const {
-    switch (type) {
-        case lexer::TokenType::PLUS: return semantics::BinaryOpType::Sum;
-        case lexer::TokenType::MINUS: return semantics::BinaryOpType::Sub;
-        case lexer::TokenType::STAR: return semantics::BinaryOpType::Mult;
-        case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
-        case lexer::TokenType::EQ: return semantics::BinaryOpType::Equal;
-        //case lexer::TokenType::NEQ: return semantics::BinaryOpType::NotEqual;
-        //case lexer::TokenType::LT: return semantics::BinaryOpType::Less;
-        case lexer::TokenType::LTE: return semantics::BinaryOpType::LesserEqual;
-        //case lexer::TokenType::GT: return semantics::BinaryOpType::Greater;
-        case lexer::TokenType::GTE: return semantics::BinaryOpType::GreaterEqual;
-        default:
-            throw except::SyntaxError("Unexpected token type for binary operator",
-                tokens_[current_].line(), tokens_[current_].column());
-    }
-}
+namespace parser {
 
-int Parser::getPrecedence(lexer::TokenType type) const {
-    switch (type) {
-        // Logical OR (lowest of binary ops)
-        case lexer::TokenType::OR: return 1;
+Parser::Parser(const std::vector<lexer::Token>& tokens) : tokens_(tokens), current_(0) {
+    // Binary (infix) operators
+    infixTable_ = {
+        // Lowest precedence: assignment (right‑associative).
+        // e.g. `a = b = c` parses as `a = (b = c)`
+        {lexer::TokenType::ASSIGN,  {1, Associativity::RIGHT}},
 
-        // Logical AND
-        case lexer::TokenType::AND: return 2;
+        // Logical operators: AND binds tighter than OR,
+        // e.g. `a or b and c` parses as `a or (b and c)`
+        {lexer::TokenType::OR,      {2, Associativity::LEFT}},
+        {lexer::TokenType::AND,     {3, Associativity::LEFT}},
 
-        // Equality
-        case lexer::TokenType::EQ:
-        case lexer::TokenType::NEQ: return 3;
+        // Equality operators: bind tighter than logical operators.
+        // e.g. `a == b or c` parses as `(a == b) or c`
+        {lexer::TokenType::EQ,      {4, Associativity::LEFT}},
+        {lexer::TokenType::NEQ,     {4, Associativity::LEFT}},
 
-        // Comparison
-        case lexer::TokenType::LT:
-        case lexer::TokenType::LTE:
-        case lexer::TokenType::GT:
-        case lexer::TokenType::GTE: return 4;
+        // Comparison operators: bind tighter than equality operators.
+        // e.g. `a <= b == False` parses as `(a <= b) == False`
+        {lexer::TokenType::LT,      {5, Associativity::LEFT}},
+        {lexer::TokenType::LTE,     {5, Associativity::LEFT}},
+        {lexer::TokenType::GT,      {5, Associativity::LEFT}},
+        {lexer::TokenType::GTE,     {5, Associativity::LEFT}},
 
-        // Addition/Subtraction
-        case lexer::TokenType::PLUS:
-        case lexer::TokenType::MINUS: return 5;
+        // Arithmetic operators: bind tighter than comparison operators.
+        // e.g. `a + b >= c` parses as `(a + b) >= c`
+        {lexer::TokenType::PLUS,    {6, Associativity::LEFT}},
+        {lexer::TokenType::MINUS,   {6, Associativity::LEFT}},
 
-        // Multiplication/Division
-        case lexer::TokenType::STAR:
-        case lexer::TokenType::SLASH: return 6;
+        // Multiplication and division bind tighter than addition and subtraction.
+        // e.g. `a + b * c + d` parses as `a + (b * c) + d`
+        {lexer::TokenType::STAR,    {7, Associativity::LEFT}},
+        {lexer::TokenType::SLASH,   {7, Associativity::LEFT}},
+    };
 
-        // Unary operators typically have higher precedence (handled separately if needed)
-        // Function calls, indexing, attribute access, etc., would be even higher
+    // Prefix (unary) operators
+    prefixTable_ = {
+        // Negation: binds tighter than multiplication or division.
+        // e.g. `-a * -b` parses as `(-a) * (-b)`
+        // e.g. `-a + b` parses as `(-a) + b`
+        {lexer::TokenType::MINUS, 8},
 
-        default: return -1; // Not an operator or not part of an expression
-    }
+        // Logical Not operator: binds looser than everything.
+        // e.g. `not a == b` parses as `not (a == b)`
+        // e.g. `not a * b` parses as `not (a * b)`
+        // e.g. `not (a + b) == c` parses as `not ((a + b) == c)`
+        // e.g. `not a = b` parses as `not (a = b)`
+        {lexer::TokenType::NOT,   0},
+    };
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parse() {
@@ -86,115 +87,85 @@ std::shared_ptr<semantics::ASTNode> Parser::parse() {
     return std::make_shared<semantics::Code>(std::move(statements));
 }
 
-std::shared_ptr<semantics::ASTNode> Parser::parseExprStatement() {
-    auto expr = parseExpression();
+std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
+    if (match(lexer::TokenType::IF))    return parseIf();
+    if (match(lexer::TokenType::WHILE)) return parseWhile();
+    if (match(lexer::TokenType::DEF))   return parseFunctionDef();
+    if (match(lexer::TokenType::PRINT)) return parsePrint();
 
-    if (match(lexer::TokenType::ASSIGN)) {
-        auto value = parseExprStatement(); // recursive call
+    auto expr = parseExpression(0);
+    expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
+    return expr;
+}
 
-        // Attempt to cast expr to AssignableASTNode
-        auto assignableExpr = std::dynamic_pointer_cast<semantics::AssignableASTNode>(expr);
+std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minBp) {
+    auto left = parsePrimary();
+
+    // While there’s an infix whose lbp >= minBp
+    while (!isAtEnd()) {
+        auto tok = peek();
+        int lbp = getBinaryPrecedence(tok.type());
+        if (lbp <= minBp) break;
+
+        advance(); // consume operator
+        left = parseInfix(left, tok, lbp);
+    }
+    return left;
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
+    if (match(lexer::TokenType::INT)) {
+        const auto& number = previous().value();
+        return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(number)));
+    }
+
+    if (match(lexer::TokenType::STRING)) {
+        const auto& varName = previous().value();
+        return std::make_shared<semantics::Const>(std::make_shared<core::String>(varName));
+    }
+
+    if (match(lexer::TokenType::IDENTIFIER)) {
+        const auto& varName = previous().value();
+        return std::make_shared<semantics::Variable>(varName);
+    }
+    if (match(lexer::TokenType::LPAREN)) {
+        auto expr = parseExpression();
+        expect(lexer::TokenType::RPAREN, "Expected ')' after expression");
+        return expr;
+    }
+
+    // Prefix/unary operators
+    if (match(lexer::TokenType::MINUS) || match(lexer::TokenType::NOT)) {
+        auto op = previous();
+        int r_bp = getUnaryPrecedence(op.type());
+        auto rhs = parseExpression(r_bp);
+        return std::make_shared<semantics::UnaryOp>(mapUnaryOp(op.type()), rhs);
+    }
+
+    throw except::SyntaxError("Unexpected token in expression", peek().line(), peek().column());
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseInfix(
+    std::shared_ptr<semantics::ASTNode> left,
+    const lexer::Token& op,
+    int lbp
+) {
+    // Right‑assoc: reduce next call’s minBp by 1
+    int nextMinBp = lbp - (isRightAssociative(op.type()) ? 1 : 0);
+    auto right = parseExpression(nextMinBp);
+
+    // Handle special binary operators (like assignment) here
+    if (op.type() == lexer::TokenType::ASSIGN) {
+        auto assignableExpr = std::dynamic_pointer_cast<semantics::AssignableASTNode>(left);
         if (!assignableExpr) {
             throw except::SyntaxError("Left-hand side of assignment must be an assignable expression",
                 tokens_[current_].line(), tokens_[current_].column());
         }
-        expr = std::make_shared<semantics::Assign>(std::move(assignableExpr), std::move(value));
+        return std::make_shared<semantics::Assign>(assignableExpr, right);
     }
 
-    return expr;
+    return std::make_shared<semantics::BinaryOp>(mapBinaryOp(op.type()), left, right);
 }
-
-std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
-    // statements starting with a keyword
-    if (match(lexer::TokenType::IF)) return parseIf();
-    if (match(lexer::TokenType::WHILE)) return parseWhile();
-    if (match(lexer::TokenType::DEF)) return parseFunctionDef();
-    if (match(lexer::TokenType::PRINT)) return parsePrint();
-
-    auto stmt = parseExprStatement();
-    expect(lexer::TokenType::NEWLINE, "Unexpected token after statement");
-    return stmt;
-}
-
-// primary is a single component, like a variable, a number, or a string, or an expression in parentheses
-std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
-    if (match(lexer::TokenType::IDENTIFIER)) {
-        auto varName = previous().value();
-        return std::make_shared<semantics::Variable>(varName);
-    }
-
-    if (match(lexer::TokenType::INT)) {
-        auto value = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(value)));
-    }
-
-    if (match(lexer::TokenType::STRING)) {
-        auto value = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::String>(value));
-    }
-
-    expect(lexer::TokenType::LPAREN, "Expected '(' before expression");
-    auto expr = parseExpression();
-    expect(lexer::TokenType::RPAREN, "Expected ')' after expression");
-    return expr;
-}
-
-//
-// parseUnary: handle unary operators such as NOT, or a unary '-' if you support it.
-//
-std::shared_ptr<semantics::ASTNode> Parser::parseUnary() {
-    if (match(lexer::TokenType::NOT)) {
-        // Unary operator: NOT a
-        auto operand = parseUnary();
-        return std::make_shared<semantics::UnaryOp>(semantics::UnaryOpType::Not, std::move(operand));
-    }
-    // Optionally, if you have a unary minus:
-    if (match(lexer::TokenType::MINUS)) {
-        auto operand = parseUnary();
-        return std::make_shared<semantics::UnaryOp>(semantics::UnaryOpType::Neg, std::move(operand));
-    }
-    // Otherwise, fallback to primary expressions.
-    return parsePrimary();
-}
-
-//
-// parseExpression: uses precedence climbing.
-// The parameter minPrecedence indicates the minimum binding power required to continue parsing.
-std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minPrecedence) {
-    // Start by parsing the left operand, which may be a unary expression.
-    auto left = parseUnary();
-
-    // Continue as long as there's an operator with sufficient precedence.
-    while (!isAtEnd()) {
-        lexer::Token op = peek();
-        int prec = getPrecedence(op.type());
-
-        // If the current operator's precedence is lower than what we require,
-        // break out and return what we've parsed so far.
-        if (prec < minPrecedence)
-            break;
-        
-        // Consume the operator.
-        advance();
-
-        // Parse the right-hand side operand: note that we add 1
-        // to enforce left associativity for binary operators.
-        auto right = parseExpression(prec + 1);
-
-        // Combine the left and right-hand sides into a new binary expression node.
-        left = std::make_shared<semantics::BinaryOp>(mapBinaryOp(op.type()), std::move(left), std::move(right));
-    }
-
-    return left;
-}
-
-//
-// Overload of parseExpression that starts with minimal precedence (zero).
-//
-std::shared_ptr<semantics::ASTNode> Parser::parseExpression() {
-    return parseExpression(0);
-}
-
 
 std::shared_ptr<semantics::ASTNode> Parser::parseWhile() {
     auto condition = parseExpression();
@@ -245,17 +216,9 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrint() {
     return std::make_shared<semantics::Print>(std::move(expression));
 }
 
-std::shared_ptr<semantics::ASTNode> Parser::parseAssignment() {
-    auto varName = tokens_[current_].value();
-    advance(); // consume identifier
-    expect(lexer::TokenType::ASSIGN, "Expected '=' after variable name");
-    auto value = parseExpression();
-    expect(lexer::TokenType::NEWLINE, "Expected newline after assignment");
-    return std::make_shared<semantics::Assign>(std::make_shared<semantics::Variable>(varName), std::move(value));
-}
-
 std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
     auto condition = parseExpression();
+
     expect(lexer::TokenType::COLON, "Expected ':' after if condition");
     expect(lexer::TokenType::NEWLINE, "Expected newline after ':'");
     expect(lexer::TokenType::INDENT, "Expected indent after newline");
@@ -264,6 +227,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
     while (!match(lexer::TokenType::DEDENT) && !check(lexer::TokenType::END_OF_FILE)) {
         thenBranch->statements.push_back(parseStatement());
     }
+    std::cout << "br: " << thenBranch->stringify() << std::endl;
 
     std::shared_ptr<semantics::Code> elseBranch = std::make_shared<semantics::Code>();
     if (match(lexer::TokenType::ELSE)) {
@@ -296,12 +260,12 @@ const lexer::Token& Parser::previous() const {
     return tokens_[current_ - 1];
 }
 
-bool Parser::check(lexer::TokenType type) const {
+bool Parser::check(const lexer::TokenType& type) const {
     if (isAtEnd()) return false;
     return tokens_[current_].type() == type;
 }
 
-bool Parser::match(lexer::TokenType type) {
+bool Parser::match(const lexer::TokenType& type) {
     if (check(type)) {
         advance();
         return true;
@@ -309,10 +273,58 @@ bool Parser::match(lexer::TokenType type) {
     return false;
 }
 
-void Parser::expect(lexer::TokenType type, const std::string& msg) {
+void Parser::expect(const lexer::TokenType& type, const std::string& msg) {
     if (check(type)) {
         advance();
     } else {
-        throw except::SyntaxError(msg, tokens_[current_ - 1].line(), tokens_[current_ - 1].column());
+        throw except::SyntaxError(msg, previous().line(), previous().column());
     }
 }
+
+int Parser::getBinaryPrecedence(const lexer::TokenType& type) const {
+    auto it = infixTable_.find(type);
+    return it != infixTable_.end() ? it->second.precedence : -1;
+}
+
+int Parser::getUnaryPrecedence(const lexer::TokenType& type) const {
+    auto it = prefixTable_.find(type);
+    return it != prefixTable_.end()? it->second : -1;
+}
+
+bool Parser::isRightAssociative(const lexer::TokenType& type) const {
+    auto it = infixTable_.find(type);
+    if (it == infixTable_.end()) {
+        throw except::SyntaxError("Incorrect use of operator", previous().line(), previous().column());
+    }
+    return it->second.associativity == Associativity::RIGHT;
+}
+
+semantics::BinaryOpType Parser::mapBinaryOp(const lexer::TokenType& type) const {
+    switch (type) {
+        case lexer::TokenType::PLUS: return semantics::BinaryOpType::Sum;
+        case lexer::TokenType::MINUS: return semantics::BinaryOpType::Sub;
+        case lexer::TokenType::STAR: return semantics::BinaryOpType::Mult;
+        case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
+        case lexer::TokenType::EQ: return semantics::BinaryOpType::Equal;
+        //case lexer::TokenType::NEQ: return semantics::BinaryOpType::NotEqual;
+        //case lexer::TokenType::LT: return semantics::BinaryOpType::Less;
+        case lexer::TokenType::LTE: return semantics::BinaryOpType::LesserEqual;
+        //case lexer::TokenType::GT: return semantics::BinaryOpType::Greater;
+        case lexer::TokenType::GTE: return semantics::BinaryOpType::GreaterEqual;
+        default:
+            throw except::SyntaxError("Unexpected token type for binary operator",
+                previous().line(), previous().column());
+    }
+}
+
+semantics::UnaryOpType Parser::mapUnaryOp(const lexer::TokenType& type) const {
+    switch (type) {
+        case lexer::TokenType::NOT: return semantics::UnaryOpType::Not;
+        case lexer::TokenType::MINUS: return semantics::UnaryOpType::Neg;
+        default:
+            throw except::SyntaxError("Unexpected token type for unary operator",
+                previous().line(), previous().column());
+    }
+}
+
+} // namespace parser

@@ -12,7 +12,7 @@ RUN_OBJ_DIR := $(RUN_BUILD_DIR)/obj
 TEST_OBJ_DIR := $(TEST_BUILD_DIR)/obj
 
 # Prevent auto-deletion of object files
-.PRECIOUS: $(TEST_OBJ_DIR)/%.o
+.SECONDARY:
 
 # Executable output
 RUN_BIN := $(RUN_BUILD_DIR)/krait

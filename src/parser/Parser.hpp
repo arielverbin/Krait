@@ -3,57 +3,79 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include "lexer/Token.hpp"
 #include "exceptions/exceptions.hpp"
 #include "semantics/ASTNode.hpp"
 #include "semantics/operation_semantics/BinaryOp.hpp"
+#include "semantics/operation_semantics/UnaryOp.hpp"
 
 namespace parser {
-class Parser {
-    public:
-        Parser(const std::vector<lexer::Token>& tokens)
-            : tokens_(tokens), current_(0) {}
-    
-        std::shared_ptr<semantics::ASTNode> parse(); // entry point
-    
-    private:
-        const std::vector<lexer::Token>& tokens_;
-        size_t current_;
-    
-        std::shared_ptr<semantics::ASTNode> parseStatement(); // entry point for online interpreter
-        std::shared_ptr<semantics::ASTNode> parseExpression();
-        std::shared_ptr<semantics::ASTNode> parseExpression(int minPrecedence);
-        std::shared_ptr<semantics::ASTNode> parseExprStatement();
-        std::shared_ptr<semantics::ASTNode> parseBlock();
-    
-        // Specific statements
-        std::shared_ptr<semantics::ASTNode> parseIf();
-        std::shared_ptr<semantics::ASTNode> parseWhile();
-        std::shared_ptr<semantics::ASTNode> parseFunctionDef();
-        std::shared_ptr<semantics::ASTNode> parseAssignment();
-        std::shared_ptr<semantics::ASTNode> parsePrint();
-    
-        // Expression components
-        std::shared_ptr<semantics::ASTNode> parseEquality();
-        std::shared_ptr<semantics::ASTNode> parseComparison();
-        std::shared_ptr<semantics::ASTNode> parseTerm();      // +, -
-        std::shared_ptr<semantics::ASTNode> parseFactor();    // *, /
-        std::shared_ptr<semantics::ASTNode> parsePrimary();   // literals, identifiers, grouping
-        std::shared_ptr<semantics::ASTNode> parseUnary();
-    
-        // Helpers
-        bool isAtEnd() const;
-        const lexer::Token& advance();
-        const lexer::Token& peek() const;
-        const lexer::Token& previous() const;
 
-        bool match(lexer::TokenType type);
-        bool check(lexer::TokenType type) const;
-        void expect(lexer::TokenType type, const std::string& msg);
-        int getPrecedence(lexer::TokenType type) const;
-        semantics::BinaryOpType mapBinaryOp(lexer::TokenType type) const;
-    };
+enum class Associativity { LEFT, RIGHT };
+
+/**
+ * The order of operator evaluation is primarily determined by their precedence.
+ * If two operators have the same precedence, their associativity determines the
+ * order in which they are evaluated. 
+ */
+struct OperatorInfo {
+    int precedence;
+    Associativity associativity;
+};
+
+class Parser {
+public:
+    Parser(const std::vector<lexer::Token>& tokens);
+
+    // Top-level entry: parse all statements into a Code node
+    std::shared_ptr<semantics::ASTNode> parse();
+
+    // Dispatch on keywords or fallback to expression
+    std::shared_ptr<semantics::ASTNode> parseStatement();
+
+private:
+    // Parsing Rules - Precedence of operators and associativity
+    std::unordered_map<lexer::TokenType, OperatorInfo> infixTable_;
+    std::unordered_map<lexer::TokenType, int> prefixTable_;
+
+    const std::vector<lexer::Token>& tokens_;
+    size_t current_;
+
+    // Expression parsing (Pratt / precedence‑climbing)
+    std::shared_ptr<semantics::ASTNode> parseExpression(int minBp = 0);
+    std::shared_ptr<semantics::ASTNode> parsePrimary();
+    std::shared_ptr<semantics::ASTNode> parseInfix(
+        std::shared_ptr<semantics::ASTNode> left,
+        const lexer::Token& op,
+        int lbp
+    );
+
+    // Prase statements starting with a keyword
+    std::shared_ptr<semantics::ASTNode> parseWhile();
+    std::shared_ptr<semantics::ASTNode> parseFunctionDef();
+    std::shared_ptr<semantics::ASTNode> parsePrint();
+    std::shared_ptr<semantics::ASTNode> parseIf();
+
+    // Token utilities
+    bool isAtEnd() const;
+    const lexer::Token& peek() const;
+    const lexer::Token& previous() const;
+    const lexer::Token& advance();
+    bool check(const lexer::TokenType& type) const;
+    bool match(const lexer::TokenType& type);
+    void expect(const lexer::TokenType& type, const std::string& msg);
+
+    // Binding power / precedence & associativity
+    int getBinaryPrecedence(const lexer::TokenType& type) const;
+    int getUnaryPrecedence(const lexer::TokenType& type) const;
+    bool isRightAssociative(const lexer::TokenType& type) const;
+
+    // Map between tokens and operator types
+    semantics::BinaryOpType mapBinaryOp(const lexer::TokenType& type) const;
+    semantics::UnaryOpType mapUnaryOp(const lexer::TokenType& type) const;
+};
 
 } // namespace parser
+
 #endif // PARSER_HPP
-    
