@@ -8,8 +8,11 @@ std::map<BinaryOpType, std::string> BinaryOp::functionTypeMap_ = {
     { BinaryOpType::Div,  "_div_"  },
     { BinaryOpType::Mod,  "_mod_" },
     { BinaryOpType::GreaterEqual, "_ge_" },
+    { BinaryOpType::GreaterThan, "_gt_" },
     { BinaryOpType::LesserEqual, "_le_" },
+    { BinaryOpType::LesserThan, "_lt_" },
     { BinaryOpType::Equal, "_eq_" },
+    { BinaryOpType::NotEqual, "_neq_" },
     { BinaryOpType::And, "_and_" },
     { BinaryOpType::Or, "_or_" },
 };

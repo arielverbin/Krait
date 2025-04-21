@@ -20,7 +20,7 @@ std::optional<Token> StringHandler::emit() const {
     while (!isAtEnd()) {
         char c = nextChar();
 
-        if (c == '\n') throw except::LexicalError("Unterminated string literal before newline", start.line, start.column);
+        if (c == '\n') throw except::SyntaxError("Unterminated string literal before newline", start.line, start.column);
         if (c == openingQuote) return Token(TokenType::STRING, value, start);
 
         if (c == '\\') {
@@ -30,7 +30,7 @@ std::optional<Token> StringHandler::emit() const {
         }
     }
 
-    throw except::LexicalError("Unterminated string literal", start.line, start.column);
+    throw except::SyntaxError("Unterminated string literal", start.line, start.column);
     
 }
 

@@ -11,7 +11,7 @@ OperatorHandler::OperatorHandler(LexerContext& context)
         {"+", TokenType::PLUS}, {"-", TokenType::MINUS}, {"*", TokenType::STAR},
         {"/", TokenType::SLASH}, {"=", TokenType::ASSIGN}, {"<", TokenType::LT},
         {">", TokenType::GT}, {"!", TokenType::NOT}, {":", TokenType::COLON},
-        {",", TokenType::COMMA}, {".", TokenType::DOT},
+        {"%", TokenType::MOD}, {",", TokenType::COMMA}, {".", TokenType::DOT},
     }) {}
 
 bool OperatorHandler::match() const {
@@ -24,7 +24,7 @@ std::optional<Token> OperatorHandler::emit() const {
     auto result = tryMatch();
 
     if (result.type == TokenType::UNKNOWN) {
-        throw except::LexicalError("Unknown operator", pos.line, pos.column);
+        throw except::SyntaxError("Unknown operator", pos.line, pos.column);
     }
 
     std::string res;

@@ -12,8 +12,11 @@ enum BinaryOpType {
     Div,
     Mod,
     GreaterEqual,
+    GreaterThan,
     LesserEqual,
+    LesserThan,
     Equal,
+    NotEqual,
     And,
     Or,
 };

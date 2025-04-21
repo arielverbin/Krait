@@ -2,6 +2,7 @@
 #include "exceptions/exceptions.hpp"
 
 #include "core/Integer.hpp"
+#include "core/Float.hpp"
 #include "core/String.hpp"
 #include "core/Boolean.hpp"
 #include "core/None.hpp"
@@ -61,6 +62,7 @@ Parser::Parser(const std::vector<lexer::Token>& tokens) : tokens_(tokens), curre
         // e.g. `a + b * c + d` parses as `a + (b * c) + d`
         {lexer::TokenType::STAR,    {7, Associativity::LEFT}},
         {lexer::TokenType::SLASH,   {7, Associativity::LEFT}},
+        {lexer::TokenType::MOD,     {7, Associativity::LEFT}},
     };
 
     // Prefix (unary) operators
@@ -127,6 +129,11 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
     if (match(lexer::TokenType::INT)) {
         const auto& number = previous().value();
         return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(number)));
+    }
+
+    if (match(lexer::TokenType::FLOAT)) {
+        const auto& number = previous().value();
+        return std::make_shared<semantics::Const>(std::make_shared<core::Float>(std::stod(number)));
     }
 
     if (match(lexer::TokenType::TRU)) {
@@ -373,11 +380,11 @@ semantics::BinaryOpType Parser::mapBinaryOp(const lexer::Token& token) const {
         case lexer::TokenType::AND: return semantics::BinaryOpType::And;
 
         case lexer::TokenType::EQ: return semantics::BinaryOpType::Equal;
-        //case lexer::TokenType::NEQ: return semantics::BinaryOpType::NotEqual;
+        case lexer::TokenType::NEQ: return semantics::BinaryOpType::NotEqual;
 
-        //case lexer::TokenType::LT: return semantics::BinaryOpType::Less;
+        case lexer::TokenType::LT: return semantics::BinaryOpType::LesserThan;
         case lexer::TokenType::LTE: return semantics::BinaryOpType::LesserEqual;
-        //case lexer::TokenType::GT: return semantics::BinaryOpType::Greater;
+        case lexer::TokenType::GT: return semantics::BinaryOpType::GreaterThan;
         case lexer::TokenType::GTE: return semantics::BinaryOpType::GreaterEqual;
 
         case lexer::TokenType::PLUS: return semantics::BinaryOpType::Sum;
@@ -385,6 +392,7 @@ semantics::BinaryOpType Parser::mapBinaryOp(const lexer::Token& token) const {
 
         case lexer::TokenType::STAR: return semantics::BinaryOpType::Mult;
         case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
+        case lexer::TokenType::MOD: return semantics::BinaryOpType::Mod;
 
         default:
             throw except::SyntaxError("Unexpected token type for binary operator", token.line(), token.column());

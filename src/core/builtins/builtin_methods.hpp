@@ -53,16 +53,34 @@ std::shared_ptr<core::Object> __ge_(core::ArgList args) {
     return self->_ge_(*other);
 }
 
+std::shared_ptr<core::Object> __gt_(core::ArgList args) {
+    auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
+    auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
+    return self->_gt_(*other);
+}
+
 std::shared_ptr<core::Object> __le_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
     return self->_le_(*other);
 }
 
+std::shared_ptr<core::Object> __lt_(core::ArgList args) {
+    auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
+    auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
+    return self->_lt_(*other);
+}
+
 std::shared_ptr<core::Object> __eq_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
     return self->_eq_(*other);
+}
+
+std::shared_ptr<core::Object> __neq_(core::ArgList args) {
+    auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
+    auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
+    return self->_neq_(*other);
 }
 
 std::shared_ptr<core::Object> __bool_(core::ArgList args) {
@@ -93,9 +111,9 @@ std::shared_ptr<core::Object> __not_(core::ArgList args) {
 std::map<std::string, core::Function::NativeFunc> builtinMethods = {
     {"_str_", __str_ }, {"_add_", __add_ }, {"_sub_", __sub_ },
     {"_mult_", __mult_ }, {"_div_", __div_ }, {"_mod_", __mod_ }, {"_neg_", __neg_ },
-    {"_ge_", __ge_ }, {"_le_", __le_ }, {"_eq_", __eq_ },
-    {"_bool_", __bool_}, {"_and_", __and_ }, {"_or_", __or_ },
-    {"_not_", __not_ },
+    {"_ge_", __ge_ }, {"_gt_", __gt_ }, {"_le_", __le_ }, {"_lt_", __lt_ },
+    {"_eq_", __eq_ }, {"_neq_", __neq_ }, {"_bool_", __bool_}, {"_and_", __and_ },
+    {"_or_", __or_ }, {"_not_", __not_ },
 };
 
 #endif // CORE_BUILTINS_METHODS_HPP

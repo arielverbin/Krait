@@ -44,6 +44,13 @@ std::shared_ptr<Object> String::_eq_(Object& another) {
     return Boolean::get(false);
 }
 
+std::shared_ptr<Object> String::_neq_(Object& another) {
+    if (String* i = dynamic_cast<String*>(&another)) {
+        return Boolean::get(value_ != i->value_);
+    }
+    return Boolean::get(true);
+}
+
 std::shared_ptr<Object> String::_bool_() {
     return Boolean::get(value_.size() != 0);
 }

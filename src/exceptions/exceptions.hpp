@@ -17,19 +17,31 @@ public:
     }
 };
 
-// Exception for invalid arguments
-class InvalidArgumentException : public KraitException {
+class SyntaxError : public KraitException {
 public:
-    explicit InvalidArgumentException(const std::string& msg)
-        : KraitException("Invalid Argument: " + msg) {}
+    explicit SyntaxError(const std::string& msg, size_t line, size_t column)
+        : KraitException(msg), line_(line), column_(column) {}
+    
+    size_t line() const { return line_; }
+    size_t column() const { return column_; }
+
+private:
+    size_t line_;
+    size_t column_;
 };
 
-// Exception for runtime errors
 class RuntimeException : public KraitException {
 public:
     explicit RuntimeException(const std::string& msg)
-        : KraitException("Runtime Error: " + msg) {}
+        : KraitException(msg) {}
 };
+
+// Exception for invalid arguments
+class InvalidArgumentException : public RuntimeException {
+    public:
+        explicit InvalidArgumentException(const std::string& msg)
+            : RuntimeException("Invalid Argument: " + msg) {}
+    };
 
 // Exception for variable not found
 class VariableNotFoundException : public RuntimeException {
@@ -58,27 +70,6 @@ public:
     explicit NotImplementedException(const std::string& msg)
         : RuntimeException("Not Implemented: " + msg) {}
 };
-
-class LexicalError : public KraitException {
-public:
-    explicit LexicalError(const std::string& msg, size_t line, size_t column)
-        : KraitException("Lexical Error at line " + std::to_string(line) +
-                         ", column " + std::to_string(column) + ": " + msg) {}
-};
-
-class SyntaxError : public KraitException {
-public:
-    explicit SyntaxError(const std::string& msg, size_t line, size_t column)
-        : KraitException(msg), line_(line), column_(column) {}
-    
-    size_t line() const { return line_; }
-    size_t column() const { return column_; }
-
-private:
-    size_t line_;
-    size_t column_;
-};
-
 
 } // namespace except
 

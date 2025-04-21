@@ -9,7 +9,7 @@ enum class TokenType {
     IDENTIFIER, // variable names
 
     // data types
-    INT,
+    INT, FLOAT,
     STRING,
     TRU, FALS,
     NONE,
@@ -25,6 +25,7 @@ enum class TokenType {
     STAR,        // '*'
     SLASH,       // '/'
     DOT,         // '.'
+    MOD,         // '%'
 
     // punctuation
     LPAREN, RPAREN,

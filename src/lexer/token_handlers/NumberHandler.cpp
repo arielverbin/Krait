@@ -18,14 +18,14 @@ std::optional<Token> NumberHandler::emit() const {
         number += nextChar();
     }
 
-    // // Handle optional decimal part
-    // if (!isAtEnd() && peekChar() == '.') {
-    //     number += nextChar();
-    //     while (!isAtEnd() && std::isdigit(peekChar())) {
-    //         number += nextChar();
-    //     }
-    //     return Token(TokenType::FLOAT, number, start);
-    // }
+    // Handle optional decimal part
+    if (!isAtEnd() && peekChar() == '.') {
+        number += nextChar();
+        while (!isAtEnd() && std::isdigit(peekChar())) {
+            number += nextChar();
+        }
+        return Token(TokenType::FLOAT, number, start);
+    }
 
     return Token(TokenType::INT, number, start);
 }

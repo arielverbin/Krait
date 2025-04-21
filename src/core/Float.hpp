@@ -1,16 +1,16 @@
-#ifndef CORE_INTEGER_HPP
-#define CORE_INTEGER_HPP
+#ifndef CORE_FLOAT_HPP
+#define CORE_FLOAT_HPP
 
 #include "Object.hpp"
 
 namespace core {
 
-class Integer : public Object {
+class Float : public Object {
 private:
-    long value_;
+    double value_;
 
 public:
-    Integer(long value);
+    Float(double value);
 
     std::string _type_() override;
 
@@ -33,10 +33,10 @@ public:
     std::shared_ptr<Object> _eq_(Object& another) override;
     std::shared_ptr<Object> _neq_(Object& another) override;
 
-    long toRawLong();
+    double toRawDouble();
 
-    virtual ~Integer() = default;
+    virtual ~Float() = default;
 };
 } // namespace core
 
-#endif // CORE_INTEGER_HPP
+#endif // CORE_FLOAT_HPP

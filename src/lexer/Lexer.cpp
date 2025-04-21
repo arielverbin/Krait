@@ -38,7 +38,7 @@ Token Lexer::nextToken() {
 
         if (!wasMatched) {
             char c = context_.source[context_.pos.position];
-            throw except::LexicalError(
+            throw except::SyntaxError(
                 "Unexpected character '" + std::string(1, c) + "' (" + std::to_string(static_cast<int>(c)) + ")",
                 context_.pos.line,
                 context_.pos.column

@@ -109,11 +109,25 @@ std::shared_ptr<Object> Object::_ge_(Object& another) {
         " does not support '>=' comparison.");
 }
 
+std::shared_ptr<Object> Object::_gt_(Object& another) {
+    UNREFERENCED(another);
+
+    throw except::NotImplementedException("Object of type " + this->_type_() +
+        " does not support '>' comparison.");
+}
+
 std::shared_ptr<Object> Object::_le_(Object& another) {
     UNREFERENCED(another);
 
     throw except::NotImplementedException("Object of type " + this->_type_() +
         " does not support '<=' comparison.");
+}
+
+std::shared_ptr<Object> Object::_lt_(Object& another) {
+    UNREFERENCED(another);
+
+    throw except::NotImplementedException("Object of type " + this->_type_() +
+        " does not support '<' comparison.");
 }
 
 std::shared_ptr<Object> Object::_call_(std::vector<std::shared_ptr<Object>> args) {
@@ -128,4 +142,11 @@ std::shared_ptr<Object> Object::_eq_(Object& another) {
 
     // By default, fallback to identity comparison
     return Boolean::get(this == &another);
+}
+
+std::shared_ptr<Object> Object::_neq_(Object& another) {
+    UNREFERENCED(another);
+
+    // By default, fallback to identity comparison
+    return Boolean::get(this != &another);
 }

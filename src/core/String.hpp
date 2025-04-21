@@ -16,6 +16,7 @@ public:
     std::shared_ptr<Object> _add_(Object& another) override;
     std::shared_ptr<Object> _mult_(Object& another) override;
     std::shared_ptr<Object> _eq_(Object& another) override;
+    std::shared_ptr<Object> _neq_(Object& another) override;
     std::shared_ptr<Object> _bool_() override;
     operator bool() const override;
 

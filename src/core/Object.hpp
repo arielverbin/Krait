@@ -46,8 +46,11 @@ public:
 
     virtual std::shared_ptr<Object> _bool_();
     virtual std::shared_ptr<Object> _ge_(Object& another);
+    virtual std::shared_ptr<Object> _gt_(Object& another);
     virtual std::shared_ptr<Object> _le_(Object& another);
+    virtual std::shared_ptr<Object> _lt_(Object& another);
     virtual std::shared_ptr<Object> _eq_(Object& another);
+    virtual std::shared_ptr<Object> _neq_(Object& another);
 
     virtual std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args);
 

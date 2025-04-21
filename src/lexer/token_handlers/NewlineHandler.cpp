@@ -24,7 +24,7 @@ std::optional<Token> NewlineHandler::emit() const {
     }
 
     if (indent % 4 != 0) {
-        throw except::LexicalError("Indentation must be a multiple of 4 spaces",
+        throw except::SyntaxError("Indentation must be a multiple of 4 spaces",
             pos.line, pos.column);
     }
 
@@ -65,7 +65,7 @@ size_t NewlineHandler::skipWhitespace() const {
         else if (ch == '\n') { nextChar(); indent = 0; }
         else if (ch == '#') { handleComment();  indent = 0; }
         else if (std::isspace(ch)) {
-            throw except::LexicalError("Unexpected whitespace (only spaces are allowed)",
+            throw except::SyntaxError("Unexpected whitespace (only spaces are allowed)",
                 pos.line, pos.column);
         } else {
             return indent; // return the indent level
