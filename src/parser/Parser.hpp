@@ -56,6 +56,10 @@ private:
     std::shared_ptr<semantics::ASTNode> parseFunctionDef();
     std::shared_ptr<semantics::ASTNode> parsePrint();
     std::shared_ptr<semantics::ASTNode> parseIf();
+    std::shared_ptr<semantics::ASTNode> parseReturn();
+    std::shared_ptr<semantics::ASTNode> parseBreak();
+    std::shared_ptr<semantics::ASTNode> parsePass();
+    std::shared_ptr<semantics::ASTNode> parseContinue();
 
     // Token utilities
     bool isAtEnd() const;

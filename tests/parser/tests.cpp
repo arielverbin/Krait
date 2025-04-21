@@ -17,10 +17,16 @@
 #define TEST_EXPRESSION(num) \
 TEST_CASE("Parses expressions correctly (" #num ")") { \
     auto tokens = lexer::Lexer::tokenize(expressionTest##num); \
-    auto ast = parser::Parser(tokens).parse(); \
-    REQUIRE(getResult(expressionTest##num)->stringify() == ast->stringify()); \
+    try { \
+        auto ast = parser::Parser(tokens).parse(); \
+        REQUIRE(getResult(expressionTest##num)->stringify() == ast->stringify()); \
+    } catch (const except::SyntaxError& err) { \
+        printSyntaxError(err, expressionTest##num); \
+        REQUIRE(false); \
+    } \
 }
 
+// Expressions, precedence and associativity
 TEST_EXPRESSION(1)
 TEST_EXPRESSION(2)
 TEST_EXPRESSION(3)
@@ -33,5 +39,21 @@ TEST_EXPRESSION(9)
 TEST_EXPRESSION(10)
 TEST_EXPRESSION(11)
 TEST_EXPRESSION(12)
+TEST_EXPRESSION(13)
+TEST_EXPRESSION(14)
+TEST_EXPRESSION(15)
+TEST_EXPRESSION(16)
+TEST_EXPRESSION(17)
+TEST_EXPRESSION(18)
+TEST_EXPRESSION(19)
+TEST_EXPRESSION(20)
+TEST_EXPRESSION(21)
+
+// functions, if, print and while statements
+TEST_EXPRESSION(22)
+TEST_EXPRESSION(23)
+TEST_EXPRESSION(24)
+TEST_EXPRESSION(25)
+TEST_EXPRESSION(26)
 
 #endif // KRAIT_TESTING

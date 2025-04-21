@@ -82,7 +82,8 @@ Parser::Parser(const std::vector<lexer::Token>& tokens) : tokens_(tokens), curre
 std::shared_ptr<semantics::ASTNode> Parser::parse() {
     std::vector<std::shared_ptr<semantics::ASTNode>> statements;
     while (!isAtEnd()) {
-        statements.push_back(parseStatement());
+        auto statement = parseStatement();
+        statements.push_back(statement);
     }
     return std::make_shared<semantics::Code>(std::move(statements));
 }
@@ -92,6 +93,10 @@ std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
     if (match(lexer::TokenType::WHILE)) return parseWhile();
     if (match(lexer::TokenType::DEF))   return parseFunctionDef();
     if (match(lexer::TokenType::PRINT)) return parsePrint();
+    if (match(lexer::TokenType::RETURN)) return parseReturn();
+    if (match(lexer::TokenType::PASS)) return parsePass();
+    if (match(lexer::TokenType::BREAK)) return parseBreak();
+    if (match(lexer::TokenType::CONTINUE)) return parseContinue();
 
     auto expr = parseExpression(0);
     expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
@@ -163,7 +168,6 @@ std::shared_ptr<semantics::ASTNode> Parser::parseInfix(
         }
         return std::make_shared<semantics::Assign>(assignableExpr, right);
     }
-
     return std::make_shared<semantics::BinaryOp>(mapBinaryOp(op.type()), left, right);
 }
 
@@ -183,21 +187,19 @@ std::shared_ptr<semantics::ASTNode> Parser::parseWhile() {
 
 std::shared_ptr<semantics::ASTNode> Parser::parseFunctionDef() {
     expect(lexer::TokenType::IDENTIFIER, "Expected function name after 'def'");
-    auto funcName = tokens_[current_ - 1].value();
+    auto funcName = previous().value();
     expect(lexer::TokenType::LPAREN, "Expected '(' after function name");
 
     std::vector<std::string> params;
-    while (!match(lexer::TokenType::RPAREN)) {
-        if (check(lexer::TokenType::IDENTIFIER)) {
-            params.push_back(tokens_[current_].value());
-            advance(); // consume identifier
-        } else {
-            throw except::SyntaxError("Expected parameter name", 
-                tokens_[current_].line(), tokens_[current_].column());
-        }
-        if (!match(lexer::TokenType::COMMA)) break; // consume comma
+    if (!check(lexer::TokenType::RPAREN)) {
+        // parse first param (and then any that follow after commas)
+        do {
+            expect(lexer::TokenType::IDENTIFIER, "Expected parameter name");
+            params.push_back(previous().value());
+        } while (match(lexer::TokenType::COMMA));
     }
 
+    expect(lexer::TokenType::RPAREN, "Expected ')' after function parameters");
     expect(lexer::TokenType::COLON, "Expected ':' after function parameters");
     expect(lexer::TokenType::NEWLINE, "Expected newline after ':'");
     expect(lexer::TokenType::INDENT, "Expected indent after newline");
@@ -227,7 +229,6 @@ std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
     while (!match(lexer::TokenType::DEDENT) && !check(lexer::TokenType::END_OF_FILE)) {
         thenBranch->statements.push_back(parseStatement());
     }
-    std::cout << "br: " << thenBranch->stringify() << std::endl;
 
     std::shared_ptr<semantics::Code> elseBranch = std::make_shared<semantics::Code>();
     if (match(lexer::TokenType::ELSE)) {
@@ -241,6 +242,31 @@ std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
     }
 
     return std::make_shared<semantics::If>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseReturn() {
+    auto returnValue = parseExpression();
+    expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
+
+    return std::make_shared<semantics::Return>(returnValue);
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseBreak() {
+    expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
+
+    return std::make_shared<semantics::Break>();
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parsePass() {
+    expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
+
+    return std::make_shared<semantics::Pass>();
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseContinue() {
+    expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
+
+    return std::make_shared<semantics::Continue>();
 }
 
 bool Parser::isAtEnd() const {
@@ -277,7 +303,7 @@ void Parser::expect(const lexer::TokenType& type, const std::string& msg) {
     if (check(type)) {
         advance();
     } else {
-        throw except::SyntaxError(msg, previous().line(), previous().column());
+        throw except::SyntaxError(msg, peek().line(), peek().column());
     }
 }
 
@@ -301,16 +327,23 @@ bool Parser::isRightAssociative(const lexer::TokenType& type) const {
 
 semantics::BinaryOpType Parser::mapBinaryOp(const lexer::TokenType& type) const {
     switch (type) {
-        case lexer::TokenType::PLUS: return semantics::BinaryOpType::Sum;
-        case lexer::TokenType::MINUS: return semantics::BinaryOpType::Sub;
-        case lexer::TokenType::STAR: return semantics::BinaryOpType::Mult;
-        case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
+        case lexer::TokenType::OR: return semantics::BinaryOpType::Or;
+        case lexer::TokenType::AND: return semantics::BinaryOpType::And;
+
         case lexer::TokenType::EQ: return semantics::BinaryOpType::Equal;
         //case lexer::TokenType::NEQ: return semantics::BinaryOpType::NotEqual;
+
         //case lexer::TokenType::LT: return semantics::BinaryOpType::Less;
         case lexer::TokenType::LTE: return semantics::BinaryOpType::LesserEqual;
         //case lexer::TokenType::GT: return semantics::BinaryOpType::Greater;
         case lexer::TokenType::GTE: return semantics::BinaryOpType::GreaterEqual;
+
+        case lexer::TokenType::PLUS: return semantics::BinaryOpType::Sum;
+        case lexer::TokenType::MINUS: return semantics::BinaryOpType::Sub;
+
+        case lexer::TokenType::STAR: return semantics::BinaryOpType::Mult;
+        case lexer::TokenType::SLASH: return semantics::BinaryOpType::Div;
+
         default:
             throw except::SyntaxError("Unexpected token type for binary operator",
                 previous().line(), previous().column());
