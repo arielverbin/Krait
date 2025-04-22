@@ -15,7 +15,7 @@
 
 TEST_CASE("Tokenises expressions correctly") {
     const std::string code = "x = 21 + (1 + 23) * (1   / (5 - 4)) \\\n + 22\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(21), PLUS(+), LPAREN((), NUMBER(1), PLUS(+), "
                                        "NUMBER(23), RPAREN()), STAR(*), LPAREN((), NUMBER(1), SLASH(/), LPAREN((), NUMBER(5), "
@@ -24,7 +24,7 @@ TEST_CASE("Tokenises expressions correctly") {
 
 TEST_CASE("Tokenises keywords correctly") {
     const std::string code = "if x == 1:\n    pass\nelse:\n    print(x)\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IF(if), IDENTIFIER(x), EQUAL(==), NUMBER(1), COLON(:), NEWLINE(\\n), "
@@ -35,7 +35,7 @@ TEST_CASE("Tokenises keywords correctly") {
 
 TEST_CASE("Tokenises multiline strings split by newline using a backlash") {
     const std::string code = "x = \"start of string\"  \\ \n\" continues here\"\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), STRING(start of string), STRING( continues here), NEWLINE(\\n), EOF()");
@@ -43,7 +43,7 @@ TEST_CASE("Tokenises multiline strings split by newline using a backlash") {
 
 TEST_CASE("Tokenises multiline strings split by newline using parentheses") {
     const std::string code = "x = (\"start of string\"  \n\" continues here\")\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), LPAREN((), STRING(start of string), STRING( continues here), RPAREN()), NEWLINE(\\n), EOF()");
@@ -51,7 +51,7 @@ TEST_CASE("Tokenises multiline strings split by newline using parentheses") {
 
 TEST_CASE("Ignores indentation and newline inside parentheses") {
     const std::string code = "x = (1 +\n    2)\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), LPAREN((), NUMBER(1), PLUS(+), NUMBER(2), RPAREN()), NEWLINE(\\n), EOF()");
@@ -59,7 +59,7 @@ TEST_CASE("Ignores indentation and newline inside parentheses") {
 
 TEST_CASE("Ignores indentation inside nested parentheses") {
     const std::string code = "x = (1 + (2 +\n        3))\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), LPAREN((), NUMBER(1), PLUS(+), LPAREN((), NUMBER(2), "
@@ -68,7 +68,7 @@ TEST_CASE("Ignores indentation inside nested parentheses") {
 
 TEST_CASE("Handles logical operators and comparisons") {
     const std::string code = "x = y and z or not a\nx == y != z <= 10 >= 2 < 4 > 1\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), IDENTIFIER(y), AND(and), IDENTIFIER(z), OR(or), NOT(not), IDENTIFIER(a), NEWLINE(\\n), "
@@ -78,7 +78,7 @@ TEST_CASE("Handles logical operators and comparisons") {
 
 TEST_CASE("Handles boolean and special literals") {
     const std::string code = "x = True\ny = False\nz = None\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), TRUE(True), NEWLINE(\\n), "
@@ -88,7 +88,7 @@ TEST_CASE("Handles boolean and special literals") {
 
 TEST_CASE("Handles commas and function calls") {
     const std::string code = "func(a, b, c)\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(func), LPAREN((), IDENTIFIER(a), COMMA(,), IDENTIFIER(b), COMMA(,), "
@@ -97,7 +97,7 @@ TEST_CASE("Handles commas and function calls") {
 
 TEST_CASE("Handles return, break, continue") {
     const std::string code = "return x\nbreak\ncontinue\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "RETURN(return), IDENTIFIER(x), NEWLINE(\\n), BREAK(break), NEWLINE(\\n), CONTINUE(continue), NEWLINE(\\n), EOF()");
@@ -105,7 +105,7 @@ TEST_CASE("Handles return, break, continue") {
 
 TEST_CASE("Handles nested blocks and correct indent/dedent") {
     const std::string code = "def f():\n    if x:\n        return 1\n    else:\n        return 2\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
 
     REQUIRE(stringifyTokens(tokens) ==
         "DEF(def), IDENTIFIER(f), LPAREN((), RPAREN()), COLON(:), NEWLINE(\\n), "
@@ -118,28 +118,28 @@ TEST_CASE("Handles nested blocks and correct indent/dedent") {
 // Tests an empty input file.
 TEST_CASE("Empty input") {
     const std::string code = "";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) == "EOF()");
 }
 
 // Tests input that starts with a newline.
 TEST_CASE("Starts with newline") {
     const std::string code = "\nx=42\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(42), NEWLINE(\\n), EOF()");
 }
 
 // Tests input that starts with a newline.
 TEST_CASE("Starts with newlines and spaces") {
     const std::string code = "\n\n  \nx=42\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(42), NEWLINE(\\n), EOF()");
 }
 
 // Tests multiple consecutive newlines and blank lines.
 TEST_CASE("Multiple consecutive newlines") {
     const std::string code = "x = 42\n\ny = 13\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     // Expect a NEWLINE token for the blank line.
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), NUMBER(42), NEWLINE(\\n), "
@@ -149,14 +149,14 @@ TEST_CASE("Multiple consecutive newlines") {
 // Tests that trailing spaces do not affect tokenisation.
 TEST_CASE("Handles trailing whitespace") {
     const std::string code = "x = 5    \n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(5), NEWLINE(\\n), EOF()");
 }
 
 // Tests conversion of Windows-style CRLF newlines into standard NEWLINE tokens.
 TEST_CASE("Handles Windows style newlines") {
     const std::string code = "x = 1\r\ny = 2\r\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), "
         "IDENTIFIER(y), ASSIGN(=), NUMBER(2), NEWLINE(\\n), EOF()");
@@ -165,7 +165,7 @@ TEST_CASE("Handles Windows style newlines") {
 // Tests that leading indentation on the first line is correctly handled.
 TEST_CASE("Handles leading indentation on first line") {
     const std::string code = "    x = 1\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     // Here the lexer should produce an INDENT then close it with a DEDENT at EOF.
     REQUIRE(stringifyTokens(tokens) ==
         "INDENT(), IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), DEDENT(), EOF()");
@@ -174,7 +174,7 @@ TEST_CASE("Handles leading indentation on first line") {
 // Tests that comments are ignored during tokenisation (assuming comment lines are skipped).
 TEST_CASE("Ignores comments") {
     const std::string code = "x = 1 # initialize x\nx=x  + 1";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) == "IDENTIFIER(x), ASSIGN(=), NUMBER(1), NEWLINE(\\n), "
         "IDENTIFIER(x), ASSIGN(=), IDENTIFIER(x), PLUS(+), NUMBER(1), EOF()");
 }
@@ -182,7 +182,7 @@ TEST_CASE("Ignores comments") {
 // Tests line continuation using the backslash to ignore the newline.
 TEST_CASE("Line continuation with backslash") {
     const std::string code = "x = 1 + \\\n2\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
 }
@@ -195,7 +195,7 @@ TEST_CASE("Continuation over multiple blank and whitespace lines") {
         "   \n"
         " \n"
         "2\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), NUMBER(1), PLUS(+), NUMBER(2), NEWLINE(\\n), EOF()");
 }
@@ -207,7 +207,7 @@ TEST_CASE("Continuation skips comment-only lines") {
         "# this is a comment\n"
         "# another comment\n"
         "5\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(y), ASSIGN(=), NUMBER(10), MINUS(-), NUMBER(5), NEWLINE(\\n), EOF()");
 }
@@ -218,7 +218,7 @@ TEST_CASE("Multiple consecutive backslashes for multi‑segment continuation") {
         "z = a + \\\n"
         "    b + \\\n"
         "c\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(z), ASSIGN(=), IDENTIFIER(a), PLUS(+), IDENTIFIER(b), PLUS(+), IDENTIFIER(c), NEWLINE(\\n), EOF()");
 }
@@ -228,7 +228,7 @@ TEST_CASE("Backslash in comment does not trigger continuation") {
     const std::string code =
         "x = 3 # comment with backslash \\\n"
         "+ 4\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), NUMBER(3), NEWLINE(\\n), PLUS(+), NUMBER(4), NEWLINE(\\n), EOF()");
 }
@@ -237,7 +237,7 @@ TEST_CASE("Backslash in comment does not trigger continuation") {
 // Tests string literals that include escaped quotes.
 TEST_CASE("String literal with escaped quotes") {
     const std::string code = "x = \"This is a \\\"test\\\" string\"\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), STRING(This is a \"test\" string), NEWLINE(\\n), EOF()");
 }
@@ -245,7 +245,7 @@ TEST_CASE("String literal with escaped quotes") {
 // Tests that a hash symbol inside a string literal is not treated as a comment.
 TEST_CASE("String literal containing hash symbol") {
     const std::string code = "x = \"# not a comment\"\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), STRING(# not a comment), NEWLINE(\\n), EOF()");
 }
@@ -259,7 +259,7 @@ TEST_CASE("Handles nested blocks with multiple dedents") {
         "    else:\n"
         "        z = 2\n"
         "a = 3\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IF(if), IDENTIFIER(x), COLON(:), NEWLINE(\\n), "
         "INDENT(), IF(if), IDENTIFIER(y), COLON(:), NEWLINE(\\n), "
@@ -272,7 +272,7 @@ TEST_CASE("Handles nested blocks with multiple dedents") {
 // Tests that negative numbers are tokenised as a MINUS operator followed by a NUMBER.
 TEST_CASE("Handles negative numbers and minus operator") {
     const std::string code = "x = -5\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(x), ASSIGN(=), MINUS(-), NUMBER(5), NEWLINE(\\n), EOF()");
 }
@@ -280,7 +280,7 @@ TEST_CASE("Handles negative numbers and minus operator") {
 // Tests block termination with an implicit dedent at the end of the file.
 TEST_CASE("Handles block ending with implicit dedent") {
     const std::string code = "if x:\n    y = 1\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IF(if), IDENTIFIER(x), COLON(:), NEWLINE(\\n), "
         "INDENT(), IDENTIFIER(y), ASSIGN(=), NUMBER(1), NEWLINE(\\n), DEDENT(), EOF()");
@@ -292,7 +292,7 @@ TEST_CASE("Comments after implicit continuation lines") {
         "data = (1,  # first\n"
         "      2,  # second\n"
         "        3)  # third\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(data), ASSIGN(=), LPAREN((), NUMBER(1), COMMA(,), NUMBER(2), COMMA(,), NUMBER(3), RPAREN()), NEWLINE(\\n), EOF()");
 }
@@ -301,7 +301,7 @@ TEST_CASE("Comments after implicit continuation lines") {
 TEST_CASE("Empty strings") {
     const std::string code =
         "one\t= ''\ndata = \"x\"\\\n''\\\n # More empty string\n\n\"\"\n";
-    auto tokens = lexer::Lexer::tokenize(code);
+    auto tokens = lexer::Lexer().tokenize(code);
     REQUIRE(stringifyTokens(tokens) ==
         "IDENTIFIER(one), ASSIGN(=), STRING(), NEWLINE(\\n), IDENTIFIER(data), ASSIGN(=), STRING(x), STRING(), STRING(), NEWLINE(\\n), EOF()");
 }

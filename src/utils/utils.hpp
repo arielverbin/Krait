@@ -6,6 +6,8 @@
 namespace utils {
 
 #define UNREFERENCED(var) (void)(var);
+static std::string empty = "\n";
+
 
 #ifdef KRAIT_TESTING
 std::string join(const std::vector<std::string>& vec, const std::string& delimiter);

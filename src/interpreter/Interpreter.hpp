@@ -9,8 +9,8 @@
 namespace interpreter {
 class Interpreter {
 public:
-    Interpreter(std::vector<std::shared_ptr<semantics::ASTNode>> commands);
-    runtime::Environment& interpret();
+    Interpreter();
+    runtime::Environment& interpret(std::shared_ptr<semantics::ASTNode> command);
 
 private:
     std::shared_ptr<runtime::Environment> state_;

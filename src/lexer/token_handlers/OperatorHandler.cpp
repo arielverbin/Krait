@@ -37,7 +37,7 @@ std::optional<Token> OperatorHandler::emit() const {
 }
 
 OperatorHandler::MatchResult OperatorHandler::tryMatch() const {
-    const std::string& source = context_.source;
+    const std::string_view& source = context_.source;
     LexerPosition& pos = context_.pos;
     std::string_view view = std::string_view(source).substr(pos.position);
 

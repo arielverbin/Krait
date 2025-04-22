@@ -14,8 +14,8 @@ TEST_CASE("Interprets while loops and normal flow correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(normalFlow);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(normalFlow));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -28,8 +28,8 @@ TEST_CASE("Interprets function closures correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(functionClosures);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(functionClosures));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -43,8 +43,8 @@ TEST_CASE("Interprets calculations correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(calculations);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(calculations));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -57,8 +57,8 @@ TEST_CASE("Interprets control flow correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(controlFlowTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(controlFlowTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -71,8 +71,8 @@ TEST_CASE("Interprets recursion correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(recursionTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(recursionTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -85,8 +85,8 @@ TEST_CASE("Interprets logical operators correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(logicalOperatorsTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(logicalOperatorsTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -99,8 +99,8 @@ TEST_CASE("Interprets nested closures correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(nestedClosureTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(nestedClosureTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -113,8 +113,8 @@ TEST_CASE("Interprets nested if-else correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(nestedIfElseTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(nestedIfElseTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -127,8 +127,8 @@ TEST_CASE("Interprets nested loops correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(nestedLoopTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(nestedLoopTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -142,8 +142,8 @@ TEST_CASE("Interprets functions without arguments correctly") {
     std::ostringstream buffer;
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
-    interpreter::Interpreter i(noArgFunctionTest);
-    i.interpret();
+    interpreter::Interpreter i;
+    i.interpret(CODE(noArgFunctionTest));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);

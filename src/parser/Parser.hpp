@@ -4,11 +4,13 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <span>
 #include "lexer/Token.hpp"
 #include "exceptions/exceptions.hpp"
 #include "semantics/ASTNode.hpp"
 #include "semantics/operation_semantics/BinaryOp.hpp"
 #include "semantics/operation_semantics/UnaryOp.hpp"
+#include "parser/ParserContext.hpp"
 
 namespace parser {
 
@@ -26,10 +28,10 @@ struct OperatorInfo {
 
 class Parser {
 public:
-    Parser(const std::vector<lexer::Token>& tokens);
+    Parser();
 
     // Top-level entry: parse all statements into a Code node
-    std::shared_ptr<semantics::ASTNode> parse();
+    std::shared_ptr<semantics::ASTNode> parse(std::vector<lexer::Token>& tokens);
 
     // Dispatch on keywords or fallback to expression
     std::shared_ptr<semantics::ASTNode> parseStatement();
@@ -39,8 +41,7 @@ private:
     std::unordered_map<lexer::TokenType, OperatorInfo> infixTable_;
     std::unordered_map<lexer::TokenType, int> prefixTable_;
 
-    const std::vector<lexer::Token>& tokens_;
-    size_t current_;
+    ParserContext context_;
 
     // Expression parsing (Pratt / precedence‑climbing)
     std::shared_ptr<semantics::ASTNode> parseExpression(int minBp = 0);

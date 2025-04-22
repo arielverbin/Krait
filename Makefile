@@ -1,11 +1,12 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I.
-RUN_CXXFLAGS := $(CXXFLAGS_BASE)
+CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I. 
+RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun
 TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING
 
 # Directories
 SRC_DIR := src
+RUN_DIR := run
 RUN_BUILD_DIR := build/run
 TEST_BUILD_DIR := build/tests
 RUN_OBJ_DIR := $(RUN_BUILD_DIR)/obj
@@ -18,7 +19,7 @@ TEST_OBJ_DIR := $(TEST_BUILD_DIR)/obj
 RUN_BIN := $(RUN_BUILD_DIR)/krait
 
 # Source files for run build (all files from src)
-RUN_SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+RUN_SRCS := $(shell find $(SRC_DIR) -name '*.cpp') $(shell find $(RUN_DIR) -name '*.cpp')
 RUN_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(RUN_OBJ_DIR)/%.o,$(RUN_SRCS))
 # The main program is in the project root
 RUN_MAIN := Main.cpp

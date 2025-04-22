@@ -13,7 +13,7 @@ bool TokenHandler::isAtEnd() const {
 }
 
 char TokenHandler::nextChar() const {
-    const std::string& source = context_.source;
+    const std::string_view& source = context_.source;
     LexerPosition& pos = context_.pos;
 
     if (pos.position >= source.size()) return '\0';
@@ -24,7 +24,7 @@ char TokenHandler::nextChar() const {
 }
 
 char TokenHandler::peekChar() const {
-    const std::string& source = context_.source;
+    const std::string_view& source = context_.source;
     LexerPosition& pos = context_.pos;
 
     if (pos.position >= source.size()) return '\0';

@@ -5,7 +5,7 @@
 
 namespace lexer {
 
-Lexer::Lexer(const std::string& input) : context_(input) {
+Lexer::Lexer() : context_() {
     // The order of these is important and sets the priorities.
     handlers_.emplace_back(std::make_unique<IdentifierHandler>(context_));
     handlers_.emplace_back(std::make_unique<NumberHandler>(context_));
@@ -48,11 +48,11 @@ Token Lexer::nextToken() {
 }
 
 std::vector<Token> Lexer::tokenize(const std::string& code) {
-    Lexer l(code);
-    std::vector<Token> res;
+    context_.load(code);
 
+    std::vector<Token> res;
     do {
-        Token t = l.nextToken();
+        Token t = nextToken();
         res.push_back(t);
     } while (res.back().type() != TokenType::END_OF_FILE);
 

@@ -16,9 +16,9 @@
 
 #define TEST_EXPRESSION(num) \
 TEST_CASE("Parses expressions correctly (" #num ")") { \
-    auto tokens = lexer::Lexer::tokenize(expressionTest##num); \
+    auto tokens = lexer::Lexer().tokenize(expressionTest##num); \
     try { \
-        auto ast = parser::Parser(tokens).parse(); \
+        auto ast = parser::Parser().parse(tokens); \
         REQUIRE(getResult(expressionTest##num)->stringify() == ast->stringify()); \
     } catch (const except::SyntaxError& err) { \
         printSyntaxError(err, expressionTest##num); \

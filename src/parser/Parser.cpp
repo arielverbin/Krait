@@ -29,7 +29,7 @@
 
 namespace parser {
 
-Parser::Parser(const std::vector<lexer::Token>& tokens) : tokens_(tokens), current_(0) {
+Parser::Parser() {
     // Binary (infix) operators
     infixTable_ = {
         // Lowest precedence: assignment (right‑associative).
@@ -81,7 +81,9 @@ Parser::Parser(const std::vector<lexer::Token>& tokens) : tokens_(tokens), curre
     };
 }
 
-std::shared_ptr<semantics::ASTNode> Parser::parse() {
+std::shared_ptr<semantics::ASTNode> Parser::parse(std::vector<lexer::Token>& tokens) {
+    context_.load(tokens);
+
     std::vector<std::shared_ptr<semantics::ASTNode>> statements;
     while (!isAtEnd()) {
         auto statement = parseStatement();
@@ -319,25 +321,26 @@ std::shared_ptr<semantics::ASTNode> Parser::parseContinue() {
 }
 
 bool Parser::isAtEnd() const {
-    return current_ >= tokens_.size() || tokens_[current_].type() == lexer::TokenType::END_OF_FILE;
+    return context_.current >= context_.tokens.size() || 
+        (context_.tokens[context_.current].type() == lexer::TokenType::END_OF_FILE);
 }
 
 const lexer::Token& Parser::peek() const {
-    return tokens_[current_];
+    return context_.tokens[context_.current];
 }
 
 const lexer::Token& Parser::advance() {
-    if (!isAtEnd()) current_++;
+    if (!isAtEnd()) context_.current++;
     return previous();
 }
 
 const lexer::Token& Parser::previous() const {
-    return tokens_[current_ - 1];
+    return context_.tokens[context_.current - 1];
 }
 
 bool Parser::check(const lexer::TokenType& type) const {
     if (isAtEnd()) return false;
-    return tokens_[current_].type() == type;
+    return context_.tokens[context_.current].type() == type;
 }
 
 bool Parser::match(const lexer::TokenType& type) {
