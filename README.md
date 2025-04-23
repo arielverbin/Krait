@@ -32,3 +32,13 @@ After typing `make run`, you can also use `./build/run/krait path/to/file.kr` to
 ### Read-Evaluate-Print-Loop (RELP)
 By running `./build/run/krait` without arguments, a REPL shell will open. Use `exit` to terminate.
 
+<p align="center">
+  <img src="./assets/repl-demo.png" alt="REPL demo" width="400"/>
+</p>
+
+
+## TODO
+- [ ] Member lookup (`obj.field`)
+- [ ] Backtrace for runtime errors
+- [ ] Complex types: `list`, indexing, mutation
+- [ ] `for` loops with `in`, `break`, `continue`
