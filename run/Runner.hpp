@@ -15,7 +15,6 @@ namespace run {
 class Runner {
 private:
     InputSource& source_;
-    lexer::Lexer lexer_;
     parser::Parser parser_;
     interpreter::Interpreter interpreter_;
 

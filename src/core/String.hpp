@@ -20,9 +20,8 @@ public:
     std::shared_ptr<Object> _bool_() override;
     operator bool() const override;
 
-    friend std::ostream& operator<<(std::ostream& os, const String& str) {
-        os << str.value_;
-        return os;
+    std::string rawString() {
+        return value_;
     }
 
     virtual ~String() = default;

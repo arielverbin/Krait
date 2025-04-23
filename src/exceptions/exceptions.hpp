@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 #include <string>
+#include "core/Object.hpp"
+#include "core/String.hpp"
 
 namespace except {
 
@@ -30,45 +32,49 @@ private:
     size_t column_;
 };
 
-class RuntimeException : public KraitException {
+class RuntimeError : public KraitException {
 public:
-    explicit RuntimeException(const std::string& msg)
+    explicit RuntimeError(const std::string& msg)
         : KraitException(msg) {}
 };
 
 // Exception for invalid arguments
-class InvalidArgumentException : public RuntimeException {
+class InvalidArgumentException : public RuntimeError {
     public:
         explicit InvalidArgumentException(const std::string& msg)
-            : RuntimeException("Invalid Argument: " + msg) {}
+            : RuntimeError("InvalidArgumentException: " + msg) {}
     };
 
 // Exception for variable not found
-class VariableNotFoundException : public RuntimeException {
+class VariableNotFoundException : public RuntimeError {
 public:
     explicit VariableNotFoundException(const std::string& varName)
-        : RuntimeException("Variable not found: " + varName) {}
+        : RuntimeError("VariableNotFoundException: " + varName) {}
 };
 
 // Exception for type mismatch
-class TypeMismatchException : public RuntimeException {
+class TypeMismatchException : public RuntimeError {
 public:
     explicit TypeMismatchException(const std::string& expected, const std::string& actual)
-        : RuntimeException("Type mismatch: expected " + expected + ", got " + actual) {}
+        : RuntimeError("TypeMismatchException: expected " + expected + ", got " + actual) {}
 };
 
 // Exception for division by zero
-class DivisionByZeroException : public RuntimeException {
+class DivisionByZeroException : public RuntimeError {
 public:
-    explicit DivisionByZeroException()
-        : RuntimeException("Division by zero") {}
+    explicit DivisionByZeroException(core::Object& dividend)
+        : RuntimeError("DivisionByZeroException") {
+            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend._att_("_str_")->_call_({}))) {
+                message += ": tried to divide " + i->rawString() + " with 0";
+            }
+        }
 };
 
 // Exception for not implemented features
-class NotImplementedException : public RuntimeException {
+class NotImplementedException : public RuntimeError {
 public:
     explicit NotImplementedException(const std::string& msg)
-        : RuntimeException("Not Implemented: " + msg) {}
+        : RuntimeError("NotImplementedException: " + msg) {}
 };
 
 } // namespace except

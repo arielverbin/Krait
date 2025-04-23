@@ -33,6 +33,16 @@ public:
             lineLengths.pop();
         }
     }
+
+    void reset() {
+        line = column = 1;
+        position = 0;
+        lineLengths = {};
+    }
+
+    void append() {
+        position = 0;
+    }
 };
 
 #endif // LEXER_POSITION_HPP

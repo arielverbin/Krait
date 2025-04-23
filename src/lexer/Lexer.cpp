@@ -1,5 +1,4 @@
 #include "Lexer.hpp"
-
 #include "exceptions/exceptions.hpp"
 #include "lexer/token_handlers/TokenHandler.hpp"
 
@@ -17,11 +16,27 @@ Lexer::Lexer() : context_() {
     handlers_.emplace_back(std::make_unique<CleanupHandler>(context_));
 }
 
+std::vector<Token> Lexer::tokenize(const std::string& code, bool doCleanup) {
+    context_.load(code);
+    context_.doCleanup = doCleanup;
+
+    std::vector<Token> res;
+    do {
+        Token t = nextToken();
+        res.push_back(t);
+    } while (res.back().type() != TokenType::END_OF_FILE);
+
+    if (!context_.doCleanup) res.pop_back();
+    else reset();
+
+    return res;
+}
+
 Token Lexer::nextToken() {
     while (true) {
         if (!context_.pendingTokens.empty()) {
-            Token token = context_.pendingTokens.back();
-            context_.pendingTokens.pop_back();
+            Token token = context_.pendingTokens.front();
+            context_.pendingTokens.pop_front();
             return token;
         }
 
@@ -47,16 +62,8 @@ Token Lexer::nextToken() {
     }
 }
 
-std::vector<Token> Lexer::tokenize(const std::string& code) {
-    context_.load(code);
-
-    std::vector<Token> res;
-    do {
-        Token t = nextToken();
-        res.push_back(t);
-    } while (res.back().type() != TokenType::END_OF_FILE);
-
-    return res;
+void Lexer::reset() {
+    context_.reset();
 }
 
 } // namespace lexer

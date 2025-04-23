@@ -46,7 +46,7 @@ std::shared_ptr<Object> Float::_div_(Object& another) {
             return std::make_shared<Float>(value_ / i->value_);
         }
 
-        throw except::DivisionByZeroException();
+        throw except::DivisionByZeroException(*this);
     }
 
     throw except::InvalidArgumentException("Type '" + this->_type_() + "' "
@@ -59,7 +59,7 @@ std::shared_ptr<Object> Float::_mod_(Object& another) {
             return std::make_shared<Float>(std::fmod(value_, i->value_));
         }
 
-        throw except::DivisionByZeroException();
+        throw except::DivisionByZeroException(*this);
     }
 
     throw except::InvalidArgumentException("Type '" + this->_type_() + "' "

@@ -71,7 +71,8 @@ size_t NewlineHandler::skipWhitespace() const {
             return indent; // return the indent level
         };
     }
-    return 0;
+    // The next line was empty, return the current indent level.
+    return context_.currentIndentLevel * 4;
 }
 
 

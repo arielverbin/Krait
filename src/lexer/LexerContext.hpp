@@ -15,17 +15,23 @@ struct LexerContext {
     size_t currentIndentLevel;          // for tracking current indentation level
     size_t currentGroupingLevel;        // for tracking parentheses nesting
     bool lineBroke;                     // for tracking line breaking using a backslash.
+    bool doCleanup;                     // Whether do emit cleanup (DEDENT's)
 
     LexerContext()
-        : source(), pos(), pendingTokens({}), currentIndentLevel(0), currentGroupingLevel(0), lineBroke(false) {}
+        : source(), pos(), pendingTokens({}), currentIndentLevel(0), currentGroupingLevel(0), lineBroke(false), doCleanup(true) {}
 
     void load(const std::string& src) {
         source = src;
-        pos = LexerPosition();
-        pendingTokens = {};
+        pos.append();
+    }
+
+    void reset() {
         currentIndentLevel = 0;
         currentGroupingLevel = 0;
+        pos.reset();
         lineBroke = false;
+        pendingTokens = {};
+        doCleanup = true;
     }
 
 };

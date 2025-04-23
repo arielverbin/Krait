@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I. 
+CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I.
 RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun
 TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING
 
@@ -50,7 +50,7 @@ $(TEST_OBJ_DIR)/%_test.o: tests/%/tests.cpp
 # and the test module's object (compiled from tests/<module>/tests.cpp).
 $(TEST_BUILD_DIR)/test_%: $(TEST_OBJS) $(TEST_OBJ_DIR)/%_test.o
 	@mkdir -p $(TEST_BUILD_DIR)
-	$(CXX) $(TEST_CXXFLAGS) $^ -o $@
+	$(CXX) $(TEST_CXXFLAGS) $^ -ledit -o $@
 
 # ============================================================================
 # Build rules for run target
@@ -58,7 +58,7 @@ $(TEST_BUILD_DIR)/test_%: $(TEST_OBJS) $(TEST_OBJ_DIR)/%_test.o
 # Link the main executable from Main.cpp and the sources from src.
 $(RUN_BIN): $(RUN_OBJS) $(RUN_MAIN_OBJ)
 	@mkdir -p $(dir $@)
-	$(CXX) $(RUN_CXXFLAGS) $^ -o $@
+	$(CXX) $(RUN_CXXFLAGS) $^ -ledit -o $@
 
 # Compile .cpp files from src/ for run build
 $(RUN_OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp

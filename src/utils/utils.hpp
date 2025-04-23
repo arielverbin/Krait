@@ -8,6 +8,11 @@ namespace utils {
 #define UNREFERENCED(var) (void)(var);
 static std::string empty = "\n";
 
+#define RESET       "\033[0m"
+#define BLUE        "\033[0;34m"
+#define GREY        "\033[38;5;240m"
+#define CYAN        "\033[0;36m"
+#define BOLDMAGENTA "\033[1;35m"
 
 #ifdef KRAIT_TESTING
 std::string join(const std::vector<std::string>& vec, const std::string& delimiter);

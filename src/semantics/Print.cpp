@@ -13,7 +13,7 @@ std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) const
     std::shared_ptr<core::Object> string = expression_->evaluate(state)->_str_();
 
     if (std::shared_ptr<core::String> s = std::dynamic_pointer_cast<core::String>(string)) {
-        std::cout << *s << std::endl;
+        std::cout << s->rawString() << std::endl;
         return core::None::getNone();
     }
 

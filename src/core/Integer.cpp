@@ -44,7 +44,7 @@ std::shared_ptr<Object> Integer::_div_(Object& another) {
             return std::make_shared<Integer>(value_ / i->value_);
         }
 
-        throw except::DivisionByZeroException();
+        throw except::DivisionByZeroException(*this);
     }
 
     throw except::InvalidArgumentException("Type '" + this->_type_() + "' "
@@ -57,7 +57,7 @@ std::shared_ptr<Object> Integer::_mod_(Object& another) {
             return std::make_shared<Integer>(value_ % i->value_);
         }
 
-        throw except::DivisionByZeroException();
+        throw except::DivisionByZeroException(*this);
     }
 
     throw except::InvalidArgumentException("Type '" + this->_type_() + "' "

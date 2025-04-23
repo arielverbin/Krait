@@ -10,16 +10,28 @@ FileSource::FileSource(const std::string& filePath) : file_(filePath.c_str()), e
     }
 }
 
-std::string FileSource::getNext() {
-    eof_ = true;
-
+void FileSource::readScript() {
     if (file_) {
         std::stringstream buffer;
         buffer << file_.rdbuf();
-        return buffer.str();
+        script_ = buffer.str();
+    } else {
+        script_ = utils::empty;
     }
+}
 
-    return utils::empty;
+std::vector<lexer::Token> FileSource::nextStatement() {
+    eof_ = true;
+    if (!script_.empty()) return lexer_.tokenize(script_);
+
+    readScript();
+    return lexer_.tokenize(script_);
+}
+
+const std::string& FileSource::source() {
+    if (script_.empty()) readScript();
+
+    return script_;
 }
 
 bool FileSource::eof() const {

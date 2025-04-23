@@ -9,12 +9,16 @@ namespace run {
 class FileSource : public InputSource {
 private:
     std::ifstream file_;
+    std::string script_;
     bool eof_;
+    void readScript();
 
 public:
     FileSource(const std::string& filePath);
-    std::string getNext() override;
+    std::vector<lexer::Token> nextStatement() override;
     bool eof() const override;
+    const std::string& source() override;
+    bool exitOnError() const override { return true; }
 
     ~FileSource() = default;
 };

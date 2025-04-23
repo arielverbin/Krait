@@ -1,7 +1,7 @@
 #include "Token.hpp"
 using namespace lexer;
 
-Token::Token(TokenType type, const std::string& value, LexerPosition& pos)
+Token::Token(TokenType type, const std::string& value, const LexerPosition& pos)
     : type_(type), value_(value), line_(pos.line), column_(pos.column) {}
 
 TokenType Token::type() const { return type_; }

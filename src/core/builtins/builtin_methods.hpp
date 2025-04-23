@@ -8,7 +8,6 @@
 // builtin supports,
 std::shared_ptr<core::Object> __str_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
-    auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
     return self->_str_();
 }
 

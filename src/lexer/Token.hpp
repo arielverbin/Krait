@@ -54,7 +54,7 @@ private:
     size_t column_;
 
 public:
-    Token(TokenType type, const std::string& value, LexerPosition& pos);
+    Token(TokenType type, const std::string& value, const LexerPosition& pos);
     TokenType type() const;
     const std::string& value() const;
     size_t line() const;

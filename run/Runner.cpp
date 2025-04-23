@@ -1,16 +1,29 @@
 #include "Runner.hpp"
+#include "run/ErrorPrinter.hpp"
+#include "lexer/Lexer.hpp"
+#include "lexer/Token.hpp"
 
 namespace run {
 
-Runner::Runner(InputSource& source) : source_(source), lexer_(), parser_(), interpreter_() {}
+Runner::Runner(InputSource& source) : source_(source), parser_(), interpreter_() {}
 
 void Runner::run() {
-    while(!source_.eof()) {
-        std::string nextCode = source_.getNext();
-        auto tokens = lexer_.tokenize(nextCode);
-        auto ast = parser_.parse(tokens);
-        interpreter_.interpret(ast);
-    }
+    do {
+        try {
+            auto tokens = source_.nextStatement();
+            auto ast = parser_.parse(tokens);
+            interpreter_.interpret(ast);
+        
+        // handle exceptions
+        } catch (const except::SyntaxError& err) {
+            std::cerr << ErrorPrinter::format(source_.source(), err);
+            if (source_.exitOnError()) break;
+        } catch (const except::RuntimeError& err) {
+            std::cerr << ErrorPrinter::format(source_.source(), err);
+            if (source_.exitOnError()) break;
+        }
+
+    } while (!source_.eof());
 }
     
 }
