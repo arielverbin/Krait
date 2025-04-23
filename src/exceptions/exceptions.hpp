@@ -40,10 +40,17 @@ public:
 
 // Exception for invalid arguments
 class InvalidArgumentException : public RuntimeError {
-    public:
-        explicit InvalidArgumentException(const std::string& msg)
-            : RuntimeError("InvalidArgumentException: " + msg) {}
-    };
+public:
+    explicit InvalidArgumentException(const std::string& msg)
+        : RuntimeError("InvalidArgumentException: " + msg) {}
+};
+
+// Exception for attribute errors
+class AttributeException : public RuntimeError {
+public:
+    explicit AttributeException(const std::string& msg)
+        : RuntimeError("AttributeException: " + msg) {}
+};
 
 // Exception for variable not found
 class VariableNotFoundException : public RuntimeError {
@@ -64,7 +71,7 @@ class DivisionByZeroException : public RuntimeError {
 public:
     explicit DivisionByZeroException(core::Object& dividend)
         : RuntimeError("DivisionByZeroException") {
-            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend._att_("_str_")->_call_({}))) {
+            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend._str_())) {
                 message += ": tried to divide " + i->rawString() + " with 0";
             }
         }

@@ -15,13 +15,18 @@ struct LazyValue {
     LazyValue(std::function<std::shared_ptr<Object>()> fn): creator(std::move(fn)) {}
 };
 
+enum class Permission { READONLY, READWRITE };
+
+struct MemberEntry {
+    std::variant<std::shared_ptr<Object>, LazyValue> value;
+    Permission permissions;
+};
+
 class Object {
 protected:
     // a workaround for being able to safely pass 'this' as a shared_ptr.
     std::shared_ptr<Object> self_;
-    using MemberEntry = std::variant<std::shared_ptr<Object>, LazyValue>;
-
-    std::map<std::string, MemberEntry> members_;
+    std::unordered_map<std::string, MemberEntry> members_;
 
 public:
     Object();
@@ -55,6 +60,7 @@ public:
     virtual std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args);
 
     virtual std::shared_ptr<Object> _att_(std::string varName);
+    virtual void _setatt_(std::string varName, std::shared_ptr<Object> value);
 
     virtual ~Object() = default;
 };

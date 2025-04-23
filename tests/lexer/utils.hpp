@@ -10,7 +10,7 @@
 #include "core/Boolean.hpp"
 
 #include "semantics/define_semantics/Assign.hpp"
-#include "semantics/define_semantics/Function.hpp"
+#include "semantics/define_semantics/FunctionDef.hpp"
 #include "semantics/flow_semantics/Call.hpp"
 #include "semantics/Print.hpp"
 #include "semantics/Const.hpp"

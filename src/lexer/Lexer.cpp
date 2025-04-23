@@ -1,17 +1,18 @@
 #include "Lexer.hpp"
 #include "exceptions/exceptions.hpp"
 #include "lexer/token_handlers/TokenHandler.hpp"
+#include <iostream>
 
 namespace lexer {
 
 Lexer::Lexer() : context_() {
     // The order of these is important and sets the priorities.
+    handlers_.emplace_back(std::make_unique<NewlineHandler>(context_));
     handlers_.emplace_back(std::make_unique<IdentifierHandler>(context_));
     handlers_.emplace_back(std::make_unique<NumberHandler>(context_));
     handlers_.emplace_back(std::make_unique<StringHandler>(context_));
     handlers_.emplace_back(std::make_unique<OperatorHandler>(context_));
     handlers_.emplace_back(std::make_unique<GroupingHandler>(context_));
-    handlers_.emplace_back(std::make_unique<NewlineHandler>(context_));
     handlers_.emplace_back(std::make_unique<WhitespaceHandler>(context_));
     handlers_.emplace_back(std::make_unique<CleanupHandler>(context_));
 }
@@ -42,12 +43,16 @@ Token Lexer::nextToken() {
 
         bool wasMatched = false;
         for (auto& handler : handlers_) {
+            auto prevPos = context_.pos.position;
+            auto prevPending = context_.pendingTokens.size();
+
             if (handler->match()) {
                 wasMatched = true;
                 if (auto token = handler->emit()) {
                     return *token;
                 }
-                break;
+                if (prevPos < context_.pos.position) break;
+                if (prevPending < context_.pendingTokens.size()) break;
             }
         }
 

@@ -7,9 +7,9 @@
 
 namespace semantics {
 
-class Function : public ASTNode {
+class FunctionDef : public ASTNode {
 public:
-    Function(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code);
+    FunctionDef(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
@@ -19,7 +19,7 @@ public:
     }
     #endif // KRAIT_TESTING
 
-    virtual ~Function() = default;
+    virtual ~FunctionDef() = default;
 
 private:
     std::string funcName_;

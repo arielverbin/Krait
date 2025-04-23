@@ -37,7 +37,7 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 #define MULT(a, b)                      ms(BinaryOp)(BinaryOpType::Mult, a, b)
 #define DIV(a, b)                       ms(BinaryOp)(BinaryOpType::Div, a, b)
 #define MOD(a, b)                       ms(BinaryOp)(BinaryOpType::Mod, a, b)
-#define FUNC(funcName, params, body)    ms(semantics::Function)(funcName, params, body)
+#define FUNC(funcName, params, body)    ms(semantics::FunctionDef)(funcName, params, body)
 #define STRARR(...)                     std::vector<std::string>{__VA_ARGS__}
 #define CALL(func, args)                ms(Call)(func, args)
 #define ARGS(...)                       make_ast_vector(__VA_ARGS__)

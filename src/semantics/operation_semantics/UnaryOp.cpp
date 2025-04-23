@@ -1,5 +1,7 @@
 #include "UnaryOp.hpp"
+#include "semantics/signal_semantics/Signal.hpp"
 #include "core/Integer.hpp"
+#include "core/None.hpp"
 using namespace semantics;
 
 std::map<UnaryOpType, std::string> UnaryOp::functionTypeMap_ = {
@@ -16,5 +18,10 @@ std::shared_ptr<core::Object> UnaryOp::evaluate(runtime::Environment& state) con
 
     // Retrieve the current object's implementation of the operation.
     std::shared_ptr<core::Object> operation = firstValue->_att_(UnaryOp::functionTypeMap_[type_]);
-    return operation->_call_({});
+    try {
+        operation->_call_({});
+    } catch (const ReturnSignal& returnSignal) {
+        return returnSignal.value();
+    }
+    return core::None::getNone();
 }

@@ -1,4 +1,6 @@
 #include "BinaryOp.hpp"
+#include "core/None.hpp"
+#include "semantics/signal_semantics/Signal.hpp"
 using namespace semantics;
 
 std::map<BinaryOpType, std::string> BinaryOp::functionTypeMap_ = {
@@ -26,5 +28,10 @@ std::shared_ptr<core::Object> BinaryOp::evaluate(runtime::Environment& state) co
 
     // Retrieve the current object's implementation of the operation.
     std::shared_ptr<core::Object> operation = firstValue->_att_(BinaryOp::functionTypeMap_[type_]);
-    return operation->_call_(std::vector<std::shared_ptr<core::Object>>{ secondValue });
+    try {
+        operation->_call_(std::vector<std::shared_ptr<core::Object>>{ secondValue });
+    } catch (const ReturnSignal& returnSignal) {
+        return returnSignal.value();
+    }
+    return core::None::getNone();
 }
