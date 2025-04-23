@@ -12,7 +12,7 @@ public:
     InputSource() { lexer_.reset(); }
     virtual std::vector<lexer::Token> nextStatement() = 0;
     virtual bool eof() const = 0;
-    virtual bool exitOnError() const = 0;
+    virtual bool exitOnError() = 0;
     virtual const std::string& source() = 0;
     virtual ~InputSource() = default;
 

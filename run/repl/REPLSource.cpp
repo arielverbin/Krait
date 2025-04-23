@@ -53,6 +53,12 @@ std::vector<lexer::Token> REPLSource::nextStatement() {
     return analyzer_.consume();
 }
 
+bool REPLSource::exitOnError() {
+    analyzer_.consume();
+    lexer_.reset();
+    return false;
+}
+
 const std::string& REPLSource::source() {
     return currentSource_;
 }

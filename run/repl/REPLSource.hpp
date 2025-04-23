@@ -17,7 +17,7 @@ public:
     REPLSource();
     std::vector<lexer::Token> nextStatement() override;
     bool eof() const override;
-    bool exitOnError() const override { return false; }
+    bool exitOnError() override;
     const std::string& source() override;
     virtual ~REPLSource() = default;
 };

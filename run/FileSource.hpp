@@ -18,7 +18,7 @@ public:
     std::vector<lexer::Token> nextStatement() override;
     bool eof() const override;
     const std::string& source() override;
-    bool exitOnError() const override { return true; }
+    bool exitOnError() override { return true; }
 
     ~FileSource() = default;
 };
