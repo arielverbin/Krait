@@ -20,20 +20,23 @@ public:
     using NativeFunc = std::function<std::shared_ptr<Object>(ArgList)>;
 
     // Constructors for built-in functions:
-    Function(NativeFunc nativeFunc);
+    Function(NativeFunc nativeFunc, size_t numArgs);
 
     // Constructors for user-defined functions would store an AST node, parameter list, etc.
     Function(std::shared_ptr<semantics::ASTNode> body, std::vector<std::string> params, runtime::Environment closure);
 
     std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args) override;
+    size_t numArgs();
 
     virtual std::shared_ptr<Object> _str_() override;
+    std::string _type_() override;
 
     virtual ~Function() = default;
     
 private:
     bool isBuiltIn_;
     NativeFunc nativeFunc_;
+    size_t numArgs_;
 
     // For user-defined functions:
     std::shared_ptr<semantics::ASTNode> body_;

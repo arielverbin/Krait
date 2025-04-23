@@ -17,7 +17,7 @@
 #include "semantics/flow_semantics/Pass.hpp"
 #include "semantics/flow_semantics/Call.hpp"
 
-#include "semantics/define_semantics/Function.hpp"
+#include "semantics/define_semantics/FunctionDef.hpp"
 #include "semantics/define_semantics/Assign.hpp"
 
 #include "semantics/signal_semantics/Break.hpp"
@@ -26,6 +26,7 @@
 
 #include "semantics/operation_semantics/UnaryOp.hpp"
 #include "semantics/operation_semantics/BinaryOp.hpp"
+#include "semantics/operation_semantics/AccessProperty.hpp"
 
 namespace parser {
 
@@ -207,13 +208,11 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePostfix(std::shared_ptr<semanti
             left = std::make_shared<semantics::Call>(left, std::move(args));
         }
 
-        /** TODO: Member lookup :) */
-        // else if (match(TokenType::DOT)) {
-        //     // Member access
-        //     expect(TokenType::IDENTIFIER, "Expect property name after '.'");
-        //     Token name = previous();
-        //     left = std::make_shared<GetProperty>(left, name);
-        // }
+        else if (match(lexer::TokenType::DOT)) {
+            // Member access
+            expect(lexer::TokenType::IDENTIFIER, "Expect property name after '.'");
+            left = std::make_shared<semantics::AccessProperty>(left, previous().value());
+        }
 
         else {
             break;
@@ -260,7 +259,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parseFunctionDef() {
         body->statements.push_back(parseStatement());
     }
 
-    return std::make_shared<semantics::Function>(funcName, params, std::move(body));
+    return std::make_shared<semantics::FunctionDef>(funcName, params, std::move(body));
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parsePrint() {

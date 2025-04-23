@@ -14,11 +14,11 @@ Object::Object() {
     auto self = self_;
 
     // Define all builtin methods.
-    for (auto& builtin : builtinMethods) {
-        members_[builtin.first] = LazyValue([self, builtin]() -> std::shared_ptr<BoundMethod> {
-            std::shared_ptr<Function> func = std::make_shared<Function>(builtin.second);
-            return std::make_shared<BoundMethod>(self, func);
-        });
+    for (auto& builtin : builtin::builtinMethods) {
+        members_[builtin.name] = { 
+            LazyValue([self, builtin]() -> std::shared_ptr<BoundMethod> {
+            std::shared_ptr<Function> func = std::make_shared<Function>(builtin.func, builtin.numArgs);
+            return std::make_shared<BoundMethod>(self, func); }), Permission::READONLY };
     }
 }
 
@@ -44,58 +44,75 @@ std::shared_ptr<Object> Object::_att_(std::string varName) {
     auto member = members_.find(varName);
 
     if (member == members_.end()) {
-        throw except::VariableNotFoundException(varName);
+        throw except::VariableNotFoundException("Attribute '" + 
+                varName + "' does not exist for type '" + this->_type_() + "'");
     }
 
-    if (std::holds_alternative<std::shared_ptr<Object>>(member->second)) {
-        return std::get<std::shared_ptr<Object>>(member->second);
+    if (std::holds_alternative<std::shared_ptr<Object>>(member->second.value)) {
+        return std::get<std::shared_ptr<Object>>(member->second.value);
     }
 
     // It's a LazyValue — resolve and cache
-    LazyValue& lazy = std::get<LazyValue>(member->second);
+    LazyValue& lazy = std::get<LazyValue>(member->second.value);
     std::shared_ptr<Object> resolved = lazy.creator();
-    member->second = resolved;
+    member->second.value = resolved;
     return resolved;
+}
+
+void Object::_setatt_(std::string varName, std::shared_ptr<Object> value) {
+    auto member = members_.find(varName);
+
+    if (member == members_.end()) {
+        throw except::VariableNotFoundException("Attribute '" + 
+                varName + "' does not exist for type '" + this->_type_() + "'");
+    }
+
+    if (member->second.permissions != Permission::READWRITE) {
+        throw except::AttributeException("Attribute '" + 
+            varName + "' for type '" + this->_type_() + "' is read-only.");
+    }
+
+    member->second.value = value;
 }
 
 std::shared_ptr<Object> Object::_add_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support addition.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support addition.");
 }
 
 std::shared_ptr<Object> Object::_sub_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support subtraction.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support subtraction.");
 }
 
 std::shared_ptr<Object> Object::_mult_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-    " does not support multiplication.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support multiplication.");
 }
 
 std::shared_ptr<Object> Object::_div_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support division.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support division.");
 }
 
 std::shared_ptr<Object> Object::_mod_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support modulo.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support modulo.");
 }
 
 std::shared_ptr<Object> Object::_neg_() {
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support negation.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support negation.");
 }
 
 std::shared_ptr<Object> Object::_bool_() {
@@ -105,36 +122,36 @@ std::shared_ptr<Object> Object::_bool_() {
 std::shared_ptr<Object> Object::_ge_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support '>=' comparison.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support '>=' comparison.");
 }
 
 std::shared_ptr<Object> Object::_gt_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support '>' comparison.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support '>' comparison.");
 }
 
 std::shared_ptr<Object> Object::_le_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support '<=' comparison.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support '<=' comparison.");
 }
 
 std::shared_ptr<Object> Object::_lt_(Object& another) {
     UNREFERENCED(another);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " does not support '<' comparison.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' does not support '<' comparison.");
 }
 
 std::shared_ptr<Object> Object::_call_(std::vector<std::shared_ptr<Object>> args) {
     UNREFERENCED(args);
 
-    throw except::NotImplementedException("Object of type " + this->_type_() +
-        " is not callable.");
+    throw except::NotImplementedException("Object of type '" + this->_type_() +
+        "' is not callable.");
 }
 
 std::shared_ptr<Object> Object::_eq_(Object& another) {

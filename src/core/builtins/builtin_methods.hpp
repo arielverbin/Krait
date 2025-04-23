@@ -5,6 +5,14 @@
 #include <iostream>
 #include "../Boolean.hpp"
 
+namespace builtin {
+
+struct BuiltinFunction {
+    core::Function::NativeFunc func;
+    std::string name;
+    size_t numArgs;
+};
+
 // builtin supports,
 std::shared_ptr<core::Object> __str_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
@@ -107,12 +115,15 @@ std::shared_ptr<core::Object> __not_(core::ArgList args) {
     return core::Boolean::get(!(*first->_bool_()));
 }
 
-std::map<std::string, core::Function::NativeFunc> builtinMethods = {
-    {"_str_", __str_ }, {"_add_", __add_ }, {"_sub_", __sub_ },
-    {"_mult_", __mult_ }, {"_div_", __div_ }, {"_mod_", __mod_ }, {"_neg_", __neg_ },
-    {"_ge_", __ge_ }, {"_gt_", __gt_ }, {"_le_", __le_ }, {"_lt_", __lt_ },
-    {"_eq_", __eq_ }, {"_neq_", __neq_ }, {"_bool_", __bool_}, {"_and_", __and_ },
-    {"_or_", __or_ }, {"_not_", __not_ },
+std::vector<BuiltinFunction> builtinMethods = {
+    {__str_, "_str_", 1}, {__add_, "_add_", 2}, {__sub_, "_sub_", 2},
+    {__mult_, "_mult_", 2}, {__div_, "_div_", 2}, {__mod_, "_mod_", 2}, {__neg_, "_neg_", 1},
+    {__ge_, "_ge_", 2}, {__gt_, "_gt_", 2}, {__le_, "_le_", 2}, {__lt_, "_lt_", 2},
+    {__eq_, "_eq_", 2}, {__neq_, "_neq_", 2}, {__bool_, "_bool_", 1}, {__and_, "_and_", 2},
+    {__or_, "_or_", 2}, {__not_, "_not_", 1},
 };
+
+}
+
 
 #endif // CORE_BUILTINS_METHODS_HPP
