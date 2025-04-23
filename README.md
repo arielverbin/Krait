@@ -13,6 +13,9 @@ Krait/
 │   ├── parser/        # Parsing the tokens to create the AST's
 │   ├── interpreter/   # The interpreter for executing the AST's
 │   ├── runtime/       # The state of the program at runtime
+│   ├── exceptions/    # Built-in exception classes
+│   └── utils/         # Utilities
+├── run/               # The tokenize-parse-interpret flow
 └── tests/             # Tests
 ```
 
@@ -21,6 +24,11 @@ Krait/
 git clone https://github.com/arielverbin/Krait.git
 cd krait
 make test  # For running tests/*/tests.cpp
-make test parser interpreter # For running tests/parser/tests.cpp and then tests/interpreter/tests.cpp
-make run   # For running Main.cpp (Empty for now)
+make test parser interpreter # For compiling and running tests/parser/tests.cpp and then tests/interpreter/tests.cpp
+make run   # For compiling and running a REPL shell
 ```
+After typing `make run`, you can also use `./build/run/krait path/to/file.kr` to run scripts.
+
+### Read-Evaluate-Print-Loop (RELP)
+By running `./build/run/krait` without arguments, a REPL shell will open. Use `exit` to terminate.
+
