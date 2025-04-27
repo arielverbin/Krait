@@ -12,7 +12,7 @@ Function::Function(NativeFunc nativeFunc, size_t numArgs)
 Function::Function(std::shared_ptr<semantics::ASTNode> body, std::vector<std::string> params, runtime::Environment closure) 
     : isBuiltIn_(false), body_(body), params_(params), closure_(std::move(closure)) {}
 
-std::shared_ptr<Object> Function::_call_(std::vector<std::shared_ptr<Object>> args) {
+std::shared_ptr<Object> Function::call(std::vector<std::shared_ptr<Object>> args) {
     UNREFERENCED(body_);
 
     size_t expectedNumArgs = isBuiltIn_ ? numArgs_ : params_.size();
@@ -37,15 +37,11 @@ std::shared_ptr<Object> Function::_call_(std::vector<std::shared_ptr<Object>> ar
     return body_->evaluate(evalScope);
 }
 
-size_t Function::numArgs() {
-    return isBuiltIn_ ? numArgs_ : params_.size();
-}
-
 std::string Function::_type_() {
     return "Function";
 }
 
-std::shared_ptr<Object> Function::_str_() {
+std::shared_ptr<Object> Function::toString() {
     std::ostringstream oss;
     oss << "<Function (" << (isBuiltIn_ ? "" : "non-") << "built-in)>";
     return std::make_shared<String>(oss.str());

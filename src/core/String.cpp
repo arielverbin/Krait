@@ -11,10 +11,10 @@ std::string String::_type_() {
     return "String";
 }
 
-std::shared_ptr<Object> String::_add_(Object& another) {
+std::shared_ptr<Object> String::add(Object& another) {
     // String addition attempts to convert the given object to a String
     // and concatenate the two strings.
-    if (std::shared_ptr<String> i = std::dynamic_pointer_cast<String>(another._str_())) {
+    if (std::shared_ptr<String> i = std::dynamic_pointer_cast<String>(another.toString())) {
         return std::make_shared<String>(value_ + i->value_);
     }
 
@@ -22,7 +22,7 @@ std::shared_ptr<Object> String::_add_(Object& another) {
                     "does not support addition with type '" + another._type_() +"'.");
 }
 
-std::shared_ptr<Object> String::_mult_(Object& another) {
+std::shared_ptr<Object> String::multiply(Object& another) {
     // String multiplication attempts to convert the given object to an Integer
     // and repeat the string that many times.
     if (Integer* i = dynamic_cast<Integer*>(&another)) {
@@ -37,21 +37,21 @@ std::shared_ptr<Object> String::_mult_(Object& another) {
                     "does not support multiplication with type '" + another._type_() +"'.");
 }
 
-std::shared_ptr<Object> String::_eq_(Object& another) {
+std::shared_ptr<Object> String::equal(Object& another) {
     if (String* i = dynamic_cast<String*>(&another)) {
         return Boolean::get(value_ == i->value_);
     }
     return Boolean::get(false);
 }
 
-std::shared_ptr<Object> String::_neq_(Object& another) {
+std::shared_ptr<Object> String::notEqual(Object& another) {
     if (String* i = dynamic_cast<String*>(&another)) {
         return Boolean::get(value_ != i->value_);
     }
     return Boolean::get(true);
 }
 
-std::shared_ptr<Object> String::_bool_() {
+std::shared_ptr<Object> String::toBool() {
     return Boolean::get(value_.size() != 0);
 }
 
@@ -59,6 +59,6 @@ String::operator bool() const {
     return value_.size() != 0;
 }
 
-std::shared_ptr<Object> String::_str_() {
+std::shared_ptr<Object> String::toString() {
     return std::make_shared<String>(value_);
 }

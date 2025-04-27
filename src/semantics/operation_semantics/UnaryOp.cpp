@@ -17,9 +17,9 @@ std::shared_ptr<core::Object> UnaryOp::evaluate(runtime::Environment& state) con
     std::shared_ptr<core::Object> firstValue = exp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.
-    std::shared_ptr<core::Object> operation = firstValue->_att_(UnaryOp::functionTypeMap_[type_]);
+    std::shared_ptr<core::Object> operation = firstValue->getAttribute(UnaryOp::functionTypeMap_[type_]);
     try {
-        operation->_call_({});
+        operation->call({});
     } catch (const ReturnSignal& returnSignal) {
         return returnSignal.value();
     }

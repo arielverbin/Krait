@@ -27,9 +27,9 @@ std::shared_ptr<core::Object> BinaryOp::evaluate(runtime::Environment& state) co
     std::shared_ptr<core::Object> secondValue = secExp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.
-    std::shared_ptr<core::Object> operation = firstValue->_att_(BinaryOp::functionTypeMap_[type_]);
+    std::shared_ptr<core::Object> operation = firstValue->getAttribute(BinaryOp::functionTypeMap_[type_]);
     try {
-        operation->_call_(std::vector<std::shared_ptr<core::Object>>{ secondValue });
+        operation->call(std::vector<std::shared_ptr<core::Object>>{ secondValue });
     } catch (const ReturnSignal& returnSignal) {
         return returnSignal.value();
     }

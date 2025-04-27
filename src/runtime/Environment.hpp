@@ -48,7 +48,7 @@ public:
                 if (!first) os << ", ";
                 first = false;
     
-                auto value = pair.second->_str_();
+                auto value = pair.second->toString();
     
                 if (auto strValue = std::dynamic_pointer_cast<core::String>(value)) {
                     os << pair.first << ": \"" << *strValue << "\"";

@@ -4,28 +4,13 @@
 #include <string>
 #include <map>
 #include <variant>
+#include "utils/utils.hpp"
 
 namespace core {
 
-class Object;
-struct LazyValue {
-    std::function<std::shared_ptr<Object>()> creator;
-    std::vector<std::shared_ptr<Object>> args;
-    
-    LazyValue(std::function<std::shared_ptr<Object>()> fn): creator(std::move(fn)) {}
-};
-
-enum class Permission { READONLY, READWRITE };
-
-struct MemberEntry {
-    std::variant<std::shared_ptr<Object>, LazyValue> value;
-    Permission permissions;
-};
-
-class Object {
+class Object : public std::enable_shared_from_this<Object> {
 protected:
-    // a workaround for being able to safely pass 'this' as a shared_ptr.
-    std::shared_ptr<Object> self_;
+    using MemberEntry = std::variant<std::shared_ptr<Object>, utils::LazyValue>;
     std::unordered_map<std::string, MemberEntry> members_;
 
 public:
@@ -41,26 +26,27 @@ public:
     virtual std::string _type_();
 
     // TODO: KraitClass will implement those by checking their members for "_str_" etc.
-    virtual std::shared_ptr<Object> _str_();
-    virtual std::shared_ptr<Object> _add_(Object& another);
-    virtual std::shared_ptr<Object> _sub_(Object& another);
-    virtual std::shared_ptr<Object> _mult_(Object& another);
-    virtual std::shared_ptr<Object> _div_(Object& another);
-    virtual std::shared_ptr<Object> _mod_(Object& another);
-    virtual std::shared_ptr<Object> _neg_();
+    virtual std::shared_ptr<Object> toString();
+    virtual std::shared_ptr<Object> toBool();
 
-    virtual std::shared_ptr<Object> _bool_();
-    virtual std::shared_ptr<Object> _ge_(Object& another);
-    virtual std::shared_ptr<Object> _gt_(Object& another);
-    virtual std::shared_ptr<Object> _le_(Object& another);
-    virtual std::shared_ptr<Object> _lt_(Object& another);
-    virtual std::shared_ptr<Object> _eq_(Object& another);
-    virtual std::shared_ptr<Object> _neq_(Object& another);
+    virtual std::shared_ptr<Object> add(Object& another);
+    virtual std::shared_ptr<Object> subtract(Object& another);
+    virtual std::shared_ptr<Object> multiply(Object& another);
+    virtual std::shared_ptr<Object> divide(Object& another);
+    virtual std::shared_ptr<Object> modulu(Object& another);
+    virtual std::shared_ptr<Object> negate();
 
-    virtual std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args);
+    virtual std::shared_ptr<Object> greaterEqual(Object& another);
+    virtual std::shared_ptr<Object> greater(Object& another);
+    virtual std::shared_ptr<Object> lesserEqual(Object& another);
+    virtual std::shared_ptr<Object> lesser(Object& another);
+    virtual std::shared_ptr<Object> equal(Object& another);
+    virtual std::shared_ptr<Object> notEqual(Object& another);
 
-    virtual std::shared_ptr<Object> _att_(std::string varName);
-    virtual void _setatt_(std::string varName, std::shared_ptr<Object> value);
+    virtual std::shared_ptr<Object> call(std::vector<std::shared_ptr<Object>> args);
+
+    virtual std::shared_ptr<Object> getAttribute(std::string varName);
+    virtual void setAttribute(std::string varName, MemberEntry value);
 
     virtual ~Object() = default;
 };

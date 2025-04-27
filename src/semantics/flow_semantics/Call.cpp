@@ -1,5 +1,6 @@
 #include "Call.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
+#include "core/Integer.hpp"
 #include "core/None.hpp"
 using namespace semantics;
 
@@ -16,7 +17,7 @@ std::shared_ptr<core::Object> Call::evaluate(runtime::Environment& state) const 
     }
 
     try {
-        callee->_call_(args);
+        callee->call(args);
     } catch (ReturnSignal& returnSignal) {
         return returnSignal.value();
     }

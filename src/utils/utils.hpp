@@ -3,9 +3,19 @@
 
 #include <sstream>
 
+namespace core { class Object; }
+
 namespace utils {
 
 #define UNREFERENCED(var) (void)(var);
+
+struct LazyValue {
+    std::function<std::shared_ptr<core::Object>()> creator;
+    std::vector<std::shared_ptr<core::Object>> args;
+    
+    LazyValue(std::function<std::shared_ptr<core::Object>()> fn): creator(std::move(fn)) {}
+};
+
 static std::string empty = "\n";
 
 #define RESET       "\033[0m"

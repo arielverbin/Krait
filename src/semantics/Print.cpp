@@ -10,7 +10,7 @@ using namespace semantics;
 Print::Print(std::shared_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
 std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Object> string = expression_->evaluate(state)->_str_();
+    std::shared_ptr<core::Object> string = expression_->evaluate(state)->toString();
 
     if (std::shared_ptr<core::String> s = std::dynamic_pointer_cast<core::String>(string)) {
         std::cout << s->rawString() << std::endl;

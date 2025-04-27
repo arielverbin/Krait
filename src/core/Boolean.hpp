@@ -18,14 +18,14 @@ public:
 
     operator bool() const override;
 
-    bool _and_(Boolean& other) const;
-    bool _or_(Boolean& other) const;
-    bool _not_() const;
-    std::shared_ptr<Object> _eq_(Object& another) override;
+    bool logicalAnd(Boolean& other) const;
+    bool logicalOr(Boolean& other) const;
+    bool logicalNot() const;
+    std::shared_ptr<Object> equal(Object& another) override;
 
     std::string _type_() override;
-    std::shared_ptr<Object> _str_() override;
-    std::shared_ptr<Object> _bool_() override;
+    std::shared_ptr<Object> toString() override;
+    std::shared_ptr<Object> toBool() override;
 
     virtual ~Boolean() = default;
 };

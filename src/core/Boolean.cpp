@@ -12,7 +12,7 @@ std::shared_ptr<Boolean> Boolean::get(bool value) {
     return value ? Boolean::true_ : Boolean::false_;
 }
 
-std::shared_ptr<Object> Boolean::_bool_() {
+std::shared_ptr<Object> Boolean::toBool() {
     return value_ ? Boolean::true_ : Boolean::false_;
 }
 
@@ -20,19 +20,19 @@ Boolean::operator bool() const {
     return value_;
 }
 
-bool Boolean::_and_(Boolean& other) const {
+bool Boolean::logicalAnd(Boolean& other) const {
     return other.value_ && value_;
 }
 
-bool Boolean::_or_(Boolean& other) const {
+bool Boolean::logicalOr(Boolean& other) const {
     return other.value_ || value_;
 }
 
-bool Boolean::_not_() const {
+bool Boolean::logicalNot() const {
     return !value_;
 }
 
-std::shared_ptr<Object> Boolean::_eq_(Object& another) {
+std::shared_ptr<Object> Boolean::equal(Object& another) {
     if (Boolean* i = dynamic_cast<Boolean*>(&another)) {
         return Boolean::get(value_ == i->value_);
     }
@@ -43,7 +43,7 @@ std::string Boolean::_type_() {
     return "Boolean";
 }
 
-std::shared_ptr<Object> Boolean::_str_() {
+std::shared_ptr<Object> Boolean::toString() {
     static std::shared_ptr<Object> trueString = std::make_shared<String>("True");
     static std::shared_ptr<Object> falseString = std::make_shared<String>("False");
     return value_ ? trueString : falseString;

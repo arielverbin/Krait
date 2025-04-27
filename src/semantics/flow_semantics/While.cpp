@@ -9,7 +9,7 @@ While::While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block)
 
 
 std::shared_ptr<core::Object> While::evaluate(runtime::Environment& state) const {
-    while (*condition_->evaluate(state)->_bool_()) {
+    while (*condition_->evaluate(state)->toBool()) {
         try {
             block_->evaluate(state);
         } catch (BreakSignal& breakSignal) {
