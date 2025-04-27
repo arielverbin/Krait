@@ -8,7 +8,7 @@ If::If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::s
 
 
 std::shared_ptr<core::Object> If::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Object> computed_condition = condition_->evaluate(state)->_bool_();
+    std::shared_ptr<core::Object> computed_condition = condition_->evaluate(state)->toBool();
 
     // state.pushNewScope();
     if (*computed_condition) {

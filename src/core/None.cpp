@@ -3,7 +3,7 @@
 #include "Boolean.hpp"
 using namespace core;
 
-std::shared_ptr<Object> None::_str_() {
+std::shared_ptr<Object> None::toString() {
     static std::shared_ptr<Object> none = std::make_shared<String>("None");
     return none;
 }
@@ -16,11 +16,11 @@ None::operator bool() const {
     return false;
 }
 
-std::shared_ptr<Object> None::_bool_() {
+std::shared_ptr<Object> None::toBool() {
     return Boolean::get(false);
 }
 
-std::shared_ptr<Object> None::_eq_(Object& another) {
+std::shared_ptr<Object> None::equal(Object& another) {
     return dynamic_cast<None*>(&another) == nullptr ? Boolean::get(false) : Boolean::get(false);
 }
 

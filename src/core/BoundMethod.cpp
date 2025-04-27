@@ -3,25 +3,19 @@
 
 using namespace core;
 
-BoundMethod::BoundMethod(std::shared_ptr<Object> instance, std::shared_ptr<Function> function)
-    : instance_(instance), function_(function), numArgs_(function_->numArgs() - 1) {}
+BoundMethod::BoundMethod(std::shared_ptr<Object> instance, std::shared_ptr<Object> callable)
+    : instance_(instance), callable_(callable) {}
 
-std::shared_ptr<Object> BoundMethod::_call_(std::vector<std::shared_ptr<Object>> args) {
-
-    if (args.size() != numArgs_) {
-        throw except::InvalidArgumentException("Method call with incorrect number of arguments (expected " +
-            std::to_string(numArgs_) + ", got " + std::to_string(args.size()) + ").");
-    }
-
+std::shared_ptr<Object> BoundMethod::call(std::vector<std::shared_ptr<Object>> args) {
     args.insert(args.begin(), instance_);
-    return function_->_call_(args);
+    return callable_->call(args);
 }
 
 std::string BoundMethod::_type_() {
     return "BoundMethod";
 }
 
-std::shared_ptr<Object> BoundMethod::_str_() {
+std::shared_ptr<Object> BoundMethod::toString() {
     std::ostringstream oss;
     oss << "<BoundMethod for type '" + instance_->_type_() + "'>";
     return std::make_shared<String>(oss.str());

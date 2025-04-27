@@ -71,7 +71,7 @@ class DivisionByZeroException : public RuntimeError {
 public:
     explicit DivisionByZeroException(core::Object& dividend)
         : RuntimeError("DivisionByZeroException") {
-            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend._str_())) {
+            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend.toString())) {
                 message += ": tried to divide " + i->rawString() + " with 0";
             }
         }

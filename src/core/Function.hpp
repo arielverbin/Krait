@@ -25,10 +25,9 @@ public:
     // Constructors for user-defined functions would store an AST node, parameter list, etc.
     Function(std::shared_ptr<semantics::ASTNode> body, std::vector<std::string> params, runtime::Environment closure);
 
-    std::shared_ptr<Object> _call_(std::vector<std::shared_ptr<Object>> args) override;
-    size_t numArgs();
+    std::shared_ptr<Object> call(std::vector<std::shared_ptr<Object>> args) override;
 
-    virtual std::shared_ptr<Object> _str_() override;
+    virtual std::shared_ptr<Object> toString() override;
     std::string _type_() override;
 
     virtual ~Function() = default;

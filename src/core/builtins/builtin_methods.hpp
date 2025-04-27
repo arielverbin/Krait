@@ -16,103 +16,103 @@ struct BuiltinFunction {
 // builtin supports,
 std::shared_ptr<core::Object> __str_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
-    return self->_str_();
+    return self->toString();
 }
 
 std::shared_ptr<core::Object> __add_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_add_(*other);
+    return self->add(*other);
 }
 
 std::shared_ptr<core::Object> __sub_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_sub_(*other);
+    return self->subtract(*other);
 }
 
 std::shared_ptr<core::Object> __mult_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_mult_(*other);
+    return self->multiply(*other);
 }
 
 std::shared_ptr<core::Object> __div_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_div_(*other);
+    return self->divide(*other);
 }
 
 std::shared_ptr<core::Object> __mod_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_mod_(*other);
+    return self->modulu(*other);
 }
 
 std::shared_ptr<core::Object> __neg_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
-    return self->_neg_();
+    return self->negate();
 }
 
 std::shared_ptr<core::Object> __ge_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_ge_(*other);
+    return self->greaterEqual(*other);
 }
 
 std::shared_ptr<core::Object> __gt_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_gt_(*other);
+    return self->greater(*other);
 }
 
 std::shared_ptr<core::Object> __le_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_le_(*other);
+    return self->lesserEqual(*other);
 }
 
 std::shared_ptr<core::Object> __lt_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_lt_(*other);
+    return self->lesser(*other);
 }
 
 std::shared_ptr<core::Object> __eq_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_eq_(*other);
+    return self->equal(*other);
 }
 
 std::shared_ptr<core::Object> __neq_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto other = std::dynamic_pointer_cast<core::Object>(args[1]);
-    return self->_neq_(*other);
+    return self->notEqual(*other);
 }
 
 std::shared_ptr<core::Object> __bool_(core::ArgList args) {
     auto self = std::dynamic_pointer_cast<core::Object>(args[0]);
-    return self->_bool_();
+    return self->toBool();
 }
 
 std::shared_ptr<core::Object> __and_(core::ArgList args) {
     auto first = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto second = std::dynamic_pointer_cast<core::Object>(args[1]);
 
-    return *first->_bool_() ? second : first;
+    return *first->toBool() ? second : first;
 }
 
 std::shared_ptr<core::Object> __or_(core::ArgList args) {
     auto first = std::dynamic_pointer_cast<core::Object>(args[0]);
     auto second = std::dynamic_pointer_cast<core::Object>(args[1]);
 
-    return *first->_bool_() ? first : second;
+    return *first->toBool() ? first : second;
 }
 
 std::shared_ptr<core::Object> __not_(core::ArgList args) {
     auto first = std::dynamic_pointer_cast<core::Object>(args[0]);
 
-    return core::Boolean::get(!(*first->_bool_()));
+    return core::Boolean::get(!(*first->toBool()));
 }
 
 std::vector<BuiltinFunction> builtinMethods = {
