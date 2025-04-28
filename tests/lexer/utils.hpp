@@ -4,10 +4,10 @@
 
 #include <vector>
 #include "semantics/ASTNode.hpp"
-#include "core/Integer.hpp"
-#include "core/String.hpp"
-#include "core/None.hpp"
-#include "core/Boolean.hpp"
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/builtins/builtin_types/String.hpp"
+#include "core/builtins/builtin_types/None.hpp"
+#include "core/builtins/builtin_types/Boolean.hpp"
 
 #include "semantics/define_semantics/Assign.hpp"
 #include "semantics/define_semantics/FunctionDef.hpp"

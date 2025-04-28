@@ -1,6 +1,6 @@
 #include "FunctionDef.hpp"
-#include "core/Function.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Function.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
 FunctionDef::FunctionDef(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code)

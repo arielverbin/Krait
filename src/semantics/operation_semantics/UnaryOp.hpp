@@ -8,18 +8,18 @@ namespace semantics {
 enum UnaryOpType {
     Neg,
     Not,
-    Bool,
 };
 
 class UnaryOp : public ASTNode {
 public:
+    using Method = std::shared_ptr<core::Object> (core::Object::*)();
     UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp);
 
     virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {
-        return "UnaryOp(" + functionTypeMap_[type_] + ", " + exp_->stringify() + ")";
+        return "UnaryOp(op, " + exp_->stringify() + ")";
     }
     #endif // KRAIT_TESTING
 
@@ -29,7 +29,7 @@ private:
     UnaryOpType type_;
     std::shared_ptr<ASTNode> exp_;
 
-    static std::map<UnaryOpType, std::string> functionTypeMap_;
+    static std::map<UnaryOpType, Method> functionTypeMap_;
 };
 
 } // namespace semantics

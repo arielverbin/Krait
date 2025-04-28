@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Environment.hpp"
 #include "exceptions/exceptions.hpp"
-#include "core/Integer.hpp"
 using namespace runtime;
 
 std::shared_ptr<Scope> Environment::pushNewScope() {

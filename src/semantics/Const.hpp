@@ -13,12 +13,7 @@ public:
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {
-        if (auto strObj = std::dynamic_pointer_cast<core::String>(obj_->toString())) {
-            std::ostringstream ss;
-            ss << "Const(" << *strObj << ")";
-            return ss.str();
-        }
-        return "Const(?)";
+        return "Const(" + static_cast<std::string>(*obj_->toString()) + ")";
     }
     #endif // KRAIT_TESTING
 

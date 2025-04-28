@@ -16,6 +16,18 @@ struct LazyValue {
     LazyValue(std::function<std::shared_ptr<core::Object>()> fn): creator(std::move(fn)) {}
 };
 
+// Helper template that implements _shared_from_this_base automatically
+template<typename Base, typename Derived>
+class EnableSharedFromThis : public Base, public std::enable_shared_from_this<Derived> {
+protected:
+    std::shared_ptr<Base> _shared_from_this() override {
+        return std::static_pointer_cast<Base>(this->shared_from_this());
+    }
+public:
+    template<typename... Args>
+    EnableSharedFromThis(Args&&... args) : Base(std::forward<Args>(args)...) {}
+};
+
 static std::string empty = "\n";
 
 #define RESET       "\033[0m"

@@ -1,7 +1,7 @@
 #include "Call.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
-#include "core/Integer.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
 Call::Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args)
@@ -16,10 +16,5 @@ std::shared_ptr<core::Object> Call::evaluate(runtime::Environment& state) const 
         args.push_back(arg->evaluate(state));
     }
 
-    try {
-        callee->call(args);
-    } catch (ReturnSignal& returnSignal) {
-        return returnSignal.value();
-    }
-    return core::None::getNone();
+    return callee->call(args);
 }
