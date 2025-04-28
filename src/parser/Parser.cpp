@@ -1,11 +1,11 @@
 #include "Parser.hpp"
 #include "exceptions/exceptions.hpp"
 
-#include "core/Integer.hpp"
-#include "core/Float.hpp"
-#include "core/String.hpp"
-#include "core/Boolean.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/builtins/builtin_types/Float.hpp"
+#include "core/builtins/builtin_types/String.hpp"
+#include "core/builtins/builtin_types/Boolean.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 
 #include "semantics/Const.hpp"
 #include "semantics/Variable.hpp"
@@ -145,6 +145,10 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
 
     if (match(lexer::TokenType::FALS)) {
         return std::make_shared<semantics::Const>(core::Boolean::get(false));
+    }
+
+    if (match(lexer::TokenType::NONE)) {
+        return std::make_shared<semantics::Const>(core::None::getNone());
     }
 
     if (match(lexer::TokenType::STRING)) {

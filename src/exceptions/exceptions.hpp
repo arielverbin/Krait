@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include "core/Object.hpp"
-#include "core/String.hpp"
+#include "core/builtins/builtin_types/String.hpp"
 
 namespace except {
 
@@ -45,11 +45,18 @@ public:
         : RuntimeError("InvalidArgumentException: " + msg) {}
 };
 
-// Exception for attribute errors
-class AttributeException : public RuntimeError {
+// Exception for invalid types
+class TypeError : public RuntimeError {
 public:
-    explicit AttributeException(const std::string& msg)
-        : RuntimeError("AttributeException: " + msg) {}
+    explicit TypeError(const std::string& msg) 
+        : RuntimeError("TypeError: " + msg) {}
+};
+
+// Exception for attribute erros
+class AttributeError : public RuntimeError {
+public:
+    explicit AttributeError(const std::string& msg)
+        : RuntimeError("AttributeError: " + msg) {}
 };
 
 // Exception for variable not found
@@ -71,9 +78,7 @@ class DivisionByZeroException : public RuntimeError {
 public:
     explicit DivisionByZeroException(core::Object& dividend)
         : RuntimeError("DivisionByZeroException") {
-            if (std::shared_ptr<core::String> i = std::dynamic_pointer_cast<core::String>(dividend.toString())) {
-                message += ": tried to divide " + i->rawString() + " with 0";
-            }
+            message += ": tried to divide " + static_cast<std::string>(*dividend.toString()) + " with 0";
         }
 };
 

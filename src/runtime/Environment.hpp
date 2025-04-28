@@ -2,7 +2,7 @@
 #define RUNTIME_ENVIRONMENT_HPP
 
 #include "core/Object.hpp"
-#include "core/String.hpp"
+#include "core/builtins/builtin_types/String.hpp"
 #include <map>
 #include <stack>
 #include <iostream>
@@ -49,12 +49,7 @@ public:
                 first = false;
     
                 auto value = pair.second->toString();
-    
-                if (auto strValue = std::dynamic_pointer_cast<core::String>(value)) {
-                    os << pair.first << ": \"" << *strValue << "\"";
-                } else {
-                    os << pair.first << ": " << value->_type_();
-                }
+                os << pair.first << ": \"" << static_cast<std::string>(*value) << "\"";
             }
             os << "}" << std::endl;
         }

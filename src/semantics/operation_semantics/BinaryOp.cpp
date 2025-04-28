@@ -1,22 +1,23 @@
 #include "BinaryOp.hpp"
-#include "core/None.hpp"
+#include "core/Object.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
 using namespace semantics;
 
-std::map<BinaryOpType, std::string> BinaryOp::functionTypeMap_ = {
-    { BinaryOpType::Sum,  "_add_"  },
-    { BinaryOpType::Sub,  "_sub_"  },
-    { BinaryOpType::Mult, "_mult_" },
-    { BinaryOpType::Div,  "_div_"  },
-    { BinaryOpType::Mod,  "_mod_" },
-    { BinaryOpType::GreaterEqual, "_ge_" },
-    { BinaryOpType::GreaterThan, "_gt_" },
-    { BinaryOpType::LesserEqual, "_le_" },
-    { BinaryOpType::LesserThan, "_lt_" },
-    { BinaryOpType::Equal, "_eq_" },
-    { BinaryOpType::NotEqual, "_neq_" },
-    { BinaryOpType::And, "_and_" },
-    { BinaryOpType::Or, "_or_" },
+std::map<BinaryOpType, BinaryOp::Method> BinaryOp::functionTypeMap_ = {
+    { BinaryOpType::Sum, &core::Object::add },
+    { BinaryOpType::Sub, &core::Object::subtract },
+    { BinaryOpType::Mult, &core::Object::multiply },
+    { BinaryOpType::Div, &core::Object::divide },
+    { BinaryOpType::Mod, &core::Object::modulu },
+    { BinaryOpType::GreaterEqual, &core::Object::greaterEqual },
+    { BinaryOpType::GreaterThan, &core::Object::greater },
+    { BinaryOpType::LesserEqual, &core::Object::lesserEqual },
+    { BinaryOpType::LesserThan, &core::Object::lesser },
+    { BinaryOpType::Equal, &core::Object::equal },
+    { BinaryOpType::NotEqual, &core::Object::notEqual },
+    { BinaryOpType::And, &core::Object::logicalAnd },
+    { BinaryOpType::Or, &core::Object::logicalOr },
 };
 
 BinaryOp::BinaryOp(BinaryOpType type, std::shared_ptr<ASTNode> firstExp, std::shared_ptr<ASTNode> secExp)
@@ -27,11 +28,6 @@ std::shared_ptr<core::Object> BinaryOp::evaluate(runtime::Environment& state) co
     std::shared_ptr<core::Object> secondValue = secExp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.
-    std::shared_ptr<core::Object> operation = firstValue->getAttribute(BinaryOp::functionTypeMap_[type_]);
-    try {
-        operation->call(std::vector<std::shared_ptr<core::Object>>{ secondValue });
-    } catch (const ReturnSignal& returnSignal) {
-        return returnSignal.value();
-    }
-    return core::None::getNone();
+    auto method = BinaryOp::functionTypeMap_.at(type_);
+    return (firstValue.get()->*method)(secondValue);
 }

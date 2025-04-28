@@ -1,6 +1,6 @@
 #include "While.hpp"
-#include "core/Boolean.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Boolean.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
 using namespace semantics;
 

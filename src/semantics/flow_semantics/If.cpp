@@ -1,6 +1,6 @@
 #include "If.hpp"
-#include "core/Boolean.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Boolean.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
 If::If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::shared_ptr<ASTNode> falseBlock)
@@ -8,7 +8,7 @@ If::If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::s
 
 
 std::shared_ptr<core::Object> If::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Object> computed_condition = condition_->evaluate(state)->toBool();
+    std::shared_ptr<core::Boolean> computed_condition = condition_->evaluate(state)->toBool();
 
     // state.pushNewScope();
     if (*computed_condition) {

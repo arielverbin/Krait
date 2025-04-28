@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Print.hpp"
 #include "Variable.hpp"
-#include "core/None.hpp"
-#include "core/String.hpp"
+#include "core/builtins/builtin_types/None.hpp"
+#include "core/builtins/builtin_types/String.hpp"
 #include "exceptions/exceptions.hpp"
 
 using namespace semantics;
@@ -10,12 +10,8 @@ using namespace semantics;
 Print::Print(std::shared_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
 std::shared_ptr<core::Object> Print::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Object> string = expression_->evaluate(state)->toString();
+    std::shared_ptr<core::String> string = expression_->evaluate(state)->toString();
+    std::cout << static_cast<std::string>(*string) << std::endl;
 
-    if (std::shared_ptr<core::String> s = std::dynamic_pointer_cast<core::String>(string)) {
-        std::cout << s->rawString() << std::endl;
-        return core::None::getNone();
-    }
-
-    throw except::InvalidArgumentException("Print statement requires a String argument.");
+    return core::None::getNone();
 }

@@ -1,13 +1,12 @@
 #include "UnaryOp.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
-#include "core/Integer.hpp"
-#include "core/None.hpp"
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
-std::map<UnaryOpType, std::string> UnaryOp::functionTypeMap_ = {
-    { UnaryOpType::Not,  "_not_"  },
-    { UnaryOpType::Neg,  "_neg_"  },
-    { UnaryOpType::Bool, "_bool_" },
+std::map<UnaryOpType, UnaryOp::Method> UnaryOp::functionTypeMap_ = {
+    { UnaryOpType::Not,  &core::Object::logicalNot },
+    { UnaryOpType::Neg,  &core::Object::negate }
 };
 
 UnaryOp::UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp)
@@ -17,11 +16,6 @@ std::shared_ptr<core::Object> UnaryOp::evaluate(runtime::Environment& state) con
     std::shared_ptr<core::Object> firstValue = exp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.
-    std::shared_ptr<core::Object> operation = firstValue->getAttribute(UnaryOp::functionTypeMap_[type_]);
-    try {
-        operation->call({});
-    } catch (const ReturnSignal& returnSignal) {
-        return returnSignal.value();
-    }
-    return core::None::getNone();
+    auto method = UnaryOp::functionTypeMap_.at(type_);
+    return (firstValue.get()->*method)();
 }
