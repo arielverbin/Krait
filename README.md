@@ -36,9 +36,9 @@ By running `./build/run/krait` without arguments, a REPL shell will open. Use `e
   <img src="./assets/repl-demo.png" alt="REPL demo" width="400"/>
 </p>
 
-
 ## TODO
-- [ ] Member lookup (`obj.field`)
+- [x] Member lookup (`obj.field`)
 - [ ] Backtrace for runtime errors
-- [ ] Complex types: `list`, indexing, mutation
-- [ ] `for` loops with `in`, `break`, `continue`
+- [ ] `list` datatype
+- [ ] `for` loops, `in` keyword
+- [ ] Support for user-defined types (classes)
