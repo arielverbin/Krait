@@ -299,6 +299,9 @@ std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parseReturn() {
+    if (match(lexer::TokenType::NEWLINE))
+        return std::make_shared<semantics::Return>();
+
     auto returnValue = parseExpression();
     expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
 
