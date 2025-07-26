@@ -50,7 +50,7 @@ std::vector<std::shared_ptr<ASTNode>> normalFlow = {
             ASSIGNVAR("currentNumber", ADD(VAR("currentNumber"), INT(1))),
 
             // currentLine = "currentNumber=" + currentNumber
-            ASSIGNVAR("currentLine", ADD(STR("currentNumber is "), VAR("currentNumber"))),
+            ASSIGNVAR("currentLine", ADD(STR("currentNumber is "), CALL(VAR("str"), ARGS(VAR("currentNumber"))))),
             PRINT(VAR("currentLine")),
             
             IF(EQ(VAR("currentLine"), STR("currentNumber is 3")), 
@@ -61,12 +61,12 @@ std::vector<std::shared_ptr<ASTNode>> normalFlow = {
                 PASS()
             ),
             
-            PRINT(ADD(STR("RES="), CALL(VAR("myFunction"), ARGS(VAR("currentNumber"), ADD(INT(5), INT(5)))))),
+            PRINT(ADD(STR("RES="), CALL(VAR("str"), ARGS(CALL(VAR("myFunction"), ARGS(VAR("currentNumber"), ADD(INT(5), INT(5)))))))),
 
             // reachedEnd = (currentNumber == limit - 1)
             ASSIGNVAR("reachedEnd", EQ(VAR("currentNumber"), SUB(VAR("limit"), INT(1)))),
             
-            PRINT(ADD(STR("reachedEnd="), VAR("reachedEnd"))),
+            PRINT(ADD(STR("reachedEnd="), CALL(VAR("str"), ARGS(VAR("reachedEnd"))))),
             PRINT(MULT(STR("-"), INT(5)))
 
         )
@@ -99,21 +99,21 @@ std::vector<std::shared_ptr<ASTNode>> functionClosures = {
                 )
             ),
             
-            PRINT(ADD(STR("Returned Summer with "), VAR("value"))),
+            PRINT(ADD(STR("Returned Summer with "), CALL(VAR("str"), ARGS(VAR("value"))))),
             RETURN(VAR("myFunction"))
         )
     ),
 
     ASSIGNVAR("sumWith3", CALL(VAR("getSummer"), ARGS(INT(3)))),
-    PRINT(ADD(STR("sumWith3(5) = "), CALL(VAR("sumWith3"), ARGS(INT(5))))),
-    PRINT(ADD(STR("sumWith3(10) = "), CALL(VAR("sumWith3"), ARGS(INT(10))))),
+    PRINT(ADD(STR("sumWith3(5) = "), CALL(VAR("str"), ARGS(CALL(VAR("sumWith3"), ARGS(INT(5))))))),
+    PRINT(ADD(STR("sumWith3(10) = "), CALL(VAR("str"), ARGS(CALL(VAR("sumWith3"), ARGS(INT(10))))))),
 
     ASSIGNVAR("sumWith5", CALL(VAR("getSummer"), ARGS(INT(5)))),
 
-    PRINT(ADD(STR("sumWith5(5) = "), CALL(VAR("sumWith5"), ARGS(INT(5))))),
-    PRINT(ADD(STR("sumWith5(10) = "), CALL(VAR("sumWith5"), ARGS(INT(10))))),
+    PRINT(ADD(STR("sumWith5(5) = "), CALL(VAR("str"), ARGS(CALL(VAR("sumWith5"), ARGS(INT(5))))))),
+    PRINT(ADD(STR("sumWith5(10) = "), CALL(VAR("str"), ARGS(CALL(VAR("sumWith5"), ARGS(INT(10))))))),
 
-    PRINT(ADD(STR("TOTAL CALLS: "), VAR("numCalls")))
+    PRINT(ADD(STR("TOTAL CALLS: "), CALL(VAR("str"), ARGS(VAR("numCalls")))))
 
     /** 
      * Expected Output:
@@ -164,7 +164,7 @@ std::vector<std::shared_ptr<ASTNode>> controlFlowTest = {
             // If i is even, print and then skip the remaining block using CONTINUE
             IF(EQ(MOD(VAR("i"), INT(2)), INT(0)),
                 CODE(
-                    PRINT(ADD(STR("Even: "), VAR("i"))),
+                    PRINT(ADD(STR("Even: "), CALL(VAR("str"), ARGS(VAR("i"))))),
                     CONTINUE()
                 ),
                 PASS()
@@ -180,7 +180,7 @@ std::vector<std::shared_ptr<ASTNode>> controlFlowTest = {
             ),
             
             // For odd i (except 7 because of the break), print the value
-            PRINT(ADD(STR("Odd: "), VAR("i")))
+            PRINT(ADD(STR("Odd: "), CALL(VAR("str"), ARGS(VAR("i")))))
         )
     )
 
@@ -303,7 +303,7 @@ std::vector<std::shared_ptr<ASTNode>> nestedLoopTest = {
             ASSIGNVAR("j", INT(0)),
             WHILE(LT(VAR("j"), INT(4)),
                 CODE(
-                    PRINT(ADD(ADD(ADD(STR("i="), VAR("i")), STR(", j=")), VAR("j"))),
+                    PRINT(ADD(ADD(ADD(STR("i="), CALL(VAR("str"), ARGS(VAR("i")))), STR(", j=")), CALL(VAR("str"), ARGS(VAR("j"))))),
                     ASSIGNVAR("j", ADD(VAR("j"), INT(1))),
                     IF(
                         EQ(VAR("j"), INT(3)),
