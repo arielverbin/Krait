@@ -1,0 +1,61 @@
+
+def initinit(self, arg):
+    self.next = None
+
+def print_list(self):
+    result = "[" + str(self)
+    self = self.next
+
+    if None == self:
+        result = result + "]"
+        print result
+        return
+    else:
+        result = result + ", "
+
+    while None != self.next:
+        result = result + str(self) + ", "
+        self = self.next
+    
+    result = result + str(self) + "]"
+    print result
+
+def get_element(self, index):
+    while None != self and index > 0:
+        self = self.next
+        index = index - 1
+    
+    return self
+
+def length(self):
+    l = 0
+    while None != self:
+        l = l + 1
+        self = self.next
+
+    return l
+
+int.__init__ = initinit
+int.print_list = print_list
+int.get_element = get_element
+int.length = length
+
+n5 = int(5)
+n4 = int(4)
+n4.next = n5
+n3 = int(3)
+n3.next = n4
+n2 = int(2)
+n2.next = n3
+n1 = int(1)
+n1.next = n2
+
+n1.print_list()
+n2.print_list()
+n3.print_list()
+n4.print_list()
+n5.print_list()
+
+print n1.get_element(2)
+print n1.length()
+print n5.length()

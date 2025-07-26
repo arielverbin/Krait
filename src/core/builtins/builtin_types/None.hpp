@@ -10,10 +10,9 @@ class None : public utils::EnableSharedFromThis<Object, None> {
 public:
     None();
     static std::shared_ptr<None> getNone();
-    std::string _type_() override;
 
     // Operations supported (optimization)
-    //std::shared_ptr<String> toString() override;
+    std::shared_ptr<String> toString() override;
     std::shared_ptr<Boolean> toBool() override;
     std::shared_ptr<Object> equal(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> notEqual(std::shared_ptr<Object> another) override;

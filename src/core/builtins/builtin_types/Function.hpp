@@ -17,19 +17,17 @@ public:
     using NativeFunc = std::function<std::shared_ptr<Object>(const CallArgs&)>;
 
     // Constructors for built-in functions
-    Function(NativeFunc nativeFunc, size_t numArgs, bool checkArgs = true);
+    Function(NativeFunc nativeFunc);
 
     // Constructors for user-defined functions would store an AST node, parameter list, etc.
     Function(std::shared_ptr<semantics::ASTNode> body,
              std::vector<std::string> params,
              runtime::Environment closure);
 
-    std::string _type_() override;
-
     // Operations supported (optimization)
     std::shared_ptr<Object> call(const CallArgs& args) override;
     std::shared_ptr<String> toString() override;
-    std::shared_ptr<Object> get(std::shared_ptr<Object> instance) override;
+    std::shared_ptr<Object> get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) override;
 
     // Operations supported
     static std::shared_ptr<Object> callOp(const CallArgs& args);
@@ -41,12 +39,10 @@ public:
 private:
     bool isBuiltIn_;
     NativeFunc nativeFunc_;
-    size_t numArgs_;
+
     std::shared_ptr<semantics::ASTNode> body_;
     std::vector<std::string> params_;
     runtime::Environment closure_;
-
-    bool checkArgs_;
 };
 
 } // namespace core

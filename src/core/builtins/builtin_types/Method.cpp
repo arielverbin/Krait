@@ -1,4 +1,4 @@
-#include "BoundMethod.hpp"
+#include "Method.hpp"
 #include "String.hpp"
 #include "core/TypeObject.hpp"
 #include "exceptions/exceptions.hpp"
@@ -6,20 +6,16 @@
 
 using namespace core;
 
-BoundMethod::BoundMethod(std::shared_ptr<Object> instance,
+Method::Method(std::shared_ptr<Object> instance,
                          std::shared_ptr<Object> callable)
-    : utils::EnableSharedFromThis<Object, BoundMethod>(KraitBuiltins::boundMethodType),
+    : utils::EnableSharedFromThis<Object, Method>(KraitBuiltins::methodType),
       instance_(instance), callable_(callable) {}
 
-std::string BoundMethod::_type_() {
-    return "method";
-}
-
-std::shared_ptr<Object> BoundMethod::callOp(const CallArgs& args) {
+std::shared_ptr<Object> Method::callOp(const CallArgs& args) {
     if (args.size() < 1)
         throw except::InvalidArgumentException(
             "method.__call__ requires at least 1 argument (received " + std::to_string(args.size()) + ")");
-    auto self = std::dynamic_pointer_cast<BoundMethod>(args[0]);
+    auto self = std::dynamic_pointer_cast<Method>(args[0]);
     if (!self)
         throw except::InvalidArgumentException("first argument to method.__call__ must be a method");
     
@@ -28,25 +24,25 @@ std::shared_ptr<Object> BoundMethod::callOp(const CallArgs& args) {
     newArgs.insert(newArgs.begin(), self->instance_);
     return self->callable_->call(newArgs);
 }
-std::shared_ptr<Object> BoundMethod::call(const CallArgs&  args) {
+std::shared_ptr<Object> Method::call(const CallArgs&  args) {
     CallArgs fullArgs{ _shared_from_this() };
     fullArgs.insert(fullArgs.end(), args.begin(), args.end());
-    return BoundMethod::callOp(fullArgs);
+    return Method::callOp(fullArgs);
 }
 
-std::shared_ptr<Object> BoundMethod::toStringOp(const CallArgs& args) {
+std::shared_ptr<Object> Method::toStringOp(const CallArgs& args) {
     if (args.size() != 1)
         throw except::InvalidArgumentException(
             "method.__str__ requires exactly 1 argument (received " + std::to_string(args.size()) + ")");
-    auto self = std::dynamic_pointer_cast<BoundMethod>(args[0]);
+    auto self = std::dynamic_pointer_cast<Method>(args[0]);
     if (!self)
-        throw except::InvalidArgumentException("first argument to method.__str__ must be a BoundMethod");
+        throw except::InvalidArgumentException("first argument to method.__str__ must be a method");
     
     std::ostringstream oss;
-    oss << "<" << self->type_->name() << " for type '" << self->instance_->_type_();
+    oss << "<" << self->type()->name() << " for type '" << self->instance_->type()->name();
     oss <<  "' at "  << self.get() << ">";
     return std::make_shared<String>(oss.str());
 }
-std::shared_ptr<String> BoundMethod::toString() {
-    return std::dynamic_pointer_cast<String>(BoundMethod::toStringOp({ _shared_from_this() }));
+std::shared_ptr<String> Method::toString() {
+    return std::dynamic_pointer_cast<String>(Method::toStringOp({ _shared_from_this() }));
 }

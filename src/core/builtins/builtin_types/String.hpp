@@ -11,7 +11,6 @@ class String: public utils::EnableSharedFromThis<Object, String> {
 public:
     String(std::string str);
     operator std::string() const;
-    std::string _type_() override;
 
     // Operations supported (optimization)
     std::shared_ptr<String> toString() override;
@@ -28,6 +27,7 @@ public:
     static std::shared_ptr<Object> multiplyOp(const CallArgs& args);
     static std::shared_ptr<Object> equalOp(const CallArgs& args);
     static std::shared_ptr<Object> notEqualOp(const CallArgs& args);
+    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
 
     virtual ~String() = default;
 

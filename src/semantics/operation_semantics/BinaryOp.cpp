@@ -25,6 +25,7 @@ BinaryOp::BinaryOp(BinaryOpType type, std::shared_ptr<ASTNode> firstExp, std::sh
 
 std::shared_ptr<core::Object> BinaryOp::evaluate(runtime::Environment& state) const {
     std::shared_ptr<core::Object> firstValue = firstExp_->evaluate(state);
+    /** TODO: skip evaluation in some cases, for example AND, where the firstValue is already false */
     std::shared_ptr<core::Object> secondValue = secExp_->evaluate(state);
 
     // Retrieve the current object's implementation of the operation.

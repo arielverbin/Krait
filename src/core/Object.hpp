@@ -19,8 +19,6 @@ protected:
     std::shared_ptr<TypeObject> type_;
 
     virtual std::shared_ptr<Object> getAttributeRaw(const std::string& varName);
-    virtual std::shared_ptr<Object> getTypeAttribute(const std::string& varName);
-    virtual bool hasAttribute(const std::string& varName);
 
 public:
     Object(std::shared_ptr<TypeObject> type);
@@ -32,9 +30,7 @@ public:
     Object& operator=(Object&&) = delete;
 
     virtual std::shared_ptr<TypeObject> type();
-    virtual std::string _type_();
 
-    // TODO: KraitClass will implement those by checking their members for "_str_" etc.
     virtual std::shared_ptr<String> toString();
     virtual std::shared_ptr<Boolean> toBool();
 
@@ -57,10 +53,15 @@ public:
     virtual std::shared_ptr<Object> logicalNot();
 
     virtual std::shared_ptr<Object> call(const CallArgs& args);
-    virtual std::shared_ptr<Object> get(std::shared_ptr<Object> instance);
+    virtual std::shared_ptr<Object> get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner);
 
     virtual std::shared_ptr<Object> getAttribute(const std::string& varName);
     virtual void setAttribute(const std::string& varName, MemberEntry value);
+    virtual bool hasAttribute(const std::string& varName);
+
+    // class support
+    virtual std::shared_ptr<Object> createNew(const CallArgs& args);
+    virtual std::shared_ptr<Object> initialize(const CallArgs& args);
 
     virtual ~Object() = default;
 };

@@ -15,10 +15,6 @@ std::shared_ptr<None> None::getNone() {
     return none_;
 }
 
-std::string None::_type_() {
-    return "None";
-}
-
 std::shared_ptr<Object> None::toStringOp(const CallArgs& args) {
     if (args.size() != 1) {
         throw except::InvalidArgumentException(
@@ -28,9 +24,9 @@ std::shared_ptr<Object> None::toStringOp(const CallArgs& args) {
     static std::shared_ptr<String> noneStr = std::make_shared<String>("None");
     return noneStr;
 }
-// std::shared_ptr<String> None::toString() {
-//     return std::dynamic_pointer_cast<String>(None::toStringOp({ _shared_from_this() }));
-// }
+std::shared_ptr<String> None::toString() {
+    return std::dynamic_pointer_cast<String>(None::toStringOp({ _shared_from_this() }));
+}
 
 std::shared_ptr<Object> None::toBoolOp(const CallArgs& args) {
     if (args.size() != 1) {
@@ -73,6 +69,6 @@ std::shared_ptr<Object> None::notEqualOp(const CallArgs& args) {
     return Boolean::get(true);
 }
 std::shared_ptr<Object> None::notEqual(std::shared_ptr<Object> another) {
-    return None::equalOp({ _shared_from_this(), another });
+    return None::notEqualOp({ _shared_from_this(), another });
 }
 

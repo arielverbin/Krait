@@ -7,11 +7,9 @@
 
 namespace core {
 
-class BoundMethod : public utils::EnableSharedFromThis<Object, BoundMethod> {
+class Method : public utils::EnableSharedFromThis<Object, Method> {
 public:
-    BoundMethod(std::shared_ptr<Object> instance, std::shared_ptr<Object> callable);
-
-    std::string _type_() override;
+    Method(std::shared_ptr<Object> instance, std::shared_ptr<Object> callable);
 
     // Operations supported (optimization)
     std::shared_ptr<Object> call(const CallArgs& args) override;
@@ -21,7 +19,7 @@ public:
     static std::shared_ptr<Object> callOp(const CallArgs& args);
     static std::shared_ptr<Object> toStringOp(const CallArgs& args);
 
-    virtual ~BoundMethod() = default;
+    virtual ~Method() = default;
 
 private:
     std::shared_ptr<Object> instance_;

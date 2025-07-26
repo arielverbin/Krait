@@ -2,6 +2,7 @@
 #include "String.hpp"
 #include "Boolean.hpp"
 #include <cmath>
+#include "core/TypeObject.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
 #include "exceptions/exceptions.hpp"
 
@@ -9,10 +10,6 @@ using namespace core;
 
 Float::Float(double value)
     : utils::EnableSharedFromThis<Object, Float>(KraitBuiltins::floatType), value_(value) {}
-
-std::string Float::_type_() {
-    return "Float";
-}
 
 Float::operator double() const {
     return value_;
@@ -53,7 +50,7 @@ std::shared_ptr<Object> Float::addOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__add__ expects both arguments to be floats");
     return std::make_shared<Float>(a->value_ + b->value_);
 }
@@ -68,7 +65,7 @@ std::shared_ptr<Object> Float::subtractOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__sub__ expects both arguments to be floats");
     return std::make_shared<Float>(a->value_ - b->value_);
 }
@@ -83,7 +80,7 @@ std::shared_ptr<Object> Float::multiplyOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__mul__ expects both arguments to be floats");
     return std::make_shared<Float>(a->value_ * b->value_);
 }
@@ -98,7 +95,7 @@ std::shared_ptr<Object> Float::divideOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__div__ expects both arguments to be floats");
 
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
@@ -116,7 +113,7 @@ std::shared_ptr<Object> Float::moduluOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__mod__ expects both arguments to be floats");
             
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
@@ -148,7 +145,7 @@ std::shared_ptr<Object> Float::greaterEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__ge__ expects both arguments to be floats");
     return Boolean::get(a->value_ >= b->value_);
 }
@@ -163,7 +160,7 @@ std::shared_ptr<Object> Float::greaterOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__gt__ expects both arguments to be floats");
     return Boolean::get(a->value_ > b->value_);
 }
@@ -178,7 +175,7 @@ std::shared_ptr<Object> Float::lesserEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__le__ expects both arguments to be floats");
     return Boolean::get(a->value_ <= b->value_);
 }
@@ -193,7 +190,7 @@ std::shared_ptr<Object> Float::lesserOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__lt__ expects both arguments to be floats");
     return Boolean::get(a->value_ < b->value_);
 }
@@ -208,7 +205,7 @@ std::shared_ptr<Object> Float::equalOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__eq__ expects both arguments to be floats");
     return Boolean::get(a->value_ == b->value_);
 }
@@ -223,10 +220,33 @@ std::shared_ptr<Object> Float::notEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Float>(args[0]);
     auto b = std::dynamic_pointer_cast<Float>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "float.__ne__ expects both arguments to be floats");
     return Boolean::get(a->value_ != b->value_);
 }
 std::shared_ptr<Object> Float::notEqual(std::shared_ptr<Object> another) {
     return Float::notEqualOp({ _shared_from_this(), another });
+}
+
+std::shared_ptr<Object> Float::createNewOp(const CallArgs& args) {
+    if (args.size() != 2) {
+        throw except::InvalidArgumentException(
+                "float.__new__ requires at exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+    }
+
+    auto classType = std::dynamic_pointer_cast<TypeObject>(args[0]);
+    if (!classType) {
+        throw except::InvalidArgumentException("float.__new__ expects first argument to be a type (got: '"
+            + classType->type()->name() + "')"); 
+    }
+    
+    if (classType != KraitBuiltins::floatType) {
+        throw except::InvalidArgumentException("float.__new__ expects first argument to be a subclass of '"
+            + KraitBuiltins::floatType->name() +"' (got: '" + classType->name() + "')");  
+    }
+
+    auto value = std::dynamic_pointer_cast<Float>(args[1]);
+    if (!value) throw except::InvalidArgumentException("float.__new__ expects argument to be a float");  
+
+    return value; 
 }

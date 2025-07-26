@@ -19,9 +19,11 @@ public:
 
     // Operations supported (optimization)
     std::shared_ptr<String> toString() override;
+    std::shared_ptr<Object> call(const CallArgs& args) override;
 
     // Operations supported
     static std::shared_ptr<Object> toStringOp(const CallArgs& args);
+    static std::shared_ptr<Object> callOp(const CallArgs& args);
 };
 
 }

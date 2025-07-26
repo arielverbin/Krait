@@ -2,16 +2,13 @@
 #include "String.hpp"
 #include "Boolean.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
+#include "core/TypeObject.hpp"
 #include "exceptions/exceptions.hpp"
 
 using namespace core;
 
 Integer::Integer(long value)
     : utils::EnableSharedFromThis<Object, Integer>(KraitBuiltins::intType), value_(value) {}
-
-std::string Integer::_type_() {
-    return "Integer";
-}
 
 Integer::operator long() const {
     return value_;
@@ -52,7 +49,7 @@ std::shared_ptr<Object> Integer::addOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__add__ expects both arguments to be integers");
     return std::make_shared<Integer>(a->value_ + b->value_);
 }
@@ -67,7 +64,7 @@ std::shared_ptr<Object> Integer::subtractOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__sub__ expects both arguments to be integers");
     return std::make_shared<Integer>(a->value_ - b->value_);
 }
@@ -82,7 +79,7 @@ std::shared_ptr<Object> Integer::multiplyOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__mul__ expects both arguments to be integers");
     return std::make_shared<Integer>(a->value_ * b->value_);
 }
@@ -97,7 +94,7 @@ std::shared_ptr<Object> Integer::divideOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__div__ expects both arguments to be integers");
 
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
@@ -115,7 +112,7 @@ std::shared_ptr<Object> Integer::moduluOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__mod__ expects both arguments to be integers");
             
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
@@ -147,7 +144,7 @@ std::shared_ptr<Object> Integer::greaterEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__ge__ expects both arguments to be integers");
     return Boolean::get(a->value_ >= b->value_);
 }
@@ -162,7 +159,7 @@ std::shared_ptr<Object> Integer::greaterOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__gt__ expects both arguments to be integers");
     return Boolean::get(a->value_ > b->value_);
 }
@@ -177,7 +174,7 @@ std::shared_ptr<Object> Integer::lesserEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__le__ expects both arguments to be integers");
     return Boolean::get(a->value_ <= b->value_);
 }
@@ -192,7 +189,7 @@ std::shared_ptr<Object> Integer::lesserOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__lt__ expects both arguments to be integers");
     return Boolean::get(a->value_ < b->value_);
 }
@@ -207,7 +204,7 @@ std::shared_ptr<Object> Integer::equalOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__eq__ expects both arguments to be integers");
     return Boolean::get(a->value_ == b->value_);
 }
@@ -222,10 +219,32 @@ std::shared_ptr<Object> Integer::notEqualOp(const CallArgs& args) {
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
-        throw except::InvalidArgumentException(
+        throw except::NotImplementedException(
             "integer.__ne__ expects both arguments to be integers");
     return Boolean::get(a->value_ != b->value_);
 }
 std::shared_ptr<Object> Integer::notEqual(std::shared_ptr<Object> another) {
     return Integer::notEqualOp({ _shared_from_this(), another });
+}
+
+std::shared_ptr<Object> Integer::createNewOp(const CallArgs& args) {
+    if (args.size() != 2)
+        throw except::InvalidArgumentException(
+                "integer.__new__ requires at exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+
+    auto classType = std::dynamic_pointer_cast<TypeObject>(args[0]);
+    if (!classType) {
+        throw except::InvalidArgumentException("integer.__new__ expects first argument to be a type (got: '"
+            + classType->type()->name() + "')"); 
+    }
+    
+    if (classType != KraitBuiltins::intType) {
+        throw except::InvalidArgumentException("integer.__new__ expects first argument to be a subclass of '"
+            + KraitBuiltins::intType->name() +"' (got: '" + classType->name() + "')");  
+    }
+
+    auto value = std::dynamic_pointer_cast<Integer>(args[1]);
+    if (!value) throw except::InvalidArgumentException("integer.__new__ expects argument to be an integer");  
+
+    return value;
 }

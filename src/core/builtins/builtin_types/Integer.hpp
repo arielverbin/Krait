@@ -9,7 +9,6 @@ namespace core {
 class Integer : public utils::EnableSharedFromThis<Object, Integer> {
 public:
     Integer(long value);
-    std::string _type_() override;
     operator long() const;
 
     // Operations supported (optimization)
@@ -43,6 +42,8 @@ public:
     static std::shared_ptr<Object> lesserOp(const CallArgs& args);
     static std::shared_ptr<Object> equalOp(const CallArgs& args);
     static std::shared_ptr<Object> notEqualOp(const CallArgs& args);
+
+    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
 
 private:
     long value_;
