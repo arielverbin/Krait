@@ -38,7 +38,9 @@ By running `./build/run/krait` without arguments, a REPL shell will open. Use `e
 
 ## TODO
 - [x] Member lookup (`obj.field`)
+- [ ] Automatic type casting, `__radd__`, `__rmul__` mechanism
 - [ ] Backtrace for runtime errors
 - [ ] `list` datatype
 - [ ] `for` loops, `in` keyword
 - [ ] Support for user-defined types (classes)
+- [ ] Common modules like `sys` and `os`
