@@ -1,14 +1,15 @@
 # Compiler and flags
 CXX := g++
 CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -g -MMD -MP -Isrc -Itests -I.
-RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun -DKRAIT_TESTING
+RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun
 TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING
 
 # Directories
 SRC_DIR := src
 RUN_DIR := run
-RUN_BUILD_DIR := build/run
-TEST_BUILD_DIR := build/tests
+BUILD_DIR = build
+RUN_BUILD_DIR := $(BUILD_DIR)/run
+TEST_BUILD_DIR := $(BUILD_DIR)/tests
 RUN_OBJ_DIR := $(RUN_BUILD_DIR)/obj
 TEST_OBJ_DIR := $(TEST_BUILD_DIR)/obj
 
@@ -103,13 +104,13 @@ test: $(if $(REQUESTED_TEST_MODULES), \
 
 # Cleaning targets
 clean:
-	rm -rf build
+	rm -rf $(BUILD_DIR)
 
 clean_run:
-	rm -rf $(RUN_BUILD_DIR)/run
+	rm -rf $(RUN_BUILD_DIR)
 
 clean_test:
-	rm -rf $(TEST_BUILD_DIR)/tests
+	rm -rf $(TEST_BUILD_DIR)
 
 # Prevent make from treating extra test module names as files
 %:
