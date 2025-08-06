@@ -32,6 +32,9 @@ std::shared_ptr<Object> String::addOp(const CallArgs& args) {
 std::shared_ptr<Object> String::add(std::shared_ptr<Object> another) {
     return String::addOp({ _shared_from_this(), another });
 }
+std::shared_ptr<Object> String::reversedAdd(std::shared_ptr<Object> another) {
+    return String::addOp({ another, _shared_from_this() });
+}
 
 std::shared_ptr<Object> String::multiplyOp(const CallArgs& args) {
     if (args.size() != 2) {
@@ -55,6 +58,10 @@ std::shared_ptr<Object> String::multiplyOp(const CallArgs& args) {
             + KraitBuiltins::stringType->name() + "', '" + KraitBuiltins::intType->name() +"'");
 }
 std::shared_ptr<Object> String::multiply(std::shared_ptr<Object> another) {
+    return String::multiplyOp({ _shared_from_this(), another });
+}
+
+std::shared_ptr<Object> String::reversedMultiply(std::shared_ptr<Object> another) {
     return String::multiplyOp({ _shared_from_this(), another });
 }
 
@@ -104,7 +111,7 @@ std::shared_ptr<Object> String::toBoolOp(const CallArgs& args) {
         return Boolean::get(!self->value_.empty());
     }
 
-    throw except::InvalidArgumentException("first argument to string.__bool__ must be a string");
+    throw except::TypeError("first argument to string.__bool__ must be a string");
 }
 std::shared_ptr<Boolean> String::toBool() {
     return std::dynamic_pointer_cast<Boolean>(String::toBoolOp({ _shared_from_this() }));
@@ -118,7 +125,7 @@ std::shared_ptr<Object> String::toStringOp(const CallArgs& args) {
     auto self = std::dynamic_pointer_cast<String>(args[0]);
     if (self) return self;
 
-    throw except::InvalidArgumentException("first argument to string.__str__ must be a string");
+    throw except::TypeError("first argument to string.__str__ must be a string");
 }
 std::shared_ptr<String> String::toString() {
     return std::dynamic_pointer_cast<String>(String::toStringOp({ _shared_from_this() }));
@@ -132,12 +139,12 @@ std::shared_ptr<Object> String::createNewOp(const CallArgs& args) {
     
     auto classType = std::dynamic_pointer_cast<TypeObject>(args[0]);
     if (!classType) {
-        throw except::InvalidArgumentException("str.__new__ expects first argument to be a type (got: '"
+        throw except::TypeError("str.__new__ expects first argument to be a type (got: '"
             + classType->type()->name() + "')"); 
     }
     
     if (classType != KraitBuiltins::stringType) {
-        throw except::InvalidArgumentException("str.__new__ expects first argument to be subclass of '"
+        throw except::TypeError("str.__new__ expects first argument to be subclass of '"
             + KraitBuiltins::stringType->name() +"' (got: '" + classType->name() + "')");  
     }
 

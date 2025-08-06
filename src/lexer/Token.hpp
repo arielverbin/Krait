@@ -16,7 +16,7 @@ enum class TokenType {
 
     // keywords
     DEF, RETURN, IF, ELSE, WHILE, PRINT,
-    PASS, BREAK, CONTINUE,
+    PASS, BREAK, CONTINUE, CLASS,
 
     // operators
     ASSIGN,      // '='

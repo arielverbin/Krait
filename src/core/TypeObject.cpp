@@ -1,15 +1,21 @@
 #include "TypeObject.hpp"
 #include "exceptions/exceptions.hpp"
-#include "builtins/builtin_types/None.hpp"
+#include "core/builtins/builtin_types/None.hpp"
+#include "core/builtins/builtin_types/Function.hpp"
+#include "core/builtins/builtin_types/ClassMethod.hpp"
 using namespace core;
 #include <iostream>
 
 
-TypeObject::TypeObject(std::string name)
-    : utils::EnableSharedFromThis<Object, TypeObject>(typeType), name_(std::move(name)) {}
+TypeObject::TypeObject(std::string name, Function::NativeFunc creator)
+    : utils::EnableSharedFromThis<Object, TypeObject>(typeType), name_(std::move(name)) {
+        if (creator != nullptr) {
+            setAttribute("__new__", std::make_shared<core::ClassMethod>(std::make_shared<core::Function>(creator)));
+        }
+    }
 
 std::shared_ptr<TypeObject> TypeObject::initType() {
-    auto self = std::make_shared<TypeObject>("type");
+    auto self = std::make_shared<TypeObject>("type", nullptr);
     
     // re-initialize type's type object
     self->type_ = self;
@@ -43,11 +49,12 @@ std::shared_ptr<Object> TypeObject::callOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "type.__call__ requires at least 1 argument (received " + std::to_string(args.size()) + ")"
         );
+        
     auto self = std::dynamic_pointer_cast<TypeObject>(args[0]);
     if (!self) throw except::InvalidArgumentException("first argument to type.__call__ must be a type");
     
     std::shared_ptr<Object> newInstance = self->createNew(CallArgs(args.begin() + 1, args.end()));
-    
+
     if (self->hasAttribute("__init__"))
         newInstance->initialize(CallArgs(args.begin() + 1, args.end()));
     

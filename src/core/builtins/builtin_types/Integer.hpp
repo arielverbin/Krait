@@ -15,10 +15,15 @@ public:
     std::shared_ptr<String> toString() override;
     std::shared_ptr<Boolean> toBool() override;
     std::shared_ptr<Object> add(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedAdd(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> subtract(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedSubtract(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> multiply(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedMultiply(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> divide(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedDivide(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> modulu(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedModulu(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> negate() override;
     std::shared_ptr<Object> greaterEqual(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> greater(std::shared_ptr<Object> another) override;
@@ -34,7 +39,9 @@ public:
     static std::shared_ptr<Object> subtractOp(const CallArgs& args);
     static std::shared_ptr<Object> multiplyOp(const CallArgs& args);
     static std::shared_ptr<Object> divideOp(const CallArgs& args);
+    static std::shared_ptr<Object> reversedDivideOp(const CallArgs& args);
     static std::shared_ptr<Object> moduluOp(const CallArgs& args);
+    static std::shared_ptr<Object> reversedModuluOp(const CallArgs& args);
     static std::shared_ptr<Object> negateOp(const CallArgs& args);
     static std::shared_ptr<Object> greaterEqualOp(const CallArgs& args);
     static std::shared_ptr<Object> greaterOp(const CallArgs& args);

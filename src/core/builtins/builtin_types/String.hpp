@@ -16,7 +16,9 @@ public:
     std::shared_ptr<String> toString() override;
     std::shared_ptr<Boolean> toBool() override;
     std::shared_ptr<Object> add(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedAdd(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> multiply(std::shared_ptr<Object> another) override;
+    std::shared_ptr<Object> reversedMultiply(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> equal(std::shared_ptr<Object> another) override;
     std::shared_ptr<Object> notEqual(std::shared_ptr<Object> another) override;
 

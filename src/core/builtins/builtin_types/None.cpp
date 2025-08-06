@@ -72,3 +72,7 @@ std::shared_ptr<Object> None::notEqual(std::shared_ptr<Object> another) {
     return None::notEqualOp({ _shared_from_this(), another });
 }
 
+std::shared_ptr<Object> None::createNewOp(const CallArgs& args) {
+    UNREFERENCED(args);
+    return None::getNone();
+}

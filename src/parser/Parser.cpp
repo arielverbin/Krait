@@ -17,6 +17,7 @@
 #include "semantics/flow_semantics/Pass.hpp"
 #include "semantics/flow_semantics/Call.hpp"
 
+#include "semantics/define_semantics/ClassDef.hpp"
 #include "semantics/define_semantics/FunctionDef.hpp"
 #include "semantics/define_semantics/Assign.hpp"
 
@@ -97,6 +98,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
     if (match(lexer::TokenType::IF))    return parseIf();
     if (match(lexer::TokenType::WHILE)) return parseWhile();
     if (match(lexer::TokenType::DEF))   return parseFunctionDef();
+    if (match(lexer::TokenType::CLASS)) return parseClassDef();
     if (match(lexer::TokenType::PRINT)) return parsePrint();
     if (match(lexer::TokenType::RETURN)) return parseReturn();
     if (match(lexer::TokenType::PASS)) return parsePass();
@@ -264,6 +266,22 @@ std::shared_ptr<semantics::ASTNode> Parser::parseFunctionDef() {
     }
 
     return std::make_shared<semantics::FunctionDef>(funcName, params, std::move(body));
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseClassDef() {
+    expect(lexer::TokenType::IDENTIFIER, "Expected class name after 'class'");
+    auto className = previous().value();
+
+    expect(lexer::TokenType::COLON, "Expected ':' after class name");
+    expect(lexer::TokenType::NEWLINE, "Expected newline after ':'");
+    expect(lexer::TokenType::INDENT, "Expected indent after newline");
+
+    std::shared_ptr<semantics::Code> body = std::make_shared<semantics::Code>();
+    while (!match(lexer::TokenType::DEDENT) && !check(lexer::TokenType::END_OF_FILE)) {
+        body->statements.push_back(parseStatement());
+    }
+
+    return std::make_shared<semantics::ClassDef>(className, std::move(body));
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parsePrint() {

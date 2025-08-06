@@ -56,6 +56,7 @@ private:
     // Prase statements starting with a keyword
     std::shared_ptr<semantics::ASTNode> parseWhile();
     std::shared_ptr<semantics::ASTNode> parseFunctionDef();
+    std::shared_ptr<semantics::ASTNode> parseClassDef();
     std::shared_ptr<semantics::ASTNode> parsePrint();
     std::shared_ptr<semantics::ASTNode> parseIf();
     std::shared_ptr<semantics::ASTNode> parseReturn();

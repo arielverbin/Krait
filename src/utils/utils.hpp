@@ -16,6 +16,9 @@ struct LazyValue {
     LazyValue(std::function<std::shared_ptr<core::Object>()> fn): creator(std::move(fn)) {}
 };
 
+using MemberEntry = std::variant<std::shared_ptr<core::Object>, utils::LazyValue>;
+using Scope = std::unordered_map<std::string, MemberEntry>;
+
 // Helper template that implements _shared_from_this_base automatically
 template<typename Base, typename Derived>
 class EnableSharedFromThis : public Base, public std::enable_shared_from_this<Derived> {

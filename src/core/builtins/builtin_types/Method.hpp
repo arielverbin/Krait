@@ -19,6 +19,8 @@ public:
     static std::shared_ptr<Object> callOp(const CallArgs& args);
     static std::shared_ptr<Object> toStringOp(const CallArgs& args);
 
+    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+
     virtual ~Method() = default;
 
 private:

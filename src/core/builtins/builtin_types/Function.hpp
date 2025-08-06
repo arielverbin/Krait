@@ -34,6 +34,8 @@ public:
     static std::shared_ptr<Object> toStringOp(const CallArgs& args);
     static std::shared_ptr<Object> getOp(const CallArgs& args);
 
+    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+
     virtual ~Function() = default;
 
 private:

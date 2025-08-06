@@ -21,6 +21,8 @@ void Runner::run() {
         } catch (const except::RuntimeError& err) {
             std::cerr << ErrorPrinter::format(source_.source(), err);
             if (source_.exitOnError()) break;
+        } catch (const except::KraitException& err) {
+            std::cerr << ErrorPrinter::format(source_.source(), err);
         }
 
     } while (!source_.eof());

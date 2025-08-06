@@ -21,6 +21,8 @@ std::string REPLSource::getLine(bool notComplete) {
     if (*input) add_history(input);
 
     std::string line(input);
+    free(input);
+
     if (line == "exit") {
         eof_ = true;
         std::cout << BOLDMAGENTA << "GOODBYE " << RESET 

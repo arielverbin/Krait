@@ -4,6 +4,7 @@
 #include <string>
 #include "utils/utils.hpp"
 #include "Object.hpp"
+#include "core/builtins/builtin_types/Function.hpp"
 
 namespace core {
 
@@ -13,7 +14,7 @@ private:
     static std::shared_ptr<TypeObject> initType();
 
 public:
-    TypeObject(std::string name);
+    TypeObject(std::string name, Function::NativeFunc creator);
     const std::string& name();
     static std::shared_ptr<TypeObject> typeType;
 

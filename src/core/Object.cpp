@@ -9,19 +9,24 @@
 #include "core/builtins/builtin_types/String.hpp"
 #include "core/builtins/builtin_types/None.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
+#include "core/builtins/KraitBuiltins.hpp"
 #include "exceptions/exceptions.hpp"
 #include "core/TypeObject.hpp"
 #include "utils/utils.hpp"
 
 using namespace core;
 
-Object::Object(std::shared_ptr<TypeObject> type) : type_(type) {
+Object::Object(std::shared_ptr<TypeObject> type) : type_(type), members_(std::make_shared<utils::Scope>()) {
     // All objects expose their type objects through the '__class__' attribute.
     setAttribute("__class__", type_);
 }
 
 std::shared_ptr<TypeObject> Object::type() {
     return type_;
+}
+
+std::shared_ptr<utils::Scope> Object::getScope() {
+    return members_;
 }
 
 std::shared_ptr<String> Object::toString() {
@@ -40,84 +45,132 @@ std::shared_ptr<String> Object::toString() {
 }
 
 std::shared_ptr<Boolean> Object::toBool() {
-    std::shared_ptr<Object> boolean = getAttribute("__bool__")->call({});
-    if (std::shared_ptr<core::Boolean> b = std::dynamic_pointer_cast<core::Boolean>(boolean)) {
-        return b;
+    if (type_->hasAttribute("__bool__")) {
+        std::shared_ptr<Object> boolean = getAttribute("__bool__")->call({});
+        if (std::shared_ptr<core::Boolean> b = std::dynamic_pointer_cast<core::Boolean>(boolean)) {
+            return b;
+        }
+        throw except::TypeError("'__bool__' returned non-bool (type '" + boolean->type()->name() + "')");
     }
-    throw except::TypeError("'__bool__' returned non-bool (type '" + boolean->type()->name() + "')");
+    
+    // all objects return True by default, except None
+    return Boolean::get(type_ != KraitBuiltins::noneType);
 }
 
 std::shared_ptr<Object> Object::add(std::shared_ptr<Object> another) {
-    return getAttribute("__add__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__add__");
+    if (!attribute) throw except::NotImplementedException("__add__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
+}
+std::shared_ptr<Object> Object::reversedAdd(std::shared_ptr<Object> another) {
+    std::shared_ptr<Object> attribute = findAttribute("__radd__");
+    if (!attribute) throw except::NotImplementedException("__radd__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::subtract(std::shared_ptr<Object> another) {
-    return getAttribute("__sub__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__sub__");
+    if (!attribute) throw except::NotImplementedException("__sub__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
+}
+std::shared_ptr<Object> Object::reversedSubtract(std::shared_ptr<Object> another) {
+    std::shared_ptr<Object> attribute = findAttribute("__rsub__");
+    if (!attribute) throw except::NotImplementedException("__rsub__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::multiply(std::shared_ptr<Object> another) {
-    return getAttribute("__mult__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__mult__");
+    if (!attribute) throw except::NotImplementedException("__mult__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
+}
+std::shared_ptr<Object> Object::reversedMultiply(std::shared_ptr<Object> another) {
+    std::shared_ptr<Object> attribute = findAttribute("__rmult__");
+    if (!attribute) throw except::NotImplementedException("__rmult__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::divide(std::shared_ptr<Object> another) {
-    return getAttribute("__div__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__div__");
+    if (!attribute) throw except::NotImplementedException("__div__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
+}
+std::shared_ptr<Object> Object::reversedDivide(std::shared_ptr<Object> another) {
+    std::shared_ptr<Object> attribute = findAttribute("__rdiv__");
+    if (!attribute) throw except::NotImplementedException("__rdiv__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::modulu(std::shared_ptr<Object> another) {
-    return getAttribute("__mod__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__mod__");
+    if (!attribute) throw except::NotImplementedException("__mod__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
+}
+std::shared_ptr<Object> Object::reversedModulu(std::shared_ptr<Object> another) {
+    std::shared_ptr<Object> attribute = findAttribute("__rmod__");
+    if (!attribute) throw except::NotImplementedException("__rmod__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::negate() {
-    return getAttribute("__neg__")->call({});
+    std::shared_ptr<Object> attribute = findAttribute("__neg__");
+    if (!attribute) throw except::NotImplementedException("__neg__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({});
 }
 
 std::shared_ptr<Object> Object::greaterEqual(std::shared_ptr<Object> another) {
-    return getAttribute("__ge__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__ge__");
+    if (!attribute) throw except::NotImplementedException("__ge__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::greater(std::shared_ptr<Object> another) {
-    return getAttribute("__gt__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__gt__");
+    if (!attribute) throw except::NotImplementedException("__gt__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::lesserEqual(std::shared_ptr<Object> another) {
-    return getAttribute("__le__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__le__");
+    if (!attribute) throw except::NotImplementedException("__le__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::lesser(std::shared_ptr<Object> another) {
-    return getAttribute("__lt__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__lt__");
+    if (!attribute) throw except::NotImplementedException("__lt__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::equal(std::shared_ptr<Object> another) {
-    return getAttribute("__eq__")->call({ another });
+    std::shared_ptr<Object> attribute = findAttribute("__eq__");
+    if (!attribute) throw except::NotImplementedException("__eq__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::notEqual(std::shared_ptr<Object> another) {
-    return getAttribute("__neq__")->call({ another });
-}
-
-std::shared_ptr<Object> Object::logicalOr(std::shared_ptr<Object> another) {
-    return getAttribute("__or__")->call({ another });
-}
-
-std::shared_ptr<Object> Object::logicalAnd(std::shared_ptr<Object> another) {
-    return getAttribute("__and__")->call({ another });
-}
-
-std::shared_ptr<Object> Object::logicalNot() {
-    return getAttribute("__not__")->call({ });
+    std::shared_ptr<Object> attribute = findAttribute("__neq__");
+    if (!attribute) throw except::NotImplementedException("__neq__ does not exists for type '" + type()->name() + "'");
+    return attribute->call({ another });
 }
 
 std::shared_ptr<Object> Object::createNew(const CallArgs& args) {
-    return getAttribute("__new__")->call(args);
+    std::shared_ptr<Object> attribute = findAttribute("__new__");
+    if (!attribute) throw except::NotImplementedException("__new__ does not exists for type '" + type()->name() + "'");
+    return attribute->call(args);
 }
 
 std::shared_ptr<Object> Object::initialize(const CallArgs& args) {
-    return getAttribute("__init__")->call(args);
+    std::shared_ptr<Object> attribute = findAttribute("__init__");
+    if (!attribute) throw except::NotImplementedException("__init__ does not exists for type '" + type()->name() + "'");
+    return attribute->call(args);
 }
 
 std::shared_ptr<Object> Object::call(const CallArgs& args) {
     try {
-        return getAttribute("__call__")->call({ args });
+        std::shared_ptr<Object> attribute = findAttribute("__call__");
+        if (!attribute) throw except::NotImplementedException("__call__ does not exists for type '" + type()->name() + "'");
+        attribute->call({ args });
     } catch (const semantics::ReturnSignal& ret) {
         return ret.value();
     }
@@ -125,21 +178,24 @@ std::shared_ptr<Object> Object::call(const CallArgs& args) {
 }
 
 std::shared_ptr<Object> Object::get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) {
-    auto fnRaw = type_->getAttributeRaw("__get__");
-    if (!fnRaw)
-        throw except::AttributeError("__get__ not found on descriptor");
+    if (!type_->hasAttribute("__get__"))
+        throw except::NotImplementedException("__get__ does not exists for type '" + type()->name() + "'");
 
+    auto fnRaw = type_->getAttributeRaw("__get__");
     return fnRaw->call({ _shared_from_this(), instance, owner });
 }
 
 bool Object::hasAttribute(const std::string& varName) {
-    return members_.find(varName) != members_.end();
+    utils::Scope& members = *members_;
+    return members.find(varName) != members.end();
 }
 
 std::shared_ptr<Object> Object::getAttributeRaw(const std::string& varName) {
+    utils::Scope& members = *members_;
+
     // TODO: even in raw, check if the properly has a __get__ function, if so - call it.
-    auto member = members_.find(varName);
-    if (member == members_.end()) throw except::AttributeError(
+    auto member = members.find(varName);
+    if (member == members.end()) throw except::AttributeError(
         "'" + type_->name() + "' object has no attribute '" + varName + "'");
     
     if (std::holds_alternative<utils::LazyValue>(member->second)) {
@@ -152,7 +208,7 @@ std::shared_ptr<Object> Object::getAttributeRaw(const std::string& varName) {
     return std::get<std::shared_ptr<Object>>(member->second);
 }
 
-std::shared_ptr<Object> Object::getAttribute(const std::string& varName) { 
+std::shared_ptr<Object> Object::findAttribute(const std::string& varName) { 
     auto isClass = [&]() {
         // a 'class' is defined as an object of type 'type'.
         return this->type() == TypeObject::typeType;
@@ -180,9 +236,17 @@ std::shared_ptr<Object> Object::getAttribute(const std::string& varName) {
 
     /** TODO: fallback to __getattr__ implementation */
 
-    throw except::AttributeError("'" + type_->name() + "' object has no attribute '" + varName + "'");
+    return nullptr;
 }
 
-void Object::setAttribute(const std::string& varName, MemberEntry value) {
-    members_[varName] = value;
+std::shared_ptr<Object> Object::getAttribute(const std::string& varName) { 
+    std::shared_ptr<Object> ob = findAttribute(varName);
+    if (!ob) throw except::AttributeError("'" + type_->name() + "' object has no attribute '" + varName + "'");
+    return ob;
+}
+
+void Object::setAttribute(const std::string& varName, utils::MemberEntry value) {
+    utils::Scope& members = *members_;
+
+    members[varName] = value;
 }

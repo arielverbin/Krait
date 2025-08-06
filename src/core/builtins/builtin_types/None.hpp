@@ -23,6 +23,8 @@ public:
     static std::shared_ptr<Object> equalOp(const CallArgs& args);
     static std::shared_ptr<Object> notEqualOp(const CallArgs& args);
 
+    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+
     virtual ~None() = default;
 };
 

@@ -28,20 +28,19 @@ std::shared_ptr<Object> ClassMethod::createNewOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
                 "classmethod.__new__ requires at exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-
     auto classType = std::dynamic_pointer_cast<TypeObject>(args[0]);
     if (!classType) {
-        throw except::InvalidArgumentException("classmethod.__new__ expects first argument to be a type (got: '"
-            + classType->type()->name() + "')"); 
+        throw except::TypeError("classmethod.__new__ expects first argument to be a type (got: '"
+            + args[0]->type()->name() + "')"); 
     }
     
     if (classType != KraitBuiltins::classMethodType) {
-        throw except::InvalidArgumentException("classmethod.__new__ expects first argument to be a subclass of '"
-            + KraitBuiltins::classMethodType->name() +"' (got: '" + classType->name() + "')");  
+        throw except::TypeError("classmethod.__new__ expects first argument to be a subclass of '"
+            + KraitBuiltins::classMethodType->name() + "' (got: '" + classType->name() + "')");  
     }
 
     auto value = std::dynamic_pointer_cast<Function>(args[1]);
-    if (!value) throw except::InvalidArgumentException("classmethod.__new__ expects argument to be a function");  
+    if (!value) throw except::TypeError("classmethod.__new__ expects argument to be a function");  
 
     return std::make_shared<ClassMethod>(value);
 }

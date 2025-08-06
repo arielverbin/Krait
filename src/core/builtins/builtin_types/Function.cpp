@@ -27,7 +27,7 @@ std::shared_ptr<Object> Function::callOp(const CallArgs& args) {
             "function.__call__ requires at least 1 argument (received " + std::to_string(args.size()) + ")");
     auto self = std::dynamic_pointer_cast<Function>(args[0]);
     if (!self)
-        throw except::InvalidArgumentException("first argument to function.__call__ must be a function");
+        throw except::TypeError("first argument to function.__call__ must be a function");
     
     if (self->isBuiltIn_) {
         // no need to check number of arguments for builtin functions, they need to do it themselves.
@@ -80,7 +80,7 @@ std::shared_ptr<Object> Function::getOp(const CallArgs& args) {
 
     std::shared_ptr<Function> self = std::dynamic_pointer_cast<Function>(args[0]);
     if (!self) {
-        throw except::InvalidArgumentException(
+        throw except::TypeError(
             "first argument to function.__get__ must be a function (got: " + args[0]->type()->name() + ")"
         );
     }
@@ -95,4 +95,9 @@ std::shared_ptr<Object> Function::getOp(const CallArgs& args) {
 
 std::shared_ptr<Object> Function::get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) {
     return Function::getOp( { _shared_from_this(), instance, owner });
+}
+
+std::shared_ptr<Object> Function::createNewOp(const CallArgs& args) {
+    UNREFERENCED(args);
+    throw except::NotImplementedException("explicit function constructor is not supported yet");
 }

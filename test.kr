@@ -1,61 +1,94 @@
+class Const:
+    def __init__(self, value):
+        self.value = value
 
-def initinit(self, arg):
-    self.next = None
+    def diff(self, var):
+        return Const(0)
 
-def print_list(self):
-    result = "[" + str(self)
-    self = self.next
+    def __str__(self):
+        return str(self.value)
 
-    if None == self:
-        result = result + "]"
-        print result
-        return
-    else:
-        result = result + ", "
+def Const___add__(self, other):
+    return Add(self, other)
 
-    while None != self.next:
-        result = result + str(self) + ", "
-        self = self.next
-    
-    result = result + str(self) + "]"
-    print result
+def Const___mul__(self, other):
+    return Mul(self, other)
 
-def get_element(self, index):
-    while None != self and index > 0:
-        self = self.next
-        index = index - 1
-    
-    return self
+Const.__add__ = Const___add__
+Const.__mul__ = Const___mul__
 
-def length(self):
-    l = 0
-    while None != self:
-        l = l + 1
-        self = self.next
+class Var:
+    def __init__(self, name):
+        self.name = name
 
-    return l
+    def diff(self, var):
+        if self.name == var.name:
+            return Const(1)
+        return Const(0)
 
-int.__init__ = initinit
-int.print_list = print_list
-int.get_element = get_element
-int.length = length
+    def __str__(self):
+        return self.name
 
-n5 = int(5)
-n4 = int(4)
-n4.next = n5
-n3 = int(3)
-n3.next = n4
-n2 = int(2)
-n2.next = n3
-n1 = int(1)
-n1.next = n2
+def Var___add__(self, other):
+    return Add(self, other)
 
-n1.print_list()
-n2.print_list()
-n3.print_list()
-n4.print_list()
-n5.print_list()
+def Var___mul__(self, other):
+    return Mul(self, other)
 
-print n1.get_element(2)
-print n1.length()
-print n5.length()
+Var.__add__ = Var___add__
+Var.__mul__ = Var___mul__
+
+class Add:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def diff(self, var):
+        return Add(self.left.diff(var), self.right.diff(var))
+
+    def __str__(self):
+        return "(" + str(self.left) + " + " + str(self.right) + ")"
+
+def Add___add__(self, other):
+    return Add(self, other)
+
+def Add___mul__(self, other):
+    return Mul(self, other)
+
+Add.__add__ = Add___add__
+Add.__mul__ = Add___mul__
+
+class Mul:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def diff(self, var):
+        return Add(
+            Mul(self.left.diff(var), self.right),
+            Mul(self.left, self.right.diff(var))
+        )
+
+    def __str__(self):
+        return "(" + str(self.left) + " * " + str(self.right) + ")"
+
+def Mul___add__(self, other):
+    return Add(self, other)
+
+def Mul___mul__(self, other):
+    return Mul(self, other)
+
+Mul.__add__ = Mul___add__
+Mul.__mul__ = Mul___mul__
+
+# --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
+# x = Var("x")
+# expr = Const(2) * x * x + Const(3) * x + Const(5)
+
+# print("Expr: " + str(expr))
+# d = expr.diff(x)
+# print("Diff: " + str(d))
+
+x = 10
+while x < 10
+    x = x + 1

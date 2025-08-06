@@ -46,6 +46,7 @@ std::shared_ptr<Object> Integer::addOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "integer.__add__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+            
     auto a = std::dynamic_pointer_cast<Integer>(args[0]);
     auto b = std::dynamic_pointer_cast<Integer>(args[1]);
     if (!a || !b)
@@ -54,6 +55,9 @@ std::shared_ptr<Object> Integer::addOp(const CallArgs& args) {
     return std::make_shared<Integer>(a->value_ + b->value_);
 }
 std::shared_ptr<Object> Integer::add(std::shared_ptr<Object> another) {
+    return Integer::addOp({ _shared_from_this(), another });
+}
+std::shared_ptr<Object> Integer::reversedAdd(std::shared_ptr<Object> another) {
     return Integer::addOp({ _shared_from_this(), another });
 }
 
@@ -71,6 +75,9 @@ std::shared_ptr<Object> Integer::subtractOp(const CallArgs& args) {
 std::shared_ptr<Object> Integer::subtract(std::shared_ptr<Object> another) {
     return Integer::subtractOp({ _shared_from_this(), another });
 }
+std::shared_ptr<Object> Integer::reversedSubtract(std::shared_ptr<Object> another) {
+    return Integer::subtractOp({ _shared_from_this(), another });
+}
 
 std::shared_ptr<Object> Integer::multiplyOp(const CallArgs& args) {
     if (args.size() != 2)
@@ -84,6 +91,9 @@ std::shared_ptr<Object> Integer::multiplyOp(const CallArgs& args) {
     return std::make_shared<Integer>(a->value_ * b->value_);
 }
 std::shared_ptr<Object> Integer::multiply(std::shared_ptr<Object> another) {
+    return Integer::multiplyOp({ _shared_from_this(), another });
+}
+std::shared_ptr<Object> Integer::reversedMultiply(std::shared_ptr<Object> another) {
     return Integer::multiplyOp({ _shared_from_this(), another });
 }
 
@@ -105,6 +115,24 @@ std::shared_ptr<Object> Integer::divide(std::shared_ptr<Object> another) {
     return Integer::divideOp({ _shared_from_this(), another });
 }
 
+std::shared_ptr<Object> Integer::reversedDivideOp(const CallArgs& args) {
+    if (args.size() != 2)
+        throw except::InvalidArgumentException(
+            "integer.__div__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+    auto a = std::dynamic_pointer_cast<Integer>(args[0]);
+    auto b = std::dynamic_pointer_cast<Integer>(args[1]);
+    if (!a || !b)
+        throw except::NotImplementedException(
+            "integer.__div__ expects both arguments to be integers");
+
+    if (a->value_ == 0) throw except::DivisionByZeroException(*b);
+
+    return std::make_shared<Integer>(b->value_ / a->value_);
+}
+std::shared_ptr<Object> Integer::reversedDivide(std::shared_ptr<Object> another) {
+    return Integer::reversedDivideOp({ _shared_from_this(), another });
+}
+
 std::shared_ptr<Object> Integer::moduluOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
@@ -120,6 +148,24 @@ std::shared_ptr<Object> Integer::moduluOp(const CallArgs& args) {
     return std::make_shared<Integer>(a->value_ % b->value_);
 }
 std::shared_ptr<Object> Integer::modulu(std::shared_ptr<Object> another) {
+    return Integer::moduluOp({ _shared_from_this(), another });
+}
+
+std::shared_ptr<Object> Integer::reversedModuluOp(const CallArgs& args) {
+    if (args.size() != 2)
+        throw except::InvalidArgumentException(
+            "integer.__mod__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+    auto a = std::dynamic_pointer_cast<Integer>(args[0]);
+    auto b = std::dynamic_pointer_cast<Integer>(args[1]);
+    if (!a || !b)
+        throw except::NotImplementedException(
+            "integer.__mod__ expects both arguments to be integers");
+  
+    if (a->value_ == 0) throw except::DivisionByZeroException(*b);
+
+    return std::make_shared<Integer>(b->value_ % a->value_);
+}
+std::shared_ptr<Object> Integer::reversedModulu(std::shared_ptr<Object> another) {
     return Integer::moduluOp({ _shared_from_this(), another });
 }
 
@@ -234,17 +280,17 @@ std::shared_ptr<Object> Integer::createNewOp(const CallArgs& args) {
 
     auto classType = std::dynamic_pointer_cast<TypeObject>(args[0]);
     if (!classType) {
-        throw except::InvalidArgumentException("integer.__new__ expects first argument to be a type (got: '"
+        throw except::TypeError("integer.__new__ expects first argument to be a type (got: '"
             + classType->type()->name() + "')"); 
     }
     
     if (classType != KraitBuiltins::intType) {
-        throw except::InvalidArgumentException("integer.__new__ expects first argument to be a subclass of '"
+        throw except::TypeError("integer.__new__ expects first argument to be a subclass of '"
             + KraitBuiltins::intType->name() +"' (got: '" + classType->name() + "')");  
     }
 
     auto value = std::dynamic_pointer_cast<Integer>(args[1]);
-    if (!value) throw except::InvalidArgumentException("integer.__new__ expects argument to be an integer");  
+    if (!value) throw except::TypeError("integer.__new__ expects argument to be an integer");  
 
     return value;
 }

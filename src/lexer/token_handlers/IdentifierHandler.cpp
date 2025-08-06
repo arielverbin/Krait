@@ -5,7 +5,7 @@ namespace lexer {
 
 IdentifierHandler::IdentifierHandler(LexerContext& context)
     : TokenHandler(context), keywords_({
-        {"def", TokenType::DEF}, {"return", TokenType::RETURN},
+        {"def", TokenType::DEF}, {"class", TokenType::CLASS}, {"return", TokenType::RETURN},
         {"if", TokenType::IF}, {"else", TokenType::ELSE},
         {"while", TokenType::WHILE}, {"print", TokenType::PRINT},
         {"pass", TokenType::PASS}, {"break", TokenType::BREAK},
