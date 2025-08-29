@@ -28,6 +28,6 @@ void GarbageCollector::mark_and_sweep() {
 
 GarbageCollector::~GarbageCollector() {
     for (auto obj : trackedObjects_) {
-        //delete obj;
+       delete obj;
     }
 }

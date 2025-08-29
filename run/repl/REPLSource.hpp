@@ -19,7 +19,7 @@ public:
     bool eof() const override;
     bool exitOnError() override;
     const std::string& source() override;
-    virtual ~REPLSource() = default;
+    virtual ~REPLSource();
 };
 
 }

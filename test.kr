@@ -90,5 +90,8 @@ Mul.__mul__ = Mul___mul__
 # print("Diff: " + str(d))
 
 x = 10
-while x < 10
+while x < 10:
     x = x + 1
+
+print x
+

@@ -2,6 +2,7 @@
 #define TOKEN_HANDLER_HPP
 
 #include <map>
+#include <optional>
 #include "lexer/LexerContext.hpp"
 #include "lexer/LexerPosition.hpp"
 #include "lexer/Token.hpp"

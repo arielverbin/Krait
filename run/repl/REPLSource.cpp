@@ -68,3 +68,7 @@ const std::string& REPLSource::source() {
 bool REPLSource::eof() const {
     return eof_;
 }
+
+REPLSource::~REPLSource() {
+    clear_history();
+}
