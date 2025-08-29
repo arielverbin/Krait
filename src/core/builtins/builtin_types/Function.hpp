@@ -12,9 +12,9 @@
 
 namespace core {
 
-class Function : public utils::EnableSharedFromThis<Object, Function> {
+class Function : public Object {
 public:
-    using NativeFunc = std::function<std::shared_ptr<Object>(const CallArgs&)>;
+    using NativeFunc = std::function<Object*(const CallArgs&)>;
 
     // Constructors for built-in functions
     Function(NativeFunc nativeFunc);
@@ -25,16 +25,16 @@ public:
              runtime::Environment closure);
 
     // Operations supported (optimization)
-    std::shared_ptr<Object> call(const CallArgs& args) override;
-    std::shared_ptr<String> toString() override;
-    std::shared_ptr<Object> get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) override;
+    Object* call(const CallArgs& args) override;
+    String* toString() override;
+    Object* get(Object* instance, TypeObject* owner) override;
 
     // Operations supported
-    static std::shared_ptr<Object> callOp(const CallArgs& args);
-    static std::shared_ptr<Object> toStringOp(const CallArgs& args);
-    static std::shared_ptr<Object> getOp(const CallArgs& args);
+    static Object* callOp(const CallArgs& args);
+    static Object* toStringOp(const CallArgs& args);
+    static Object* getOp(const CallArgs& args);
 
-    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+    static Object* createNewOp(const CallArgs& args);
 
     virtual ~Function() = default;
 

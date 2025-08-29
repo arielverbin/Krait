@@ -10,7 +10,7 @@ class Call : public ASTNode {
 public:
     Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Environment& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

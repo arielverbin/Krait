@@ -9,11 +9,11 @@
 namespace utils {
 
 template<typename T>
-T getNumericValue(std::shared_ptr<core::Object> o) {
-    std::shared_ptr<core::Float> f = std::dynamic_pointer_cast<core::Float>(o);
+T getNumericValue(core::Object* o) {
+    core::Float* f = dynamic_cast<core::Float*>(o);
     if (f) return static_cast<T>(*f);
 
-    std::shared_ptr<core::Integer> i = std::dynamic_pointer_cast<core::Integer>(o);
+    core::Integer* i = dynamic_cast<core::Integer*>(o);
     if (i) return static_cast<T>(*i);
 
     throw except::NotImplementedException("expected a numeric type (got: '" + o->type()->name() + "')");

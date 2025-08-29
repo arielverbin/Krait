@@ -6,51 +6,51 @@
 
 namespace core {
 
-class Float : public utils::EnableSharedFromThis<Object, Float> {
+class Float : public Object {
 public:
     Float(double value);
     operator double() const;
 
     // Operations supported (optimization)
-    std::shared_ptr<String> toString() override;
-    std::shared_ptr<Boolean> toBool() override;
-    std::shared_ptr<Object> add(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> reversedAdd(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> subtract(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> reversedSubtract(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> multiply(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> reversedMultiply(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> divide(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> reversedDivide(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> modulu(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> reversedModulu(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> negate() override;
-    std::shared_ptr<Object> greaterEqual(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> greater(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> lesserEqual(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> lesser(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> equal(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> notEqual(std::shared_ptr<Object> another) override;
+    String* toString() override;
+    Boolean* toBool() override;
+    Object* add(Object* another) override;
+    Object* reversedAdd(Object* another) override;
+    Object* subtract(Object* another) override;
+    Object* reversedSubtract(Object* another) override;
+    Object* multiply(Object* another) override;
+    Object* reversedMultiply(Object* another) override;
+    Object* divide(Object* another) override;
+    Object* reversedDivide(Object* another) override;
+    Object* modulu(Object* another) override;
+    Object* reversedModulu(Object* another) override;
+    Object* negate() override;
+    Object* greaterEqual(Object* another) override;
+    Object* greater(Object* another) override;
+    Object* lesserEqual(Object* another) override;
+    Object* lesser(Object* another) override;
+    Object* equal(Object* another) override;
+    Object* notEqual(Object* another) override;
 
     // Operations supported
-    static std::shared_ptr<Object> toStringOp(const CallArgs& args);
-    static std::shared_ptr<Object> toBoolOp(const CallArgs& args);
-    static std::shared_ptr<Object> addOp(const CallArgs& args);
-    static std::shared_ptr<Object> subtractOp(const CallArgs& args);
-    static std::shared_ptr<Object> multiplyOp(const CallArgs& args);
-    static std::shared_ptr<Object> divideOp(const CallArgs& args);
-    static std::shared_ptr<Object> reversedDivideOp(const CallArgs& args);
-    static std::shared_ptr<Object> moduluOp(const CallArgs& args);
-    static std::shared_ptr<Object> reversedModuluOp(const CallArgs& args);
-    static std::shared_ptr<Object> negateOp(const CallArgs& args);
-    static std::shared_ptr<Object> greaterEqualOp(const CallArgs& args);
-    static std::shared_ptr<Object> greaterOp(const CallArgs& args);
-    static std::shared_ptr<Object> lesserEqualOp(const CallArgs& args);
-    static std::shared_ptr<Object> lesserOp(const CallArgs& args);
-    static std::shared_ptr<Object> equalOp(const CallArgs& args);
-    static std::shared_ptr<Object> notEqualOp(const CallArgs& args);
+    static Object* toStringOp(const CallArgs& args);
+    static Object* toBoolOp(const CallArgs& args);
+    static Object* addOp(const CallArgs& args);
+    static Object* subtractOp(const CallArgs& args);
+    static Object* multiplyOp(const CallArgs& args);
+    static Object* divideOp(const CallArgs& args);
+    static Object* reversedDivideOp(const CallArgs& args);
+    static Object* moduluOp(const CallArgs& args);
+    static Object* reversedModuluOp(const CallArgs& args);
+    static Object* negateOp(const CallArgs& args);
+    static Object* greaterEqualOp(const CallArgs& args);
+    static Object* greaterOp(const CallArgs& args);
+    static Object* lesserEqualOp(const CallArgs& args);
+    static Object* lesserOp(const CallArgs& args);
+    static Object* equalOp(const CallArgs& args);
+    static Object* notEqualOp(const CallArgs& args);
 
-    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+    static Object* createNewOp(const CallArgs& args);
 
 private:
     double value_;

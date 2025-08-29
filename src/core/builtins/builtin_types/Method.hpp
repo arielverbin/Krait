@@ -7,25 +7,25 @@
 
 namespace core {
 
-class Method : public utils::EnableSharedFromThis<Object, Method> {
+class Method : public Object {
 public:
-    Method(std::shared_ptr<Object> instance, std::shared_ptr<Object> callable);
+    Method(Object* instance, Object* callable);
 
     // Operations supported (optimization)
-    std::shared_ptr<Object> call(const CallArgs& args) override;
-    std::shared_ptr<String> toString() override;
+    Object* call(const CallArgs& args) override;
+    String* toString() override;
 
     // Operations supported
-    static std::shared_ptr<Object> callOp(const CallArgs& args);
-    static std::shared_ptr<Object> toStringOp(const CallArgs& args);
+    static Object* callOp(const CallArgs& args);
+    static Object* toStringOp(const CallArgs& args);
 
-    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+    static Object* createNewOp(const CallArgs& args);
 
     virtual ~Method() = default;
 
 private:
-    std::shared_ptr<Object> instance_;
-    std::shared_ptr<Object> callable_;
+    Object* instance_;
+    Object* callable_;
 };
 
 } // namespace core

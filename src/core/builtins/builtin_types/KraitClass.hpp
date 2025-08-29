@@ -6,10 +6,10 @@
 
 namespace core {
 
-class KraitClass : public utils::EnableSharedFromThis<Object, KraitClass> {
+class KraitClass : public Object {
 public:
-    KraitClass(std::shared_ptr<TypeObject> type);
-    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+    KraitClass(TypeObject* type);
+    static Object* createNewOp(const CallArgs& args);
 };
 
 } // namespace core

@@ -8,8 +8,9 @@ namespace core {
 class KraitBuiltins {
 private:
     static void initializeFunctionType();
-    static void initializedClassMethodType();
+    static void initializeClassMethodType();
     static void initializeMethodType();
+    static void initializeScopeType();
     static void initializeTypeType();
     static void initializeNoneType();
     static void initializeIntType();
@@ -20,14 +21,15 @@ private:
 public:
     static void initializeBuiltins();
 
-    static std::shared_ptr<TypeObject> functionType;
-    static std::shared_ptr<TypeObject> classMethodType;
-    static std::shared_ptr<TypeObject> methodType;
-    static std::shared_ptr<TypeObject> noneType;
-    static std::shared_ptr<TypeObject> intType;
-    static std::shared_ptr<TypeObject> floatType;
-    static std::shared_ptr<TypeObject> boolType;
-    static std::shared_ptr<TypeObject> stringType;
+    static TypeObject* functionType;
+    static TypeObject* classMethodType;
+    static TypeObject* methodType;
+    static TypeObject* scopeType;
+    static TypeObject* noneType;
+    static TypeObject* intType;
+    static TypeObject* floatType;
+    static TypeObject* boolType;
+    static TypeObject* stringType;
 };
 
 } // namespace core

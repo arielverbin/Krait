@@ -2,16 +2,25 @@
 #include "Interpreter.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
 #include "core/TypeObject.hpp"
+#include "core/gc/GarbageCollector.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
 using namespace interpreter;
 
-Interpreter::Interpreter() : state_(std::make_shared<runtime::Environment>()) {
+Interpreter::Interpreter() : state_(new runtime::Environment()) {
+    // Initialize the grabage collector
+    gc::GarbageCollector::initialize(state_);
+    gc::GarbageCollector::instance().trackObject(state_);
+
+    // Initialize 'type' type.
+    core::TypeObject::typeType = core::TypeObject::initType();
+
+    // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
     
     // Initialize the global scope.
     state_->pushNewScope();
 
-    // Initialize built-in types.
+    // Expose buildin types.
     state_->defineVariable("none", core::KraitBuiltins::noneType);
     state_->defineVariable("bool", core::KraitBuiltins::boolType);
     state_->defineVariable("float", core::KraitBuiltins::floatType);

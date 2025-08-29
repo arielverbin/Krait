@@ -2,31 +2,32 @@
 #define RUNTIME_ENVIRONMENT_HPP
 
 #include "core/Object.hpp"
-#include "utils/utils.hpp"
 #include "core/builtins/builtin_types/String.hpp"
+#include "core/builtins/builtin_types/Scope.hpp"
+#include "core/gc/GCTrackable.hpp"
 #include <map>
 #include <stack>
 #include <iostream>
 
 namespace runtime {
 
-class Environment {
+class Environment : public gc::GCTrackable {
 private:
-    std::deque<std::shared_ptr<utils::Scope>> scopeStack_;
+    std::deque<core::Scope*> scopeStack_;
 
 public:
     Environment() = default;
     Environment(const Environment&) = default;
 
-    std::shared_ptr<utils::Scope> pushNewScope();
-    void pushScope(std::shared_ptr<utils::Scope> scope);
-    std::shared_ptr<utils::Scope> popLastScope();
+    core::Scope* pushNewScope();
+    void pushScope(core::Scope* scope);
+    core::Scope* popLastScope();
 
-    std::shared_ptr<core::Object> getVariable(std::string varName);
-    void setVariable(std::string varName, std::shared_ptr<core::Object> value);
+    core::Object* getVariable(std::string varName);
+    void setVariable(std::string varName, core::Object* value);
 
     // Explicitly define a new variable in the current scope.
-    void defineVariable(std::string varName, std::shared_ptr<core::Object> value);
+    void defineVariable(std::string varName, core::Object* value);
 
     #ifdef KRAIT_TESTING
     // For debugging purposes, print the current environment.
@@ -39,14 +40,14 @@ public:
             os << "Scope " << i << ": {";
     
             bool first = true;
-            for (const auto& [key, value] : *scope) {
+            for (const auto& [key, value] : scope->getMembers()) {
                 if (!first) os << ", ";
                 first = false;
 
-                if (std::holds_alternative<utils::LazyValue>(value)) {
+                if (std::holds_alternative<core::LazyValue>(value)) {
                     os << key << ": [LazyValue]";
                 } else {
-                    auto strValue = std::get<std::shared_ptr<core::Object>>(value)->toString();
+                    auto strValue = std::get<core::Object*>(value)->toString();
                     os << key << ": \"" << static_cast<std::string>(*strValue) << "\"";
                 }
             }
@@ -60,6 +61,7 @@ public:
     
 
     Environment createChildEnvironment();
+    std::vector<gc::GCTrackable*> referencees() override;
 };
 }
 

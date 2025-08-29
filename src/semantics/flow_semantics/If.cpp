@@ -7,8 +7,8 @@ If::If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::s
     : condition_(std::move(cond)), trueBlock_(std::move(trueBlock)), falseBlock_(std::move(falseBlock)) {}
 
 
-std::shared_ptr<core::Object> If::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Boolean> computed_condition = condition_->evaluate(state)->toBool();
+core::Object* If::evaluate(runtime::Environment& state) const {
+    core::Boolean* computed_condition = condition_->evaluate(state)->toBool();
 
     // state.pushNewScope();
     if (*computed_condition) {

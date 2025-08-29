@@ -9,7 +9,7 @@
 namespace semantics {
 class ASTNode {
 public:
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const = 0;
+    virtual core::Object* evaluate(runtime::Environment& state) const = 0;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const = 0;
@@ -20,7 +20,7 @@ public:
 
 class AssignableASTNode : public ASTNode {
 public:
-    virtual void assign(runtime::Environment& state, std::shared_ptr<core::Object> value) = 0;
+    virtual void assign(runtime::Environment& state, core::Object* value) = 0;
 
     virtual ~AssignableASTNode() = default;
 };

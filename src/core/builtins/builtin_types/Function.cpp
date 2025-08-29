@@ -3,6 +3,7 @@
 #include "Boolean.hpp"
 #include "None.hpp"
 #include "Method.hpp"
+#include "core/gc/GarbageCollector.hpp"
 #include "exceptions/exceptions.hpp"
 #include "semantics/signal_semantics/Signal.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
@@ -12,20 +13,19 @@
 using namespace core;
 
 Function::Function(NativeFunc nativeFunc) 
-        : utils::EnableSharedFromThis<Object, Function>(KraitBuiltins::functionType),
-        isBuiltIn_(true), nativeFunc_(nativeFunc) {}
+    : Object(KraitBuiltins::functionType), isBuiltIn_(true), nativeFunc_(nativeFunc) {}
 
 Function::Function(std::shared_ptr<semantics::ASTNode> body,
                    std::vector<std::string> params,
                    runtime::Environment closure)
-    : utils::EnableSharedFromThis<Object, Function>(KraitBuiltins::functionType),
+    : Object(KraitBuiltins::functionType),
     isBuiltIn_(false), body_(body), params_(params), closure_(std::move(closure)) {}
 
-std::shared_ptr<Object> Function::callOp(const CallArgs& args) {
+Object* Function::callOp(const CallArgs& args) {
     if (args.size() < 1)
         throw except::InvalidArgumentException(
             "function.__call__ requires at least 1 argument (received " + std::to_string(args.size()) + ")");
-    auto self = std::dynamic_pointer_cast<Function>(args[0]);
+    auto self = dynamic_cast<Function*>(args[0]);
     if (!self)
         throw except::TypeError("first argument to function.__call__ must be a function");
     
@@ -51,53 +51,53 @@ std::shared_ptr<Object> Function::callOp(const CallArgs& args) {
     catch (const semantics::ReturnSignal& ret) { return ret.value(); }
     return None::getNone();
 }
-std::shared_ptr<Object> Function::call(const CallArgs& args) {
-    CallArgs fullArgs{ _shared_from_this() };
+Object* Function::call(const CallArgs& args) {
+    CallArgs fullArgs{ this };
     fullArgs.insert(fullArgs.end(), args.begin(), args.end());
     return Function::callOp(fullArgs);
 }
 
-std::shared_ptr<Object> Function::toStringOp(const CallArgs& args) {
+Object* Function::toStringOp(const CallArgs& args) {
     if (args.size() != 1)
         throw except::InvalidArgumentException(
             "function.__str__ requires exactly 1 argument (received " + std::to_string(args.size()) + ")");
-    auto self = std::dynamic_pointer_cast<Function>(args[0]);
+    auto self = dynamic_cast<Function*>(args[0]);
     if (!self)
         throw except::InvalidArgumentException("first argument to function.__str__ must be a function");
     
     std::ostringstream oss;
-    oss <<"<" + self->type()->name() + " at "  << self.get() << " (" << (self->isBuiltIn_ ? "" : "non ") << "built-in)>";
-    return std::make_shared<String>(oss.str());
+    oss <<"<" + self->type()->name() + " at "  << self << " (" << (self->isBuiltIn_ ? "" : "non ") << "built-in)>";
+    return gc::make_tracked<String>(oss.str());
 }
-std::shared_ptr<String> Function::toString() {
-    return std::dynamic_pointer_cast<String>(Function::toStringOp({ _shared_from_this() }));
+String* Function::toString() {
+    return dynamic_cast<String*>(Function::toStringOp({ this }));
 }
 
-std::shared_ptr<Object> Function::getOp(const CallArgs& args) {
+Object* Function::getOp(const CallArgs& args) {
     if (args.size() != 3) 
         throw except::AttributeError(
             "function.__get__ requires exactly 3 arguments (received " + std::to_string(args.size()) + ")");
 
-    std::shared_ptr<Function> self = std::dynamic_pointer_cast<Function>(args[0]);
+    Function* self = dynamic_cast<Function*>(args[0]);
     if (!self) {
         throw except::TypeError(
             "first argument to function.__get__ must be a function (got: " + args[0]->type()->name() + ")"
         );
     }
 
-    std::shared_ptr<Object> instance = std::dynamic_pointer_cast<core::Object>(args[1]);
+    Object* instance = dynamic_cast<core::Object*>(args[1]);
 
     // don't bind to None type
     if (instance->type() == KraitBuiltins::noneType) return self;
 
-    return std::make_shared<Method>(instance, self);
+    return gc::make_tracked<Method>(instance, self);
 }
 
-std::shared_ptr<Object> Function::get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) {
-    return Function::getOp( { _shared_from_this(), instance, owner });
+Object* Function::get(Object* instance, TypeObject* owner) {
+    return Function::getOp( { this, instance, owner });
 }
 
-std::shared_ptr<Object> Function::createNewOp(const CallArgs& args) {
+Object* Function::createNewOp(const CallArgs& args) {
     UNREFERENCED(args);
     throw except::NotImplementedException("explicit function constructor is not supported yet");
 }

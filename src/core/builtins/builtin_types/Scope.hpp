@@ -1,23 +1,23 @@
-#ifndef CORE_BOOLEAN_HPP
-#define CORE_BOOLEAN_HPP
+#ifndef CORE_SCOPE_HPP
+#define CORE_SCOPE_HPP
 
 #include "core/Object.hpp"
-#include "utils/utils.hpp"
 
 namespace core {
-
-class Boolean : public Object {
+class Scope : public Object {
 public:
-    Boolean(bool value);
-    // Singleton access
-    static Boolean* get(bool value);
-    operator bool() const;
+    Scope();
+    Scope* getScope() override;
 
     // Operations supported (optimization)
     String* toString() override;
     Boolean* toBool() override;
     Object* equal(Object* another) override;
     Object* notEqual(Object* another) override;
+
+    Object* getMember(const std::string& varName);
+    bool hasMember(const std::string& varName);
+    void setMember(const std::string& varName, MemberEntry obj);
 
     // Operations supported
     static Object* toStringOp(const CallArgs& args);
@@ -27,12 +27,14 @@ public:
 
     static Object* createNewOp(const CallArgs& args);
 
-    virtual ~Boolean() = default;
+    #ifdef KRAIT_TESTING
+    std::unordered_map<std::string, MemberEntry> getMembers();
+    #endif // KRAIT_TESTING
 
 private:
-    bool value_;
+    std::unordered_map<std::string, MemberEntry> members_;
 };
 
-} // namespace core
+}
 
-#endif // CORE_BOOLEAN_HPP
+#endif // CORE_SCOPE_HPP

@@ -13,7 +13,7 @@ public:
     runtime::Environment& interpret(std::shared_ptr<semantics::ASTNode> command);
 
 private:
-    std::shared_ptr<runtime::Environment> state_;
+    runtime::Environment* state_;
     std::vector<std::shared_ptr<semantics::ASTNode>> commands_;
 };
 

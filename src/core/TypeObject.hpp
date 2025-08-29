@@ -6,25 +6,31 @@
 #include "Object.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
 
+namespace interpreter {
+class Interpreter;
+}
+
 namespace core {
 
-class TypeObject : public utils::EnableSharedFromThis<Object, TypeObject> {
+class TypeObject : public Object {
 private:
     std::string name_;
-    static std::shared_ptr<TypeObject> initType();
+    static TypeObject* initType();
+
+    friend class interpreter::Interpreter;
 
 public:
     TypeObject(std::string name, Function::NativeFunc creator);
     const std::string& name();
-    static std::shared_ptr<TypeObject> typeType;
+    static TypeObject* typeType;
 
     // Operations supported (optimization)
-    std::shared_ptr<String> toString() override;
-    std::shared_ptr<Object> call(const CallArgs& args) override;
+    String* toString() override;
+    Object* call(const CallArgs& args) override;
 
     // Operations supported
-    static std::shared_ptr<Object> toStringOp(const CallArgs& args);
-    static std::shared_ptr<Object> callOp(const CallArgs& args);
+    static Object* toStringOp(const CallArgs& args);
+    static Object* callOp(const CallArgs& args);
 };
 
 }

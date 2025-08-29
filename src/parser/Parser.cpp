@@ -1,6 +1,8 @@
 #include "Parser.hpp"
 #include "exceptions/exceptions.hpp"
 
+#include "core/gc/GarbageCollector.hpp"
+
 #include "core/builtins/builtin_types/Integer.hpp"
 #include "core/builtins/builtin_types/Float.hpp"
 #include "core/builtins/builtin_types/String.hpp"
@@ -133,12 +135,12 @@ std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minBp) {
 std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
     if (match(lexer::TokenType::INT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(number)));
+        return std::make_shared<semantics::Const>(gc::make_tracked<core::Integer>(std::stoi(number)));
     }
 
     if (match(lexer::TokenType::FLOAT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::Float>(std::stod(number)));
+        return std::make_shared<semantics::Const>(gc::make_tracked<core::Float>(std::stod(number)));
     }
 
     if (match(lexer::TokenType::TRU)) {
@@ -155,7 +157,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
 
     if (match(lexer::TokenType::STRING)) {
         const auto& varName = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::String>(varName));
+        return std::make_shared<semantics::Const>(gc::make_tracked<core::String>(varName));
     }
 
     if (match(lexer::TokenType::IDENTIFIER)) {

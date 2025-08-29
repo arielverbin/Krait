@@ -11,13 +11,13 @@ enum UnaryOpType {
 
 class UnaryOp : public ASTNode {
 public:
-    using Method = std::shared_ptr<core::Object> (UnaryOp::*)(runtime::Environment& state) const;
+    using Method = core::Object* (UnaryOp::*)(runtime::Environment& state) const;
     UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Environment& state) const override;
 
-    std::shared_ptr<core::Object> negate(runtime::Environment& state) const;
-    std::shared_ptr<core::Object> logicalNot(runtime::Environment& state) const;
+    core::Object* negate(runtime::Environment& state) const;
+    core::Object* logicalNot(runtime::Environment& state) const;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

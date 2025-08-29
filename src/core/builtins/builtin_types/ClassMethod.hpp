@@ -7,20 +7,20 @@
 
 namespace core {
 
-class ClassMethod : public utils::EnableSharedFromThis<Object, ClassMethod> {
+class ClassMethod : public Object {
 public:
     // Constructors for built-in functions
-    ClassMethod(std::shared_ptr<Function> function);
+    ClassMethod(Function* function);
 
     // Operations supported (optimization)
-    std::shared_ptr<Object> get(std::shared_ptr<Object> instance, std::shared_ptr<TypeObject> owner) override;
+    Object* get(Object* instance, TypeObject* owner) override;
 
     // Operations supported
-    static std::shared_ptr<Object> getOp(const CallArgs& args);
-    static std::shared_ptr<Object> createNewOp(const CallArgs& args);
+    static Object* getOp(const CallArgs& args);
+    static Object* createNewOp(const CallArgs& args);
 
 private:
-    std::shared_ptr<Function> function;
+    Function* function;
 };
 
 } // namespace core

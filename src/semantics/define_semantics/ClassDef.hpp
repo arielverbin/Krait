@@ -11,7 +11,7 @@ class ClassDef : public ASTNode {
 public:
     ClassDef(std::string className, std::shared_ptr<ASTNode> body);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Environment& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

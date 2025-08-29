@@ -2,9 +2,9 @@
 #include "utils/utils.hpp"
 using namespace semantics;
 
-Const::Const(std::shared_ptr<core::Object> obj) : obj_(obj) {}
+Const::Const(core::Object* obj) : obj_(obj) {}
 
-std::shared_ptr<core::Object> Const::evaluate(runtime::Environment& state) const {
+core::Object* Const::evaluate(runtime::Environment& state) const {
     UNREFERENCED(state);
 
     return obj_;
