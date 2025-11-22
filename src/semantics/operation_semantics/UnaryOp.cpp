@@ -13,18 +13,18 @@ std::map<UnaryOpType, UnaryOp::Method> UnaryOp::functionTypeMap_ = {
 UnaryOp::UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp)
     : type_(type), exp_(std::move(exp)) {}
 
-core::Object* UnaryOp::evaluate(runtime::Environment& state) const {
+core::Object* UnaryOp::evaluate(runtime::Frame& state) const {
     // Retrieve the current implementation of the operation.
     auto method = UnaryOp::functionTypeMap_.at(type_);
     return (this->*method)(state);
 }
 
-core::Object* UnaryOp::negate(runtime::Environment& state) const {
+core::Object* UnaryOp::negate(runtime::Frame& state) const {
     core::Object* o = exp_->evaluate(state);
     return o->negate();
 }
 
-core::Object* UnaryOp::logicalNot(runtime::Environment& state) const {
+core::Object* UnaryOp::logicalNot(runtime::Frame& state) const {
     core::Object* o = exp_->evaluate(state);
     return core::Boolean::get(!(*(o->toBool())));
 }

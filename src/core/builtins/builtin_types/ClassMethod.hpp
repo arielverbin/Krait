@@ -13,14 +13,14 @@ public:
     ClassMethod(Function* function);
 
     // Operations supported (optimization)
-    Object* get(Object* instance, TypeObject* owner) override;
+    Object* get(Object* instance, Object* owner) override;
 
     // Operations supported
     static Object* getOp(const CallArgs& args);
     static Object* createNewOp(const CallArgs& args);
 
 private:
-    Function* function;
+    Function* function_;
 };
 
 } // namespace core

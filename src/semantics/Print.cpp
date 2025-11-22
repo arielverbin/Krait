@@ -9,7 +9,7 @@ using namespace semantics;
 
 Print::Print(std::shared_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
-core::Object* Print::evaluate(runtime::Environment& state) const {
+core::Object* Print::evaluate(runtime::Frame& state) const {
     core::String* string = expression_->evaluate(state)->toString();
     std::cout << static_cast<std::string>(*string) << std::endl;
 

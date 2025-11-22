@@ -4,28 +4,16 @@
 #include "core/builtins/builtin_types/None.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
 #include "core/builtins/builtin_types/ClassMethod.hpp"
+#include "core/builtins/KraitBuiltins.hpp"
 using namespace core;
-#include <iostream>
 
 
 TypeObject::TypeObject(std::string name, Function::NativeFunc creator) 
-    : Object(typeType), name_(std::move(name)) {
+    : Object(KraitBuiltins::typeType), name_(std::move(name)) {
         if (creator != nullptr) {
             setAttribute("__new__", gc::make_tracked<core::ClassMethod>(gc::make_tracked<core::Function>(creator)));
         }
-    }
-
-TypeObject* TypeObject::initType() {
-    auto self = gc::make_tracked<TypeObject>("type", nullptr);
-    
-    // re-initialize type's type object
-    self->type_ = self;
-    self->setAttribute("__class__", self);
-    return self;
 }
-
-// Initialize the type 'type'.
-TypeObject* TypeObject::typeType = nullptr;
 
 const std::string& TypeObject::name() {
     return name_;

@@ -6,7 +6,9 @@
 #include "exceptions/exceptions.hpp"
 using namespace core;
 
-ClassMethod::ClassMethod(Function* function) : Object(KraitBuiltins::classMethodType), function(function) {}
+ClassMethod::ClassMethod(Function* function) : Object(KraitBuiltins::classMethodType), function_(function) {
+    setAttribute("__function__", function_);
+}
 
 Object* ClassMethod::getOp(const CallArgs& args) {
     if (args.size() != 3) 
@@ -18,9 +20,9 @@ Object* ClassMethod::getOp(const CallArgs& args) {
         throw except::InvalidArgumentException("first argument to classmethod.__get__ must be a classmethod");
     
     auto owner = dynamic_cast<core::Object*>(args[2]);
-    return gc::make_tracked<Method>(owner, self->function);
+    return gc::make_tracked<Method>(owner, self->function_);
 }
-Object* ClassMethod::get(Object* instance, TypeObject* owner) {
+Object* ClassMethod::get(Object* instance, Object* owner) {
     return ClassMethod::getOp( { this, instance, owner });
 }
 

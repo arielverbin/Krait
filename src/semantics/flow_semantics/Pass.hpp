@@ -7,7 +7,7 @@ namespace semantics {
 
 class Pass : public ASTNode {
 public:
-    core::Object* evaluate(runtime::Environment& state) const override;
+    core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     std::string stringify() const override {

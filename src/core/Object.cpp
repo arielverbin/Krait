@@ -20,7 +20,11 @@ using namespace core;
 
 Object::Object(TypeObject *type, bool initScope) : type_(type), members_(initScope ? gc::make_tracked<Scope>() : nullptr) {
     // All objects expose their type objects through the '__class__' attribute.
-    if (initScope) setAttribute("__class__", type_);
+    // and their dictionary through the '__dict__' attribute.
+    if (initScope) {
+        setAttribute("__class__", type_);
+        setAttribute("__dict__", members_);
+    }
 }
 
 TypeObject* Object::type() {
@@ -28,14 +32,21 @@ TypeObject* Object::type() {
 }
 
 Scope* Object::getScope() {
+    if (members_ == nullptr) {
+        // lazy scope initialization
+        members_ = gc::make_tracked<Scope>();
+        setAttribute("__class__", type_);
+        setAttribute("__dict__", members_);
+    }
+    
     return members_;
 }
 
 String* Object::toString() {
-    if (!type_->hasAttribute("__str__")) {
+    if (!type()->hasAttribute("__str__")) {
         // all objects must have a string representation
         std::ostringstream oss;
-        oss <<"<'" + type_->name() + "' object at " <<  this << + ">";
+        oss <<"<'" + type()->name() + "' object at " <<  this << + ">";
         return gc::make_tracked<String>(oss.str());
     }
 
@@ -47,8 +58,8 @@ String* Object::toString() {
 }
 
 Boolean* Object::toBool() {
-    if (type_->hasAttribute("__bool__")) {
-        Object* boolean = getAttribute("__bool__")->call({});
+    if (type()->hasAttribute("__bool__")) {
+        Object* boolean = getTypeAttribute("__bool__")->call({});
         if (core::Boolean* b = dynamic_cast<core::Boolean*>(boolean)) {
             return b;
         }
@@ -56,102 +67,102 @@ Boolean* Object::toBool() {
     }
     
     // all objects return True by default, except None
-    return Boolean::get(type_ != KraitBuiltins::noneType);
+    return Boolean::get(type() != KraitBuiltins::noneType);
 }
 
 Object* Object::add(Object* another) {
-    Object* attribute = findAttribute("__add__");
+    Object* attribute = getTypeAttribute("__add__");
     if (!attribute) throw except::NotImplementedException("__add__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 Object* Object::reversedAdd(Object* another) {
-    Object* attribute = findAttribute("__radd__");
+    Object* attribute = getTypeAttribute("__radd__");
     if (!attribute) throw except::NotImplementedException("__radd__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::subtract(Object* another) {
-    Object* attribute = findAttribute("__sub__");
+    Object* attribute = getTypeAttribute("__sub__");
     if (!attribute) throw except::NotImplementedException("__sub__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 Object* Object::reversedSubtract(Object* another) {
-    Object* attribute = findAttribute("__rsub__");
+    Object* attribute = getTypeAttribute("__rsub__");
     if (!attribute) throw except::NotImplementedException("__rsub__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::multiply(Object* another) {
-    Object* attribute = findAttribute("__mult__");
+    Object* attribute = getTypeAttribute("__mult__");
     if (!attribute) throw except::NotImplementedException("__mult__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 Object* Object::reversedMultiply(Object* another) {
-    Object* attribute = findAttribute("__rmult__");
+    Object* attribute = getTypeAttribute("__rmult__");
     if (!attribute) throw except::NotImplementedException("__rmult__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::divide(Object* another) {
-    Object* attribute = findAttribute("__div__");
+    Object* attribute = getTypeAttribute("__div__");
     if (!attribute) throw except::NotImplementedException("__div__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 Object* Object::reversedDivide(Object* another) {
-    Object* attribute = findAttribute("__rdiv__");
+    Object* attribute = getTypeAttribute("__rdiv__");
     if (!attribute) throw except::NotImplementedException("__rdiv__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::modulu(Object* another) {
-    Object* attribute = findAttribute("__mod__");
+    Object* attribute = getTypeAttribute("__mod__");
     if (!attribute) throw except::NotImplementedException("__mod__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 Object* Object::reversedModulu(Object* another) {
-    Object* attribute = findAttribute("__rmod__");
+    Object* attribute = getTypeAttribute("__rmod__");
     if (!attribute) throw except::NotImplementedException("__rmod__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::negate() {
-    Object* attribute = findAttribute("__neg__");
+    Object* attribute = getTypeAttribute("__neg__");
     if (!attribute) throw except::NotImplementedException("__neg__ does not exists for type '" + type()->name() + "'");
     return attribute->call({});
 }
 
 Object* Object::greaterEqual(Object* another) {
-    Object* attribute = findAttribute("__ge__");
+    Object* attribute = getTypeAttribute("__ge__");
     if (!attribute) throw except::NotImplementedException("__ge__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::greater(Object* another) {
-    Object* attribute = findAttribute("__gt__");
+    Object* attribute = getTypeAttribute("__gt__");
     if (!attribute) throw except::NotImplementedException("__gt__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::lesserEqual(Object* another) {
-    Object* attribute = findAttribute("__le__");
+    Object* attribute = getTypeAttribute("__le__");
     if (!attribute) throw except::NotImplementedException("__le__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::lesser(Object* another) {
-    Object* attribute = findAttribute("__lt__");
+    Object* attribute = getTypeAttribute("__lt__");
     if (!attribute) throw except::NotImplementedException("__lt__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::equal(Object* another) {
-    Object* attribute = findAttribute("__eq__");
+    Object* attribute = getTypeAttribute("__eq__");
     if (!attribute) throw except::NotImplementedException("__eq__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
 
 Object* Object::notEqual(Object* another) {
-    Object* attribute = findAttribute("__neq__");
+    Object* attribute = getTypeAttribute("__neq__");
     if (!attribute) throw except::NotImplementedException("__neq__ does not exists for type '" + type()->name() + "'");
     return attribute->call({ another });
 }
@@ -170,7 +181,7 @@ Object* Object::initialize(const CallArgs& args) {
 
 Object* Object::call(const CallArgs& args) {
     try {
-        Object* attribute = findAttribute("__call__");
+        Object* attribute = getTypeAttribute("__call__");
         if (!attribute) throw except::NotImplementedException("__call__ does not exists for type '" + type()->name() + "'");
         attribute->call({ args });
     } catch (const semantics::ReturnSignal& ret) {
@@ -179,11 +190,11 @@ Object* Object::call(const CallArgs& args) {
     return None::getNone();
 }
 
-Object* Object::get(Object* instance, TypeObject* owner) {
-    if (!type_->hasAttribute("__get__"))
+Object* Object::get(Object* instance, Object* owner) {
+    if (!type()->hasAttribute("__get__"))
         throw except::NotImplementedException("__get__ does not exists for type '" + type()->name() + "'");
 
-    auto fnRaw = type_->getAttributeRaw("__get__");
+    auto fnRaw = type()->getAttributeRaw("__get__");
     return fnRaw->call({ this, instance, owner });
 }
 
@@ -191,35 +202,26 @@ bool Object::hasAttribute(const std::string& varName) {
     return getScope()->hasMember(varName);
 }
 
-Object* Object::getAttributeRaw(const std::string& varName) {
-    // TODO: even in raw, check if the properly has a __get__ function, if so - call it.
-    return getScope()->getMember(varName);
+Object* Object::getAttributeRaw(const std::string& varName, Object* instance) {
+    Object* attribute = getScope()->getMember(varName);
+    if (!attribute->type()->hasAttribute("__get__")) {
+        return attribute;
+    }
+    Object* bound = attribute->get(instance ? instance : core::None::getNone(), this);
+
+    // // cache on the instance's own dict and return
+    /** TODO: add mechanism to remove the cached result in case the object was changed on the instance's type */
+    // setAttribute(varName, bound); 
+    return bound;
 }
 
 Object* Object::findAttribute(const std::string& varName) { 
-    auto isClass = [&]() {
-        // a 'class' is defined as an object of type 'type'.
-        return this->type() == TypeObject::typeType;
-    };
+    return hasAttribute(varName) ? getAttributeRaw(varName, nullptr) : getTypeAttribute(varName);
+}
 
-    if (!isClass() && hasAttribute(varName)) {
-        return getAttributeRaw(varName);
-    }
-
-    TypeObject* cls = isClass() ? dynamic_cast<TypeObject*>(this) : this->type();
-    if (!cls) throw except::TypeError("class (i.e object of type 'type') must be a 'type'");
-
-    if (cls->hasAttribute(varName)) {
-        Object* attribute = cls->getAttributeRaw(varName);
-        if (!attribute->type()->hasAttribute("__get__")) {
-            return attribute;
-        }
-        Object* bound = attribute->get(isClass() ? core::None::getNone() : this, cls);
-
-        // // cache on the instance's own dict and return
-        /** TODO: add mechanism to remove the cached result in case the object was changed on the instance's type */
-        // setAttribute(varName, bound); 
-        return bound;
+Object* Object::getTypeAttribute(const std::string& varName) {
+    if (type()->hasAttribute(varName)) {
+        return type()->getAttributeRaw(varName, this); 
     }
 
     /** TODO: fallback to __getattr__ implementation */
@@ -229,14 +231,15 @@ Object* Object::findAttribute(const std::string& varName) {
 
 Object* Object::getAttribute(const std::string& varName) { 
     Object* ob = findAttribute(varName);
-    if (!ob) throw except::AttributeError("'" + type_->name() + "' object has no attribute '" + varName + "'");
+    if (!ob) throw except::AttributeError("'" + type()->name() + "' object has no attribute '" + varName + "'");
     return ob;
 }
 
-void Object::setAttribute(const std::string& varName, MemberEntry value) {
+void Object::setAttribute(const std::string& varName, AttributeEntry value) {
     getScope()->setMember(varName, value);
 }
 
 std::vector<gc::GCTrackable*> Object::referencees() {
-    return std::vector<gc::GCTrackable*>();
+    if (members_ == nullptr) return {};
+    return std::vector<gc::GCTrackable*>({members_});
 }

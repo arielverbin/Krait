@@ -6,7 +6,7 @@ using namespace semantics;
 Assign::Assign(std::shared_ptr<AssignableASTNode> target, std::shared_ptr<ASTNode> source)
     : target_(std::move(target)), source_(std::move(source)) {}
 
-core::Object* Assign::evaluate(runtime::Environment& state) const {
+core::Object* Assign::evaluate(runtime::Frame& state) const {
     core::Object* source = source_->evaluate(state);
     target_->assign(state, source);
 

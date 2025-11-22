@@ -9,7 +9,7 @@ class If : public ASTNode {
 public:
     If(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> trueBlock, std::shared_ptr<ASTNode> falseBlock);
 
-    virtual core::Object* evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

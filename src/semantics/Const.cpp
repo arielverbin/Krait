@@ -4,7 +4,7 @@ using namespace semantics;
 
 Const::Const(core::Object* obj) : obj_(obj) {}
 
-core::Object* Const::evaluate(runtime::Environment& state) const {
+core::Object* Const::evaluate(runtime::Frame& state) const {
     UNREFERENCED(state);
 
     return obj_;

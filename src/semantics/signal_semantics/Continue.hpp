@@ -8,7 +8,7 @@ namespace semantics {
 class Continue : public ASTNode {
 public:
     Continue() = default;
-    virtual core::Object* evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {
