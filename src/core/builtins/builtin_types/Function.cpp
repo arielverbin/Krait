@@ -93,7 +93,7 @@ Object* Function::getOp(const CallArgs& args) {
     return gc::make_tracked<Method>(instance, self);
 }
 
-Object* Function::get(Object* instance, TypeObject* owner) {
+Object* Function::get(Object* instance, Object* owner) {
     return Function::getOp( { this, instance, owner });
 }
 

@@ -39,9 +39,7 @@ public:
     static Object* subtractOp(const CallArgs& args);
     static Object* multiplyOp(const CallArgs& args);
     static Object* divideOp(const CallArgs& args);
-    static Object* reversedDivideOp(const CallArgs& args);
     static Object* moduluOp(const CallArgs& args);
-    static Object* reversedModuluOp(const CallArgs& args);
     static Object* negateOp(const CallArgs& args);
     static Object* greaterEqualOp(const CallArgs& args);
     static Object* greaterOp(const CallArgs& args);

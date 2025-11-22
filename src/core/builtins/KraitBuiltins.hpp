@@ -7,6 +7,7 @@ namespace core {
 
 class KraitBuiltins {
 private:
+    static void declateTypeType();
     static void initializeFunctionType();
     static void initializeClassMethodType();
     static void initializeMethodType();
@@ -21,6 +22,7 @@ private:
 public:
     static void initializeBuiltins();
 
+    static TypeObject* typeType;
     static TypeObject* functionType;
     static TypeObject* classMethodType;
     static TypeObject* methodType;

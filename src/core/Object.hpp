@@ -31,7 +31,8 @@ protected:
     TypeObject* type_;
     Scope* members_;
 
-    Object* getAttributeRaw(const std::string& varName);
+    Object* getAttributeRaw(const std::string& varName, Object* instance = nullptr);
+    Object* getTypeAttribute(const std::string& varName);
     Object* findAttribute(const std::string& varName);
     friend class KraitBuiltins;
 
@@ -73,7 +74,7 @@ public:
     virtual Object* notEqual(Object* another);
 
     virtual Object* call(const CallArgs& args);
-    virtual Object* get(Object* instance, TypeObject* owner);
+    virtual Object* get(Object* instance, Object* owner);
 
     // class support
     virtual Object* createNew(const CallArgs& args);

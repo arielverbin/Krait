@@ -4,22 +4,16 @@ using namespace gc;
 
 GarbageCollector GarbageCollector::instance_;
 
-void GarbageCollector::initialize(runtime::Environment *env) {
-    if (instance_.env_) {
-        throw std::runtime_error("GarbageCollector already initialized");
-    }
-    instance_.env_ = env;
-}
-
 GarbageCollector& GarbageCollector::instance() {
-    if (!instance_.env_) {
-        throw std::runtime_error("GarbageCollector not initialized");
-    }
     return instance_;
 }
 
 void GarbageCollector::trackObject(gc::GCTrackable *obj) {
     trackedObjects_.insert(obj);
+}
+
+void GarbageCollector::defineRoot(gc::GCTrackable *root) {
+    roots_.push_back(root);
 }
 
 void GarbageCollector::mark_and_sweep() {
@@ -28,6 +22,6 @@ void GarbageCollector::mark_and_sweep() {
 
 GarbageCollector::~GarbageCollector() {
     for (auto obj : trackedObjects_) {
-        //delete obj;
+        delete obj;
     }
 }

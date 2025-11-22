@@ -7,12 +7,8 @@
 using namespace interpreter;
 
 Interpreter::Interpreter() : state_(new runtime::Environment()) {
-    // Initialize the grabage collector
-    gc::GarbageCollector::initialize(state_);
-    gc::GarbageCollector::instance().trackObject(state_);
-
-    // Initialize 'type' type.
-    core::TypeObject::typeType = core::TypeObject::initType();
+    // Define the global environment as its mark&sweep root
+    gc::GarbageCollector::instance().defineRoot(state_);
 
     // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
@@ -26,7 +22,7 @@ Interpreter::Interpreter() : state_(new runtime::Environment()) {
     state_->defineVariable("float", core::KraitBuiltins::floatType);
     state_->defineVariable("str", core::KraitBuiltins::stringType);
     state_->defineVariable("function", core::KraitBuiltins::functionType);
-    state_->defineVariable("type", core::TypeObject::typeType);
+    state_->defineVariable("type", core::KraitBuiltins::typeType);
     state_->defineVariable("method", core::KraitBuiltins::methodType);
     state_->defineVariable("classmethod", core::KraitBuiltins::classMethodType);
     state_->defineVariable("int", core::KraitBuiltins::intType);
@@ -35,4 +31,8 @@ Interpreter::Interpreter() : state_(new runtime::Environment()) {
 runtime::Environment& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
     command->evaluate(*state_);
     return *state_;
+}
+
+Interpreter::~Interpreter() {
+    delete state_;
 }

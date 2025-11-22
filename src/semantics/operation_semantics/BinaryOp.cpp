@@ -147,7 +147,8 @@ core::Object* BinaryOp::equal(runtime::Environment& state) const {
     TRY_AND_RETURN(core::Boolean::get(!(*(o1->notEqual(o2)->toBool()))));
     TRY_AND_RETURN(core::Boolean::get(!(*(o2->notEqual(o1)->toBool()))));
 
-    throw OPERANDS_TYPE_UNSUPPORTED_EXCEPTION("==", o1->type()->name(), o2->type()->name());
+    // '==' operation fallbacks to id check
+    return core::Boolean::get(o1 == o2);
 }
 
 core::Object* BinaryOp::notEqual(runtime::Environment& state) const {
@@ -158,7 +159,8 @@ core::Object* BinaryOp::notEqual(runtime::Environment& state) const {
     TRY_AND_RETURN(core::Boolean::get(!(*(o1->equal(o2)->toBool()))));
     TRY_AND_RETURN(core::Boolean::get(!(*(o2->equal(o1)->toBool()))));
 
-    throw OPERANDS_TYPE_UNSUPPORTED_EXCEPTION("!=", o1->type()->name(), o2->type()->name());
+    // '!=' operation fallbacks to id check
+    return core::Boolean::get(o1 != o2);
 }
 
 core::Object* BinaryOp::logicalAnd(runtime::Environment& state) const {

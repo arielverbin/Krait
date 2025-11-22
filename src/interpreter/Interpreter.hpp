@@ -11,6 +11,7 @@ class Interpreter {
 public:
     Interpreter();
     runtime::Environment& interpret(std::shared_ptr<semantics::ASTNode> command);
+    ~Interpreter();
 
 private:
     runtime::Environment* state_;

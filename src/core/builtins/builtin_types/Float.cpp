@@ -60,7 +60,7 @@ Object* Float::add(Object* another) {
     return Float::addOp({ this, another });
 }
 Object* Float::reversedAdd(Object* another) {
-    return Float::addOp({ this, another });
+    return Float::addOp({ another, this });
 }
 
 Object* Float::subtractOp(const CallArgs& args) {
@@ -75,7 +75,7 @@ Object* Float::subtract(Object* another) {
     return Float::subtractOp({ this, another });
 }
 Object* Float::reversedSubtract(Object* another) {
-    return Float::addOp({ this, another });
+    return Float::subtractOp({ another, this });
 }
 
 Object* Float::multiplyOp(const CallArgs& args) {
@@ -90,7 +90,7 @@ Object* Float::multiply(Object* another) {
     return Float::multiplyOp({ this, another });
 }
 Object* Float::reversedMultiply(Object* another) {
-    return Float::addOp({ this, another });
+    return Float::multiplyOp({ another, this });
 }
 
 Object* Float::divideOp(const CallArgs& args) {
@@ -107,19 +107,8 @@ Object* Float::divideOp(const CallArgs& args) {
 Object* Float::divide(Object* another) {
     return Float::divideOp({ this, another });
 }
-
-Object* Float::reversedDivideOp(const CallArgs& args) {
-    if (args.size() != 2)
-        throw except::InvalidArgumentException(
-            "float.__div__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
-    if (a == 0) throw except::DivisionByZeroException(*args[1]);
-
-    return gc::make_tracked<Float>(b / a);
-}
 Object* Float::reversedDivide(Object* another) {
-    return Float::reversedDivideOp({ this, another });
+    return Float::divideOp({ another, this });
 }
 
 Object* Float::moduluOp(const CallArgs& args) {
@@ -135,19 +124,8 @@ Object* Float::moduluOp(const CallArgs& args) {
 Object* Float::modulu(Object* another) {
     return Float::moduluOp({ this, another });
 }
-
-Object* Float::reversedModuluOp(const CallArgs& args) {
-    if (args.size() != 2)
-        throw except::InvalidArgumentException(
-            "float.__mod__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
-    if (a == 0) throw except::DivisionByZeroException(*args[1]);
-
-    return gc::make_tracked<Float>(std::fmod(b, a));
-}
 Object* Float::reversedModulu(Object* another) {
-    return Float::moduluOp({ this, another });
+    return Float::moduluOp({ another, this });
 }
 
 Object* Float::negateOp(const CallArgs& args) {
@@ -251,7 +229,7 @@ Object* Float::notEqual(Object* another) {
 Object* Float::createNewOp(const CallArgs& args) {
     if (args.size() != 2) {
         throw except::InvalidArgumentException(
-                "float.__new__ requires at exactly 2 arguments (received " + std::to_string(args.size()) + ")");
+                "float.__new__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
     }
 
     auto classType = dynamic_cast<TypeObject*>(args[0]);
