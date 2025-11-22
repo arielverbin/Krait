@@ -4,18 +4,19 @@
 #include "core/TypeObject.hpp"
 #include "core/gc/GarbageCollector.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
+
 using namespace interpreter;
 
-Interpreter::Interpreter() : state_(new runtime::Environment()) {
+Interpreter::Interpreter() : state_(nullptr) {
     // Initialize the grabage collector
-    gc::GarbageCollector::initialize(state_);
-    gc::GarbageCollector::instance().trackObject(state_);
+    gc::GarbageCollector::initialize();
 
     // Initialize 'type' type.
     core::TypeObject::typeType = core::TypeObject::initType();
 
     // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
+    state_ = new runtime::Frame();
     
     // Initialize the global scope.
     state_->pushNewScope();
@@ -32,7 +33,11 @@ Interpreter::Interpreter() : state_(new runtime::Environment()) {
     state_->defineVariable("int", core::KraitBuiltins::intType);
 }
 
-runtime::Environment& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
+runtime::Frame& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
     command->evaluate(*state_);
     return *state_;
+}
+
+Interpreter::~Interpreter() {
+    delete state_;
 }

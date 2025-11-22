@@ -20,7 +20,7 @@ public:
     static Object* createNewOp(const CallArgs& args);
 
 private:
-    Function* function;
+    Function* function_;
 };
 
 } // namespace core

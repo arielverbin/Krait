@@ -9,7 +9,7 @@ class Const : public ASTNode {
 public:
     Const(core::Object* obj);
 
-    virtual core::Object* evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

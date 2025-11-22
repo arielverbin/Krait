@@ -12,7 +12,6 @@
 namespace core {
 
 class KraitBuiltins;
-
 class Object;
 struct LazyValue {
     std::function<core::Object*()> creator;
@@ -21,12 +20,12 @@ struct LazyValue {
     LazyValue(std::function<core::Object*()> fn): creator(std::move(fn)) {}
 };
 
-using MemberEntry = std::variant<core::Object*, core::LazyValue>;
 
 class TypeObject; class Scope;
 class String; class Boolean;
 
 using CallArgs = std::vector<Object*>;
+using AttributeEntry = std::variant<core::Object*, core::LazyValue>;
 
 class Object : public gc::GCTrackable {
 protected:
@@ -49,7 +48,7 @@ public:
     virtual Scope* getScope(); // for Scope class, this function returns 'this'
 
     virtual Object* getAttribute(const std::string& varName);
-    virtual void setAttribute(const std::string& varName, MemberEntry value);
+    virtual void setAttribute(const std::string& varName, AttributeEntry value);
     virtual bool hasAttribute(const std::string& varName);
 
     virtual String* toString();

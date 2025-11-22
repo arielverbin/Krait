@@ -7,13 +7,15 @@ using namespace semantics;
 FunctionDef::FunctionDef(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code)
     : funcName_(std::move(funcName)), params_(std::move(params)), code_(std::move(code)) {}
 
-core::Object* FunctionDef::evaluate(runtime::Environment& state) const {
+core::Object* FunctionDef::evaluate(runtime::Frame& state) const {
     // Create a duplicated environment for the function
-    runtime::Environment funcEnv(state);
+    // because the original 'state' object could have its outer scopes popped out
+    // although they are part of the currently defined function's closure.
+    runtime::Frame* funcEnv = gc::make_tracked<runtime::Frame>(state);
     core::Function* func = gc::make_tracked<core::Function>(code_, params_, funcEnv);
 
     // Store the function in the environment
-    state.setVariable(funcName_, func);
+    state.defineVariable(funcName_, func);
 
     // return None as function definitions do not return a value
     return core::None::getNone();

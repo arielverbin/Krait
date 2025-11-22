@@ -18,6 +18,7 @@ TypeObject* KraitBuiltins::functionType = nullptr;
 TypeObject* KraitBuiltins::classMethodType = nullptr;
 TypeObject* KraitBuiltins::methodType = nullptr;
 TypeObject* KraitBuiltins::scopeType = nullptr;
+TypeObject* KraitBuiltins::frameType = nullptr;
 TypeObject* KraitBuiltins::noneType = nullptr;
 TypeObject* KraitBuiltins::intType = nullptr;
 TypeObject* KraitBuiltins::floatType = nullptr;
@@ -52,16 +53,20 @@ void KraitBuiltins::initializeClassMethodType() {
     );
 
     classMethodType->setAttribute("__get__", gc::make_tracked<Function>(ClassMethod::getOp));
-    classMethodType->setAttribute("__call__", gc::make_tracked<ClassMethod>(gc::make_tracked<Function>(TypeObject::callOp)));
+    classMethodType->setAttribute("__call__", gc::make_tracked<ClassMethod>(
+        gc::make_tracked<Function>(TypeObject::callOp))
+    );
 }
 
 void KraitBuiltins::initializeScopeType() {
-    scopeType = gc::make_tracked<TypeObject>("scope", Scope::createNewOp);
-    // type 'type' and type 'function' were initialized before type 'scope'. 
+    scopeType = gc::make_tracked<TypeObject>("scope", nullptr);
+    // type 'scope' and type 'type' were initialized before type 'scope'. 
     // which means their scope's type is nullptr, so we need to re-initialize it.
     TypeObject::typeType->getScope()->type_ = scopeType;
-    functionType->getScope()->type_ = scopeType;
-    
+    TypeObject::typeType->getScope()->setAttribute("__class__", scopeType);
+    scopeType->getScope()->type_ = scopeType;
+    scopeType->getScope()->setAttribute("__class__", scopeType);
+
     scopeType->setAttribute("__eq__", gc::make_tracked<Function>(Scope::equalOp));
     scopeType->setAttribute("__neq__", gc::make_tracked<Function>(Scope::notEqualOp));
     scopeType->setAttribute("__str__", gc::make_tracked<Function>(Scope::toStringOp));
@@ -105,7 +110,9 @@ void KraitBuiltins::initializeIntType() {
     intType->setAttribute("__eq__", gc::make_tracked<Function>(Integer::equalOp));
     intType->setAttribute("__neq__", gc::make_tracked<Function>(Integer::notEqualOp));
 
-    intType->setAttribute("__call__", gc::make_tracked<ClassMethod>(gc::make_tracked<Function>(TypeObject::callOp)));
+    intType->setAttribute("__call__", gc::make_tracked<ClassMethod>(
+        gc::make_tracked<Function>(TypeObject::callOp))
+    );
 }
 
 void KraitBuiltins::initializeFloatType() {
@@ -131,7 +138,9 @@ void KraitBuiltins::initializeFloatType() {
     floatType->setAttribute("__eq__", gc::make_tracked<Function>(Float::equalOp));
     floatType->setAttribute("__neq__", gc::make_tracked<Function>(Float::notEqualOp));
 
-    floatType->setAttribute("__call__", gc::make_tracked<ClassMethod>(gc::make_tracked<Function>(TypeObject::callOp)));
+    floatType->setAttribute("__call__", gc::make_tracked<ClassMethod>(
+        gc::make_tracked<Function>(TypeObject::callOp))
+    );
 }
 
 void KraitBuiltins::initializeBoolType() {
@@ -142,7 +151,9 @@ void KraitBuiltins::initializeBoolType() {
     boolType->setAttribute("__eq__", gc::make_tracked<Function>(Boolean::equalOp));
     boolType->setAttribute("__neq__", gc::make_tracked<Function>(Boolean::notEqualOp));
 
-    boolType->setAttribute("__call__", gc::make_tracked<ClassMethod>(gc::make_tracked<Function>(TypeObject::callOp)));
+    boolType->setAttribute("__call__", gc::make_tracked<ClassMethod>(
+        gc::make_tracked<Function>(TypeObject::callOp))
+    );
 }
 
 void KraitBuiltins::initializeStringType() {
@@ -157,19 +168,26 @@ void KraitBuiltins::initializeStringType() {
     stringType->setAttribute("__eq__", gc::make_tracked<Function>(String::equalOp));
     stringType->setAttribute("__neq__", gc::make_tracked<Function>(String::notEqualOp));
 
-    stringType->setAttribute("__call__", gc::make_tracked<ClassMethod>(gc::make_tracked<Function>(TypeObject::callOp)));
+    stringType->setAttribute("__call__", gc::make_tracked<ClassMethod>(
+        gc::make_tracked<Function>(TypeObject::callOp))
+    );
+}
+
+void KraitBuiltins::initializedFrameType() {
+    frameType = gc::make_tracked<TypeObject>("frame", nullptr);
 }
 
 void KraitBuiltins::initializeBuiltins() {
     
     // Initialize builtin types - function's type and type's type must be first and in that order
-    initializeFunctionType();
     initializeScopeType();
+    initializeFunctionType();
     initializeTypeType();
 
     // rest of types,
     initializeClassMethodType();
     initializeMethodType();
+    initializedFrameType();
     initializeNoneType();
     initializeBoolType();
     initializeIntType();

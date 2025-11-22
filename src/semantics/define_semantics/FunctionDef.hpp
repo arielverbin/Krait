@@ -11,7 +11,7 @@ class FunctionDef : public ASTNode {
 public:
     FunctionDef(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code);
 
-    virtual core::Object* evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

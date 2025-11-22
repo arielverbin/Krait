@@ -3,7 +3,7 @@
 #include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
-core::Object* Pass::evaluate(runtime::Environment& state) const {
+core::Object* Pass::evaluate(runtime::Frame& state) const {
     UNREFERENCED(state);
 
     return core::None::getNone();

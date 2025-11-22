@@ -20,7 +20,6 @@ public:
     static Object* toStringOp(const CallArgs& args);
 
     static Object* createNewOp(const CallArgs& args);
-
     virtual ~Method() = default;
 
 private:

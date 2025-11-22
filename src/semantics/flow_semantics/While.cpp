@@ -8,7 +8,7 @@ While::While(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> block)
     : condition_(std::move(cond)), block_(std::move(block)) {}
 
 
-core::Object* While::evaluate(runtime::Environment& state) const {
+core::Object* While::evaluate(runtime::Frame& state) const {
     while (*condition_->evaluate(state)->toBool()) {
         try {
             block_->evaluate(state);

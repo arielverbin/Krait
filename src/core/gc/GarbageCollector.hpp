@@ -1,7 +1,7 @@
 #ifndef CORE_GC_GARBAGE_COLLECTOR_HPP
 #define CORE_GC_GARBAGE_COLLECTOR_HPP
 
-#include "runtime/Environment.hpp"
+#include "runtime/Frame.hpp"
 #include "core/Object.hpp"
 #include <unordered_set>
 
@@ -9,8 +9,7 @@ namespace gc {
 
 class GarbageCollector {
 private:
-    runtime::Environment *env_;
-    std::unordered_set<gc::GCTrackable*> trackedObjects_;
+    std::vector<gc::GCTrackable*> trackedObjects_;
 
     GarbageCollector() = default;
     GarbageCollector(const GarbageCollector&) = delete;
@@ -21,8 +20,10 @@ private:
     // Static singleton instance
     static GarbageCollector instance_;
 
+    static void scan_reachable(gc::GCTrackable* root);
+
 public:
-    static void initialize(runtime::Environment *env);
+    static void initialize();
     static GarbageCollector& instance();
 
     void trackObject(gc::GCTrackable *obj);
@@ -34,6 +35,7 @@ public:
 template <typename T, typename... Args>
 T* make_tracked(Args&&... args) {
     T* instance = new T(std::forward<Args>(args)...);
+    instance->unmark();
     gc::GarbageCollector::instance().trackObject(instance);
     return instance;
 }

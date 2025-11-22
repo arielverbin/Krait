@@ -8,7 +8,7 @@
 #include "core/Object.hpp"
 #include "utils/utils.hpp"
 #include "semantics/ASTNode.hpp"
-#include "runtime/Environment.hpp"
+#include "runtime/Frame.hpp"
 
 namespace core {
 
@@ -22,7 +22,7 @@ public:
     // Constructors for user-defined functions would store an AST node, parameter list, etc.
     Function(std::shared_ptr<semantics::ASTNode> body,
              std::vector<std::string> params,
-             runtime::Environment closure);
+             runtime::Frame* closure);
 
     // Operations supported (optimization)
     Object* call(const CallArgs& args) override;
@@ -44,7 +44,7 @@ private:
 
     std::shared_ptr<semantics::ASTNode> body_;
     std::vector<std::string> params_;
-    runtime::Environment closure_;
+    runtime::Frame* closure_;
 };
 
 } // namespace core

@@ -11,6 +11,7 @@ private:
     static void initializeClassMethodType();
     static void initializeMethodType();
     static void initializeScopeType();
+    static void initializedFrameType();
     static void initializeTypeType();
     static void initializeNoneType();
     static void initializeIntType();
@@ -25,6 +26,7 @@ public:
     static TypeObject* classMethodType;
     static TypeObject* methodType;
     static TypeObject* scopeType;
+    static TypeObject* frameType;
     static TypeObject* noneType;
     static TypeObject* intType;
     static TypeObject* floatType;

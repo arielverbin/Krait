@@ -11,27 +11,27 @@
 
 namespace runtime {
 
-class Environment : public gc::GCTrackable {
+class Frame : public core::Object {
 private:
     std::deque<core::Scope*> scopeStack_;
 
 public:
-    Environment() = default;
-    Environment(const Environment&) = default;
+    Frame();
+    Frame(const Frame&);
 
     core::Scope* pushNewScope();
     void pushScope(core::Scope* scope);
     core::Scope* popLastScope();
 
     core::Object* getVariable(std::string varName);
-    void setVariable(std::string varName, core::Object* value);
+    // void setVariable(std::string varName, core::Object* value);
 
     // Explicitly define a new variable in the current scope.
     void defineVariable(std::string varName, core::Object* value);
 
     #ifdef KRAIT_TESTING
     // For debugging purposes, print the current environment.
-    friend std::ostream& operator<<(std::ostream& os, const Environment& env) {
+    friend std::ostream& operator<<(std::ostream& os, const Frame& env) {
         size_t numScopes = env.scopeStack_.size();
         os << "-------- " << numScopes << " Scopes" << " --------" << std::endl;
     
@@ -59,8 +59,6 @@ public:
     }
     #endif // KRAIT_TESTING
     
-
-    Environment createChildEnvironment();
     std::vector<gc::GCTrackable*> referencees() override;
 };
 }

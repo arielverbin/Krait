@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -MMD -MP -Isrc -Itests -I.
+CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -MMD -MP -g -Isrc -Itests -I.
 RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun
 TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING -g
 

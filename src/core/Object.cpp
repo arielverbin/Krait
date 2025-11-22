@@ -20,7 +20,11 @@ using namespace core;
 
 Object::Object(TypeObject *type, bool initScope) : type_(type), members_(initScope ? gc::make_tracked<Scope>() : nullptr) {
     // All objects expose their type objects through the '__class__' attribute.
-    if (initScope) setAttribute("__class__", type_);
+    // and their dictionary through the '__dict__' attribute.
+    if (initScope) {
+        setAttribute("__class__", type_);
+        setAttribute("__dict__", members_);
+    }
 }
 
 TypeObject* Object::type() {
@@ -28,6 +32,13 @@ TypeObject* Object::type() {
 }
 
 Scope* Object::getScope() {
+    if (members_ == nullptr) {
+        // lazy scope initialization
+        members_ = gc::make_tracked<Scope>();
+        setAttribute("__class__", type_);
+        setAttribute("__dict__", members_);
+    }
+    
     return members_;
 }
 
@@ -233,10 +244,11 @@ Object* Object::getAttribute(const std::string& varName) {
     return ob;
 }
 
-void Object::setAttribute(const std::string& varName, MemberEntry value) {
+void Object::setAttribute(const std::string& varName, AttributeEntry value) {
     getScope()->setMember(varName, value);
 }
 
 std::vector<gc::GCTrackable*> Object::referencees() {
-    return std::vector<gc::GCTrackable*>();
+    if (members_ == nullptr) return {};
+    return std::vector<gc::GCTrackable*>({members_});
 }
