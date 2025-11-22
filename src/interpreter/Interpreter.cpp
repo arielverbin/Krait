@@ -7,16 +7,14 @@
 
 using namespace interpreter;
 
-Interpreter::Interpreter() : state_(nullptr) {
-    // Initialize the grabage collector
-    gc::GarbageCollector::initialize();
 
-    // Initialize 'type' type.
-    core::TypeObject::typeType = core::TypeObject::initType();
-
+Interpreter::Interpreter() {
     // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
+
+    // Define the global environment as its mark&sweep root
     state_ = new runtime::Frame();
+    gc::GarbageCollector::instance().defineRoot(state_);
     
     // Initialize the global scope.
     state_->pushNewScope();
@@ -27,7 +25,7 @@ Interpreter::Interpreter() : state_(nullptr) {
     state_->defineVariable("float", core::KraitBuiltins::floatType);
     state_->defineVariable("str", core::KraitBuiltins::stringType);
     state_->defineVariable("function", core::KraitBuiltins::functionType);
-    state_->defineVariable("type", core::TypeObject::typeType);
+    state_->defineVariable("type", core::KraitBuiltins::typeType);
     state_->defineVariable("method", core::KraitBuiltins::methodType);
     state_->defineVariable("classmethod", core::KraitBuiltins::classMethodType);
     state_->defineVariable("int", core::KraitBuiltins::intType);

@@ -27,7 +27,7 @@ public:
     // Operations supported (optimization)
     Object* call(const CallArgs& args) override;
     String* toString() override;
-    Object* get(Object* instance, TypeObject* owner) override;
+    Object* get(Object* instance, Object* owner) override;
 
     // Operations supported
     static Object* callOp(const CallArgs& args);

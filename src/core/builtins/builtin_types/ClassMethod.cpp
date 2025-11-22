@@ -22,7 +22,7 @@ Object* ClassMethod::getOp(const CallArgs& args) {
     auto owner = dynamic_cast<core::Object*>(args[2]);
     return gc::make_tracked<Method>(owner, self->function_);
 }
-Object* ClassMethod::get(Object* instance, TypeObject* owner) {
+Object* ClassMethod::get(Object* instance, Object* owner) {
     return ClassMethod::getOp( { this, instance, owner });
 }
 

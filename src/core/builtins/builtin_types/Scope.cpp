@@ -82,11 +82,19 @@ Boolean* Scope::toBool() {
     return static_cast<Boolean*>(Scope::toBoolOp({ this }));
 }
 
-Object* Scope::equalOp(const CallArgs& args) {}
-Object* Scope::equal(Object* another) {}
+Object* Scope::equalOp(const CallArgs& args) {
+    return nullptr;
+}
+Object* Scope::equal(Object* another) {
+    return nullptr;
+}
 
-Object* Scope::notEqualOp(const CallArgs& args) {}
-Object* Scope::notEqual(Object* another) {}
+Object* Scope::notEqualOp(const CallArgs& args) {
+    return nullptr;
+}
+Object* Scope::notEqual(Object* another) {
+    return nullptr;
+}
 
 std::vector<gc::GCTrackable*> Scope::referencees() {
     // all elements in the members_ map, which are Objects (and not LazyValue)

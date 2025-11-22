@@ -4,14 +4,12 @@ using namespace gc;
 
 GarbageCollector GarbageCollector::instance_;
 
-void GarbageCollector::initialize() {}
-
 GarbageCollector& GarbageCollector::instance() {
     return instance_;
 }
 
 void GarbageCollector::trackObject(gc::GCTrackable *obj) {
-    trackedObjects_.push_back(obj);
+    trackedObjects_.insert(obj);
 }
 
 void GarbageCollector::scan_reachable(gc::GCTrackable* root) {
@@ -24,6 +22,10 @@ void GarbageCollector::scan_reachable(gc::GCTrackable* root) {
     for (auto& ref : root->referencees()) {
         GarbageCollector::scan_reachable(ref);
     }
+}
+
+void GarbageCollector::defineRoot(gc::GCTrackable *root) {
+    roots_.push_back(root);
 }
 
 void GarbageCollector::mark_and_sweep() {
@@ -43,6 +45,6 @@ void GarbageCollector::mark_and_sweep() {
 
 GarbageCollector::~GarbageCollector() {
     for (auto obj : trackedObjects_) {
-       delete obj;
+        delete obj;
     }
 }

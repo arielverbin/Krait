@@ -11,7 +11,6 @@ class Interpreter {
 public:
     Interpreter();
     runtime::Frame& interpret(std::shared_ptr<semantics::ASTNode> command);
-
     ~Interpreter();
 
 private:

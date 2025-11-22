@@ -15,14 +15,10 @@ namespace core {
 class TypeObject : public Object {
 private:
     std::string name_;
-    static TypeObject* initType();
-
-    friend class interpreter::Interpreter;
 
 public:
     TypeObject(std::string name, Function::NativeFunc creator);
     const std::string& name();
-    static TypeObject* typeType;
 
     // Operations supported (optimization)
     String* toString() override;

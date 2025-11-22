@@ -9,7 +9,9 @@ namespace gc {
 
 class GarbageCollector {
 private:
-    std::vector<gc::GCTrackable*> trackedObjects_;
+
+    std::unordered_set<gc::GCTrackable*> trackedObjects_;
+    std::vector<gc::GCTrackable*> roots_;
 
     GarbageCollector() = default;
     GarbageCollector(const GarbageCollector&) = delete;
@@ -23,10 +25,14 @@ private:
     static void scan_reachable(gc::GCTrackable* root);
 
 public:
-    static void initialize();
     static GarbageCollector& instance();
 
+    // root objects are not managed by the GC, it does not delete them.
+    void defineRoot(gc::GCTrackable *root);
+
+    // GC takes ownership of trackable objects, and can delete them.
     void trackObject(gc::GCTrackable *obj);
+
     void mark_and_sweep();
 
     ~GarbageCollector();

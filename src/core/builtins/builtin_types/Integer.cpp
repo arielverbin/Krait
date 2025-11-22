@@ -57,7 +57,7 @@ Object* Integer::add(Object* another) {
     return Integer::addOp({ this, another });
 }
 Object* Integer::reversedAdd(Object* another) {
-    return Integer::addOp({ this, another });
+    return Integer::addOp({ another, this });
 }
 
 Object* Integer::subtractOp(const CallArgs& args) {
@@ -75,7 +75,7 @@ Object* Integer::subtract(Object* another) {
     return Integer::subtractOp({ this, another });
 }
 Object* Integer::reversedSubtract(Object* another) {
-    return Integer::subtractOp({ this, another });
+    return Integer::subtractOp({ another, this });
 }
 
 Object* Integer::multiplyOp(const CallArgs& args) {
@@ -93,7 +93,7 @@ Object* Integer::multiply(Object* another) {
     return Integer::multiplyOp({ this, another });
 }
 Object* Integer::reversedMultiply(Object* another) {
-    return Integer::multiplyOp({ this, another });
+    return Integer::multiplyOp({ another, this });
 }
 
 Object* Integer::divideOp(const CallArgs& args) {
@@ -113,23 +113,8 @@ Object* Integer::divideOp(const CallArgs& args) {
 Object* Integer::divide(Object* another) {
     return Integer::divideOp({ this, another });
 }
-
-Object* Integer::reversedDivideOp(const CallArgs& args) {
-    if (args.size() != 2)
-        throw except::InvalidArgumentException(
-            "integer.__div__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    auto a = dynamic_cast<Integer*>(args[0]);
-    auto b = dynamic_cast<Integer*>(args[1]);
-    if (!a || !b)
-        throw except::NotImplementedException(
-            "integer.__div__ expects both arguments to be integers");
-
-    if (a->value_ == 0) throw except::DivisionByZeroException(*b);
-
-    return gc::make_tracked<Integer>(b->value_ / a->value_);
-}
 Object* Integer::reversedDivide(Object* another) {
-    return Integer::reversedDivideOp({ this, another });
+    return Integer::divideOp({ another, this });
 }
 
 Object* Integer::moduluOp(const CallArgs& args) {
@@ -150,22 +135,8 @@ Object* Integer::modulu(Object* another) {
     return Integer::moduluOp({ this, another });
 }
 
-Object* Integer::reversedModuluOp(const CallArgs& args) {
-    if (args.size() != 2)
-        throw except::InvalidArgumentException(
-            "integer.__mod__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    auto a = dynamic_cast<Integer*>(args[0]);
-    auto b = dynamic_cast<Integer*>(args[1]);
-    if (!a || !b)
-        throw except::NotImplementedException(
-            "integer.__mod__ expects both arguments to be integers");
-  
-    if (a->value_ == 0) throw except::DivisionByZeroException(*b);
-
-    return gc::make_tracked<Integer>(b->value_ % a->value_);
-}
 Object* Integer::reversedModulu(Object* another) {
-    return Integer::moduluOp({ this, another });
+    return Integer::moduluOp({ another, this });
 }
 
 Object* Integer::negateOp(const CallArgs& args) {
