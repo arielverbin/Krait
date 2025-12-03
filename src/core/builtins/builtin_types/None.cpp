@@ -12,6 +12,8 @@ None::None() : Object(KraitBuiltins::noneType) {}
 
 None* None::getNone() {
     static None* none_ = gc::make_tracked<None>();
+    // TODO: move that to KraitBuiltins
+    gc::GarbageCollector::instance().defineRoot(none_);
     return none_;
 }
 

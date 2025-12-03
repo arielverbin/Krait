@@ -29,6 +29,8 @@ Interpreter::Interpreter() {
     state_->defineVariable("method", core::KraitBuiltins::methodType);
     state_->defineVariable("classmethod", core::KraitBuiltins::classMethodType);
     state_->defineVariable("int", core::KraitBuiltins::intType);
+
+    state_->defineVariable("collect_garbage", gc::make_tracked<core::Function>(gc::GarbageCollector::collect_garbage));
 }
 
 runtime::Frame& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {

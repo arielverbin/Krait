@@ -3,12 +3,15 @@
 #define TESTS_PARSER_SNIPPETS_HPP
 
 #include "utils.hpp"
+#include "core/gc/GarbageCollector.hpp"
 #include "tests/interpreter/utils.hpp"
+using namespace semantics;
+using namespace core;
 
 #define getResult(name) name##Result
 
 std::string expressionTest1 = "my_var = 5 + 4 * (2 + 1)\n";
-std::shared_ptr<ASTNode> expressionTest1Result = CODE(
+std::shared_ptr<semantics::ASTNode> expressionTest1Result = CODE(
     ASSIGNVAR("my_var", ADD(INT(5), MULT(INT(4), ADD(INT(2), INT(1)))))
 );
 

@@ -103,8 +103,3 @@ Object* Function::getOp(const CallArgs& args) {
 Object* Function::get(Object* instance, Object* owner) {
     return Function::getOp( { this, instance, owner });
 }
-
-Object* Function::createNewOp(const CallArgs& args) {
-    UNREFERENCED(args);
-    throw except::NotImplementedException("explicit function constructor is not supported yet");
-}

@@ -1,7 +1,12 @@
 # Compiler and flags
 CXX := g++
-CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -MMD -MP -g -Isrc -Itests -I.
+CXXFLAGS_BASE := -std=c++20 -Wall -Wextra -Iinclude -MMD -MP -Isrc -Itests -I.
 RUN_CXXFLAGS := $(CXXFLAGS_BASE) -Irun
+
+ifeq ($(MAKECMDGOALS),debug)
+    RUN_CXXFLAGS += -DKRAIT_TESTING -g
+endif
+
 TEST_CXXFLAGS := $(CXXFLAGS_BASE) -DKRAIT_TESTING -g
 
 # Directories
@@ -81,11 +86,13 @@ $(TEST_OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 # ============================================================================
 # Phony Targets
 # ----------------------------------------------------------------------------
-.PHONY: run test clean clean_run clean_test
+.PHONY: run debug test clean clean_run clean_test
 
 # Default target for running the main program
 run: $(RUN_BIN)
 	./$(RUN_BIN)
+
+debug: run
 
 # Test target: if any modules are provided (e.g. "make test parser interpreter"),
 # depend on those test executables; otherwise build all test executables.

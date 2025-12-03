@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "semantics/ASTNode.hpp"
+#include "exceptions/exceptions.hpp"
 #include "core/builtins/builtin_types/Integer.hpp"
 #include "core/builtins/builtin_types/String.hpp"
 #include "core/builtins/builtin_types/None.hpp"

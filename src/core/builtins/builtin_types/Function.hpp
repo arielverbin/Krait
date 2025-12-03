@@ -34,8 +34,6 @@ public:
     static Object* toStringOp(const CallArgs& args);
     static Object* getOp(const CallArgs& args);
 
-    static Object* createNewOp(const CallArgs& args);
-
     virtual ~Function() = default;
 
 private:

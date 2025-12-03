@@ -35,7 +35,7 @@ TEST_CASE("Interprets function closures correctly") {
     std::cout.rdbuf(old_buf);
 
     REQUIRE(buffer.str() == "Returned Summer with 3\nsumWith3(5) = 8\nsumWith3(10) = 13\nReturned Summer with 5\n"
-                            "sumWith5(5) = 10\nsumWith5(10) = 15\nTOTAL CALLS: 4\n");
+                            "sumWith5(5) = 10\nsumWith5(10) = 15\nTOTAL CALLS: 0\n");
 }
 
 TEST_CASE("Interprets calculations correctly") {

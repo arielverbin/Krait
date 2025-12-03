@@ -15,6 +15,10 @@ Boolean::operator bool() const {
 Boolean* Boolean::get(bool value) {
     static Boolean* true_ = gc::make_tracked<Boolean>(true);
     static Boolean* false_ = gc::make_tracked<Boolean>(false);
+
+    // TODO: move it to KraitBuiltins
+    gc::GarbageCollector::instance().defineRoot(true_);
+    gc::GarbageCollector::instance().defineRoot(false_);
     return value ? true_ : false_;
 }
 

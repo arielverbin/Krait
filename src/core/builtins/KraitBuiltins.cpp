@@ -35,8 +35,20 @@ void KraitBuiltins::declateTypeType() {
     typeType->setAttribute("__class__", typeType);
 }
 
+void KraitBuiltins::initializeScopeType() {
+    scopeType = gc::make_tracked<TypeObject>("scope", nullptr);
+    gc::GarbageCollector::instance().defineRoot(scopeType);
+
+    // type 'scope' and type 'type' were initialized before type 'scope'. 
+    // which means their scope's type is nullptr, so we need to re-initialize it.
+    KraitBuiltins::typeType->getScope()->type_ = scopeType;
+    KraitBuiltins::typeType->getScope()->setAttribute("__class__", scopeType);
+    scopeType->getScope()->type_ = scopeType;
+    scopeType->getScope()->setAttribute("__class__", scopeType);
+}
+
 void KraitBuiltins::initializeFunctionType() {
-    functionType = gc::make_tracked<TypeObject>("function", Function::createNewOp);
+    functionType = gc::make_tracked<TypeObject>("function", nullptr);
     gc::GarbageCollector::instance().defineRoot(functionType);
 
     // __get__ member of Function needs to be LazyValue, since we can't initialize a Function yet, as
@@ -46,6 +58,11 @@ void KraitBuiltins::initializeFunctionType() {
     }));
     functionType->setAttribute("__call__", gc::make_tracked<Function>(Function::callOp));
     functionType->setAttribute("__str__", gc::make_tracked<Function>(Function::toStringOp));
+}
+
+void KraitBuiltins::initializeTypeType() {
+    KraitBuiltins::typeType->setAttribute("__str__", gc::make_tracked<Function>(TypeObject::toStringOp));
+    KraitBuiltins::typeType->setAttribute("__call__", gc::make_tracked<Function>(TypeObject::callOp));
 }
 
 void KraitBuiltins::initializeMethodType() {
@@ -66,23 +83,6 @@ void KraitBuiltins::initializeClassMethodType() {
     );
 
     classMethodType->setAttribute("__get__", gc::make_tracked<Function>(ClassMethod::getOp));
-}
-
-void KraitBuiltins::initializeScopeType() {
-    scopeType = gc::make_tracked<TypeObject>("scope", nullptr);
-    gc::GarbageCollector::instance().defineRoot(scopeType);
-
-    // type 'scope' and type 'type' were initialized before type 'scope'. 
-    // which means their scope's type is nullptr, so we need to re-initialize it.
-    KraitBuiltins::typeType->getScope()->type_ = scopeType;
-    KraitBuiltins::typeType->getScope()->setAttribute("__class__", scopeType);
-    scopeType->getScope()->type_ = scopeType;
-    scopeType->getScope()->setAttribute("__class__", scopeType);
-}
-
-void KraitBuiltins::initializeTypeType() {
-    KraitBuiltins::typeType->setAttribute("__str__", gc::make_tracked<Function>(TypeObject::toStringOp));
-    KraitBuiltins::typeType->setAttribute("__call__", gc::make_tracked<Function>(TypeObject::callOp));
 }
 
 void KraitBuiltins::initializeNoneType() {
@@ -159,6 +159,7 @@ void KraitBuiltins::initializeStringType() {
 
 void KraitBuiltins::initializedFrameType() {
     frameType = gc::make_tracked<TypeObject>("frame", nullptr);
+    gc::GarbageCollector::instance().defineRoot(frameType);
 }
 
 void KraitBuiltins::initializeBuiltins() {

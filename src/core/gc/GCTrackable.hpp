@@ -14,6 +14,11 @@ public:
     void unmark() { mark_ = false; }
     bool isMarked() { return mark_; }
 
+#ifdef KRAIT_TESTING
+    const char* file;
+    unsigned int line;
+#endif // KRAIT_TESTING
+
     virtual ~GCTrackable() = default;
 
     /** TODO: use an iterator approach to avoid vector allocation */

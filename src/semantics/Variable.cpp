@@ -12,5 +12,5 @@ core::Object* Variable::evaluate(runtime::Frame& state) const {
  }
 
 void Variable::assign(runtime::Frame& state, core::Object* value) {
-    state.defineVariable(targetVar_, value);
+    state.defineVariable(targetVar_, value); // ??, why not setVariable?
 }
