@@ -1,3 +1,4 @@
+collect_garbage(True)
 class Const:
     def __init__(self, value):
         self.value = value
@@ -106,3 +107,17 @@ s = getSummer(10)
 print(s(5)(100))
 print(s(8)(100))
 print(getSummer(20)(1)(100))
+collect_garbage(True)
+
+# --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
+x = Var("x")
+expr = Const(2) * x * x + Const(3) * x + Const(5)
+
+print("Expr: " + str(expr))
+d = expr.diff(x)
+print("Diff: " + str(d))
+s = getSummer(10)
+print(s(5)(100))
+print(s(8)(100))
+print(getSummer(20)(1)(100))
+collect_garbage(True)

@@ -11,6 +11,7 @@
 #include "semantics/operation_semantics/BinaryOp.hpp"
 #include "semantics/operation_semantics/UnaryOp.hpp"
 #include "parser/ParserContext.hpp"
+#include "core/gc/GCPool.hpp"
 
 namespace parser {
 
@@ -81,6 +82,8 @@ private:
     // Map between tokens and operator types
     semantics::BinaryOpType mapBinaryOp(const lexer::Token& type) const;
     semantics::UnaryOpType mapUnaryOp(const lexer::Token& type) const;
+
+    core::Object* createConst(core::Object* obj);
 };
 
 } // namespace parser

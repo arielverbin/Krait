@@ -44,18 +44,7 @@ Object* Function::callOp(const CallArgs& args) {
             " args, got " + std::to_string(received) + ")");
     }
 
-    self->closure_->pushNewScope();
-    for (size_t i = 0; i < self->params_.size(); ++i) {
-        self->closure_->defineVariable(self->params_[i], args[i + 1]);
-    }
-
-    Object* returnValue = None::getNone();
-
-    try { self->body_->evaluate(*self->closure_); }  // execute the function
-    catch (const semantics::ReturnSignal& ret) {  returnValue = ret.value(); }
-
-    self->closure_->popLastScope();
-    return returnValue;
+    return semantics::Call::makeCall(self, args);
 }
 
 Object* Function::call(const CallArgs& args) {
@@ -71,7 +60,7 @@ Object* Function::toStringOp(const CallArgs& args) {
     auto self = dynamic_cast<Function*>(args[0]);
     if (!self)
         throw except::InvalidArgumentException("first argument to function.__str__ must be a function");
-    
+
     std::ostringstream oss;
     oss <<"<" + self->type()->name() + " at "  << self << " (" << (self->isBuiltIn_ ? "" : "non ") << "built-in)>";
     return gc::make_tracked<String>(oss.str());

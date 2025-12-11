@@ -27,6 +27,9 @@ public:
     // Operations supported
     static Object* toStringOp(const CallArgs& args);
     static Object* callOp(const CallArgs& args);
+
+    virtual size_t size() override { return sizeof(TypeObject); }
+    virtual ~TypeObject() = default;
 };
 
 }

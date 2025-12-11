@@ -20,6 +20,8 @@ public:
     static Object* toStringOp(const CallArgs& args);
 
     static Object* createNewOp(const CallArgs& args);
+
+    virtual size_t size() override { return sizeof(Method); }
     virtual ~Method() = default;
 
 private:

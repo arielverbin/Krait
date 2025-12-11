@@ -50,6 +50,9 @@ public:
 
     static Object* createNewOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(Integer); }
+    virtual ~Integer() = default;
+
 private:
     long value_;
 };

@@ -6,11 +6,15 @@
 #include "../../utils/utils.hpp"
 
 namespace semantics {
+class Function;
+
 class Call : public ASTNode {
 public:
     Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args);
 
     virtual core::Object* evaluate(runtime::Frame& state) const override;
+
+    static core::Object* makeCall(core::Function* func, core::CallArgs args);
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

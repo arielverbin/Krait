@@ -4,6 +4,7 @@
 #include "core/Object.hpp"
 #include "core/builtins/builtin_types/String.hpp"
 #include "core/builtins/builtin_types/Scope.hpp"
+#include "EvalContext.hpp"
 #include "core/gc/GCTrackable.hpp"
 #include <map>
 #include <stack>
@@ -14,10 +15,13 @@ namespace runtime {
 class Frame : public core::Object {
 private:
     std::deque<core::Scope*> scopeStack_;
-
+    EvalContext* evalContext_;
+    
 public:
     Frame();
     Frame(const Frame&);
+
+    EvalContext* context();
 
     core::Scope* pushNewScope();
     void pushScope(core::Scope* scope);
@@ -29,37 +33,10 @@ public:
     // Explicitly define a new variable in the current scope.
     void defineVariable(std::string varName, core::Object* value);
 
-    #ifdef KRAIT_TESTING
-    // For debugging purposes, print the current environment.
-    friend std::ostream& operator<<(std::ostream& os, const Frame& env) {
-        size_t numScopes = env.scopeStack_.size();
-        os << "-------- " << numScopes << " Scopes" << " --------" << std::endl;
-    
-        for (size_t i = 0; i < numScopes; ++i) {
-            const auto& scope = env.scopeStack_[numScopes - i - 1];  // Top scope first (Scope 0)
-            os << "Scope " << i << ": {";
-    
-            bool first = true;
-            for (const auto& [key, value] : scope->getMembers()) {
-                if (!first) os << ", ";
-                first = false;
-
-                if (std::holds_alternative<core::LazyValue>(value)) {
-                    os << key << ": [LazyValue]";
-                } else {
-                    auto strValue = std::get<core::Object*>(value)->toString();
-                    os << key << ": \"" << static_cast<std::string>(*strValue) << "\"";
-                }
-            }
-            os << "}" << std::endl;
-        }
-    
-        os << "--------------------------" << std::endl;
-        return os;
-    }
-    #endif // KRAIT_TESTING
-    
     std::vector<gc::GCTrackable*> referencees() override;
+
+    virtual size_t size() override { return sizeof(Frame); }
+    virtual ~Frame() = default;
 };
 }
 

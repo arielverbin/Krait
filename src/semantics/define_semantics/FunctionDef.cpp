@@ -8,7 +8,7 @@ FunctionDef::FunctionDef(std::string funcName, std::vector<std::string> params, 
     : funcName_(std::move(funcName)), params_(std::move(params)), code_(std::move(code)) {}
 
 core::Object* FunctionDef::evaluate(runtime::Frame& state) const {
-    // Create a duplicated environment for the function
+    // Create a duplicated frame for the function
     // because the original 'state' object could have its outer scopes popped out
     // although they are part of the currently defined function's closure.
     runtime::Frame* funcEnv = gc::make_tracked<runtime::Frame>(state);

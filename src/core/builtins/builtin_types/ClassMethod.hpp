@@ -19,6 +19,9 @@ public:
     static Object* getOp(const CallArgs& args);
     static Object* createNewOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(ClassMethod); }
+    virtual ~ClassMethod() = default;
+
 private:
     Function* function_;
 };

@@ -14,6 +14,8 @@ public:
     void unmark() { mark_ = false; }
     bool isMarked() { return mark_; }
 
+    virtual size_t size() = 0;
+
 #ifdef KRAIT_TESTING
     const char* file;
     unsigned int line;

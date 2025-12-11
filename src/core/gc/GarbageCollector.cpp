@@ -14,6 +14,7 @@ GarbageCollector& GarbageCollector::instance() {
 
 void GarbageCollector::trackObject(gc::GCTrackable *obj) {
     trackedObjects_.insert(obj);
+    bytesAllocated += obj->size();
 }
 
 void GarbageCollector::mark(GCTrackable* root) {
@@ -37,23 +38,34 @@ void GarbageCollector::mark(GCTrackable* root) {
     }
 }
 
-size_t GarbageCollector::sweep() {
+size_t GarbageCollector::sweep(bool verbose) {
     size_t deleteCounter = 0;
 
     for (auto it = trackedObjects_.begin(); it != trackedObjects_.end(); ) {
         GCTrackable* obj = *it;
         if (!obj->isMarked()) {
-            core::Object* asObj = dynamic_cast<core::Object*>(obj);
-            if (asObj) { std::cout << " - Deleting object '" << asObj->type()->name() << "'..." << std::endl; fflush(stdout); }
-            else { std::cout << " - Deleting Trackable..." << std::endl; }
-            delete obj;
+
+            if (verbose) {
+                core::Object* asObj = dynamic_cast<core::Object*>(obj);
+                std::cout << "[GC] Deleted object '" << asObj->type()->name()
+                #ifdef KRAIT_TESTING
+                    << "' (defined in " << asObj->file << ":" << asObj->line << ")"
+                #endif
+                    << std::endl;
+            }
+
             deleteCounter += 1;
+            bytesAllocated -= obj->size();
+
+            delete obj;
             it = trackedObjects_.erase(it);
         } else {
             obj->unmark();
             ++it;
         }
     }
+
+    for (auto r : roots_) r->unmark();
     return deleteCounter;
 }
 
@@ -64,11 +76,11 @@ void GarbageCollector::undefineRoot(gc::GCTrackable *root) {
     roots_.erase(std::remove(roots_.begin(), roots_.end(), root), roots_.end());
 }
 
-size_t GarbageCollector::mark_and_sweep() {
+size_t GarbageCollector::mark_and_sweep(bool verbose) {
     for (const auto& root : roots_) {
         GarbageCollector::mark(root);
     }
-    return sweep();
+    return sweep(verbose);
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -76,6 +88,27 @@ GarbageCollector::~GarbageCollector() {
         delete obj;
     }
     trackedObjects_.clear();
+}
+
+void GarbageCollector::call() {
+    static size_t initialByteThreshold = 300 * 1024; // 300 KB
+
+    size_t bytesBefore = bytesAllocated;
+    if (bytesAllocated > initialByteThreshold) {
+        #ifdef KRAIT_TESTING
+        std::cout << "[GC] Cleaning up from " << bytesAllocated << " allocated bytes..." << std::endl;
+        #endif
+
+        size_t deleteCounter = mark_and_sweep(/*verbose=*/false);
+
+        #ifdef KRAIT_TESTING
+        std::cout << "[GC] Cleaned " << (bytesBefore - bytesAllocated)
+            << " bytes across " << deleteCounter << " deleted objects." << std::endl;
+        #endif
+
+        // update threshold
+        initialByteThreshold = bytesAllocated * 2;
+    }
 }
 
 core::Object* GarbageCollector::collect_garbage(const core::CallArgs& args) {
@@ -86,7 +119,7 @@ core::Object* GarbageCollector::collect_garbage(const core::CallArgs& args) {
     auto verbose = dynamic_cast<core::Boolean*>(args[0]);
     if (!verbose) throw except::TypeError("argument to garbage collection must be a boolean");
     
-    size_t deleteCounter = GarbageCollector::instance().mark_and_sweep();
+    size_t deleteCounter = GarbageCollector::instance().mark_and_sweep(/*verbose=*/true);
     
     std::cout << "Successfully cleaned " << deleteCounter << " objects." << std::endl; fflush(stdout);
 

@@ -97,14 +97,14 @@ std::shared_ptr<semantics::ASTNode> Parser::parse(std::vector<lexer::Token>& tok
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
-    if (match(lexer::TokenType::IF))    return parseIf();
-    if (match(lexer::TokenType::WHILE)) return parseWhile();
-    if (match(lexer::TokenType::DEF))   return parseFunctionDef();
-    if (match(lexer::TokenType::CLASS)) return parseClassDef();
-    if (match(lexer::TokenType::PRINT)) return parsePrint();
-    if (match(lexer::TokenType::RETURN)) return parseReturn();
-    if (match(lexer::TokenType::PASS)) return parsePass();
-    if (match(lexer::TokenType::BREAK)) return parseBreak();
+    if (match(lexer::TokenType::IF))       return parseIf();
+    if (match(lexer::TokenType::WHILE))    return parseWhile();
+    if (match(lexer::TokenType::DEF))      return parseFunctionDef();
+    if (match(lexer::TokenType::CLASS))    return parseClassDef();
+    if (match(lexer::TokenType::PRINT))    return parsePrint();
+    if (match(lexer::TokenType::RETURN))   return parseReturn();
+    if (match(lexer::TokenType::PASS))     return parsePass();
+    if (match(lexer::TokenType::BREAK))    return parseBreak();
     if (match(lexer::TokenType::CONTINUE)) return parseContinue();
 
     auto expr = parseExpression(0);
@@ -135,12 +135,12 @@ std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minBp) {
 std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
     if (match(lexer::TokenType::INT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(gc::make_tracked<core::Integer>(std::stoi(number)));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::Integer>(std::stoi(number))));
     }
 
     if (match(lexer::TokenType::FLOAT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(gc::make_tracked<core::Float>(std::stod(number)));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::Float>(std::stod(number))));
     }
 
     if (match(lexer::TokenType::TRU)) {
@@ -157,7 +157,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
 
     if (match(lexer::TokenType::STRING)) {
         const auto& varName = previous().value();
-        return std::make_shared<semantics::Const>(gc::make_tracked<core::String>(varName));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::String>(varName)));
     }
 
     if (match(lexer::TokenType::IDENTIFIER)) {
@@ -435,6 +435,11 @@ semantics::UnaryOpType Parser::mapUnaryOp(const lexer::Token& token) const {
         default:
             throw except::SyntaxError("Unexpected token type for unary operator", token.line(), token.column());
     }
+}
+
+core::Object* Parser::createConst(core::Object* obj) {
+    gc::GCPool::instance().add(obj);
+    return obj;
 }
 
 } // namespace parser

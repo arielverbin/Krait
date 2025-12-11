@@ -31,6 +31,7 @@ public:
     static Object* notEqualOp(const CallArgs& args);
     static Object* createNewOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(String); }
     virtual ~String() = default;
 
 private:

@@ -7,13 +7,15 @@
 #include <functional>
 #include "core/Object.hpp"
 #include "utils/utils.hpp"
-#include "semantics/ASTNode.hpp"
 #include "runtime/Frame.hpp"
+#include "semantics/ASTNode.hpp"
+#include "semantics/flow_semantics/Call.hpp"
 
 namespace core {
 
 class Function : public Object {
 public:
+    friend class semantics::Call;
     using NativeFunc = std::function<Object*(const CallArgs&)>;
 
     // Constructors for built-in functions
@@ -34,6 +36,7 @@ public:
     static Object* toStringOp(const CallArgs& args);
     static Object* getOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(Function); }
     virtual ~Function() = default;
 
 private:

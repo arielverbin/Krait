@@ -50,6 +50,9 @@ public:
 
     static Object* createNewOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(Float); }
+    virtual ~Float() = default;
+
 private:
     double value_;
 };

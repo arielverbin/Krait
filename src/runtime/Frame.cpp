@@ -5,10 +5,15 @@
 #include "exceptions/exceptions.hpp"
 using namespace runtime;
 
-Frame::Frame() : core::Object(core::KraitBuiltins::frameType, false) {}
-Frame::Frame(const Frame& env) 
-    : core::Object(core::KraitBuiltins::frameType, false), scopeStack_(env.scopeStack_) {}
+Frame::Frame() : core::Object(core::KraitBuiltins::frameType, true), evalContext_(gc::make_tracked<EvalContext>()) {}
+Frame::Frame(const Frame& env)
+    : core::Object(core::KraitBuiltins::frameType, true),
+    scopeStack_(env.scopeStack_),
+    evalContext_(gc::make_tracked<EvalContext>()) {}
 
+EvalContext* Frame::context() {
+    return evalContext_;
+}
 
 core::Scope* Frame::pushNewScope() {
     scopeStack_.push_back(gc::make_tracked<core::Scope>());
@@ -52,12 +57,17 @@ core::Object* Frame::getVariable(std::string varName) {
 
 void Frame::defineVariable(std::string varName, core::Object* value) {
     if (scopeStack_.empty()) {
-        throw except::RuntimeError("Program runs without a scope.");
+        throw except::RuntimeError("program runs without a scope.");
     }
 
     (*scopeStack_.back()).setMember(varName, value);
 }
 
 std::vector<gc::GCTrackable*> Frame::referencees() {
-    return std::vector<gc::GCTrackable*>(scopeStack_.begin(), scopeStack_.end());
+    auto referencees_ = Object::referencees();
+    for (auto scope : scopeStack_) {
+        referencees_.push_back(scope);
+    }
+    referencees_.push_back(evalContext_);
+    return referencees_;
 }

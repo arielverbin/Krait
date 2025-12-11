@@ -32,11 +32,14 @@ public:
     std::vector<gc::GCTrackable*> referencees() override;
 
     #ifdef KRAIT_TESTING
-    std::unordered_map<std::string, AttributeEntry> getMembers();
+    size_t length();
     #endif // KRAIT_TESTING
 
-private:
-    std::unordered_map<std::string, MemberEntry> members_;
+    virtual size_t size() override { return sizeof(Scope); }
+    virtual ~Scope() = default;
+
+private: 
+    std::unordered_map<std::string, MemberEntry> scopeMembers_;
 };
 
 }

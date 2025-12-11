@@ -27,6 +27,7 @@ public:
 
     static Object* createNewOp(const CallArgs& args);
 
+    virtual size_t size() override { return sizeof(Boolean); }
     virtual ~Boolean() = default;
 
 private:

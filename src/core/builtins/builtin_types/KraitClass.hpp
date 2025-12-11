@@ -10,6 +10,9 @@ class KraitClass : public Object {
 public:
     KraitClass(TypeObject* type);
     static Object* createNewOp(const CallArgs& args);
+
+    virtual size_t size() override { return sizeof(KraitClass); }
+    virtual ~KraitClass() = default;
 };
 
 } // namespace core

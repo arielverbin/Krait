@@ -183,6 +183,7 @@ Object* Object::call(const CallArgs& args) {
     try {
         Object* attribute = getTypeAttribute("__call__");
         if (!attribute) throw except::NotImplementedException("__call__ does not exists for type '" + type()->name() + "'");
+        // TODO: if attribute == this, prevent loop
         attribute->call({ args });
     } catch (const semantics::ReturnSignal& ret) {
         return ret.value();

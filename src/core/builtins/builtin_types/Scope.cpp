@@ -13,8 +13,8 @@ Scope::Scope() : Object(KraitBuiltins::scopeType, false) {}
 // Scope* Scope::getScope() { return this; }
 
 Object* Scope::getMember(const std::string& varName) {
-    auto member = members_.find(varName);
-    if (member == members_.end()) throw except::AttributeError(
+    auto member = scopeMembers_.find(varName);
+    if (member == scopeMembers_.end()) throw except::AttributeError(
         "'" + type_->name() + "' object has no attribute '" + varName + "'");
     
     if (std::holds_alternative<LazyValue>(member->second.value)) {
@@ -27,10 +27,10 @@ Object* Scope::getMember(const std::string& varName) {
     return std::get<Object*>(member->second.value);
 }
 bool Scope::hasMember(const std::string& varName) {
-    return members_.find(varName) != members_.end();
+    return scopeMembers_.find(varName) != scopeMembers_.end();
 }
 void Scope::setMember(const std::string& varName, AttributeEntry obj) {
-    members_[varName] = { obj };
+    scopeMembers_[varName] = { obj };
 }
 
 Object* Scope::toStringOp(const CallArgs& args) {
@@ -44,9 +44,9 @@ Object* Scope::toStringOp(const CallArgs& args) {
 
     std::stringstream oss;
     oss << "{";
-    if (!self->members_.empty()) {
+    if (!self->scopeMembers_.empty()) {
         bool first = true;
-        for (const auto& [key, value] : self->members_) {
+        for (const auto& [key, value] : self->scopeMembers_) {
             if (!first) oss << ", ";
             oss << key << ": ";
             if (std::holds_alternative<Object*>(value.value)) {
@@ -76,7 +76,7 @@ Object* Scope::toBoolOp(const CallArgs& args) {
     if (!self)
         throw except::InvalidArgumentException("first argument to scope.__bool__ must be a scope");
     
-    return Boolean::get(!self->members_.empty());
+    return Boolean::get(!self->scopeMembers_.empty());
 }
 Boolean* Scope::toBool() {
     return static_cast<Boolean*>(Scope::toBoolOp({ this }));
@@ -99,10 +99,18 @@ Object* Scope::notEqual(Object* another) {
 std::vector<gc::GCTrackable*> Scope::referencees() {
     // all elements in the members_ map, which are Objects (and not LazyValue)
     std::vector<gc::GCTrackable*> refs;
-    for (auto& [key, value] : members_) {
+    for (auto& [key, value] : scopeMembers_) {
         if (std::holds_alternative<Object*>(value.value)) {
             refs.push_back(std::get<Object*>(value.value));
         }
     }
+
+    if (members_ != nullptr) refs.push_back(members_);
     return refs;
 }
+
+#ifdef KRAIT_TESTING
+size_t Scope::length() {
+    return scopeMembers_.size();
+}
+#endif

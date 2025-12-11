@@ -8,7 +8,6 @@
 #include "lexer/Lexer.hpp"
 
 #define ms(OBJECT) std::make_shared<OBJECT>
-#define mo(OBJECT) gc::make_tracked<OBJECT>
 
 template<typename... T>
 std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
@@ -16,8 +15,8 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 }
 
 #define ASSIGNVAR(name, val)            ms(Assign)(ms(Variable)(name), val)
-#define INT(n)                          ms(Const)(mo(Integer)(n))
-#define STR(s)                          ms(Const)(mo(String)(s))
+#define INT(n)                          ms(Const)(gc::make_tracked<Integer>(n))
+#define STR(s)                          ms(Const)(gc::make_tracked<String>(s))
 #define BOOL(b)                         ms(Const)(Boolean::get(b))
 #define VAR(name)                       ms(Variable)(name)
 #define PRINT(expr)                     ms(Print)(expr)
