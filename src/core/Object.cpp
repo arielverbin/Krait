@@ -18,23 +18,20 @@
 
 using namespace core;
 
-Object::Object(TypeObject *type, bool initScope) : type_(type), members_(initScope ? gc::make_tracked<Scope>() : nullptr) {
-    // All objects expose their type objects through the '__class__' attribute.
-    // and their dictionary through the '__dict__' attribute.
-    if (initScope) {
-        setAttribute("__class__", type_);
-        setAttribute("__dict__", members_);
-    }
-}
+Object::Object(TypeObject *type) : type_(type), members_(nullptr) {}
 
 TypeObject* Object::type() {
     return type_;
 }
 
 Scope* Object::getScope() {
+    if (type_ == nullptr) throw except::RuntimeError("can't init scope for object with no type");
+    
     if (members_ == nullptr) {
         // lazy scope initialization
-        members_ = gc::make_tracked<Scope>();
+        // All objects expose their type objects through the '__class__' attribute.
+        // and their dictionary through the '__dict__' attribute.
+        members_ = gc::make_guarded<Scope>();
         setAttribute("__class__", type_);
         setAttribute("__dict__", members_);
     }
@@ -47,7 +44,7 @@ String* Object::toString() {
         // all objects must have a string representation
         std::ostringstream oss;
         oss <<"<'" + type()->name() + "' object at " <<  this << + ">";
-        return gc::make_tracked<String>(oss.str());
+        return gc::make_guarded<String>(oss.str());
     }
 
     Object* string = getAttribute("__str__")->call({});

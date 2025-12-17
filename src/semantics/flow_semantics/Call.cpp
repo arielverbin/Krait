@@ -30,11 +30,22 @@ core::Object* Call::evaluate(runtime::Frame& state) const {
 }
 
 core::Object* Call::makeCall(core::Function* func, core::CallArgs args) {
-    runtime::EvalContext::push(func->closure_->context());
+    size_t expected = func->params_.size();
+    size_t received = args.size();
+    if (received != expected) {
+        throw except::InvalidArgumentException(
+            "function call with incorrect number of arguments (expected " + std::to_string(expected) +
+            " args, got " + std::to_string(received) + ")");
+    }
+
+    runtime::EvalContext::pushContext(func->closure_->context());
+    // Ensure the evaluation stack is empty when the function exists, to prevent memory leaks
+    // I could have also written func->closure_->context().Guard()
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
     func->closure_->pushNewScope();
 
     for (size_t i = 0; i < func->params_.size(); ++i) {
-        func->closure_->defineVariable(func->params_[i], args[i + 1]);
+        func->closure_->defineVariable(func->params_[i], args[i]);
     }
 
     core::Object* returnValue = core::None::getNone();
@@ -43,7 +54,7 @@ core::Object* Call::makeCall(core::Function* func, core::CallArgs args) {
     catch (const semantics::ReturnSignal& ret) {  returnValue = ret.value(); }
 
     func->closure_->popLastScope();
-    runtime::EvalContext::pop();
+    runtime::EvalContext::popContext();
 
     return returnValue;
 }

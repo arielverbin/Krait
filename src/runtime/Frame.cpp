@@ -5,18 +5,18 @@
 #include "exceptions/exceptions.hpp"
 using namespace runtime;
 
-Frame::Frame() : core::Object(core::KraitBuiltins::frameType, true), evalContext_(gc::make_tracked<EvalContext>()) {}
+Frame::Frame() : core::Object(core::KraitBuiltins::frameType), evalContext_(gc::make_guarded<EvalContext>()) {}
 Frame::Frame(const Frame& env)
-    : core::Object(core::KraitBuiltins::frameType, true),
+    : core::Object(core::KraitBuiltins::frameType),
     scopeStack_(env.scopeStack_),
-    evalContext_(gc::make_tracked<EvalContext>()) {}
+    evalContext_(gc::make_guarded<EvalContext>()) {}
 
 EvalContext* Frame::context() {
     return evalContext_;
 }
 
 core::Scope* Frame::pushNewScope() {
-    scopeStack_.push_back(gc::make_tracked<core::Scope>());
+    scopeStack_.push_back(gc::make_guarded<core::Scope>());
     return scopeStack_.back();
 }
 

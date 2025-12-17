@@ -14,6 +14,6 @@ Object* KraitClass::createNewOp(const CallArgs& args) {
     if (!classType) 
         throw except::TypeError("__new__ expects its first argument to be a 'type' (got: " + args[0]->type()->name() + ")");
 
-    auto instance = gc::make_tracked<KraitClass>(classType);
+    auto instance = gc::make_guarded<KraitClass>(classType);
     return instance;
 }

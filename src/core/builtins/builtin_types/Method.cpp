@@ -43,7 +43,7 @@ Object* Method::toStringOp(const CallArgs& args) {
     std::ostringstream oss;
     oss << "<" << self->type()->name() << " for type '" << self->instance_->type()->name();
     oss <<  "' at "  << self << ">";
-    return gc::make_tracked<String>(oss.str());
+    return gc::make_guarded<String>(oss.str());
 }
 String* Method::toString() {
     return static_cast<String*>(Method::toStringOp({ this }));

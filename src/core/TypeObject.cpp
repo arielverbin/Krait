@@ -11,7 +11,7 @@ using namespace core;
 TypeObject::TypeObject(std::string name, Function::NativeFunc creator) 
     : Object(KraitBuiltins::typeType), name_(std::move(name)) {
         if (creator != nullptr) {
-            setAttribute("__new__", gc::make_tracked<core::ClassMethod>(gc::make_tracked<core::Function>(creator)));
+            setAttribute("__new__", gc::make_guarded<core::ClassMethod>(gc::make_guarded<core::Function>(creator)));
         }
 }
 
@@ -27,7 +27,7 @@ Object* TypeObject::toStringOp(const CallArgs& args) {
     auto self = dynamic_cast<TypeObject*>(args[0]);
     if (!self)
         throw except::InvalidArgumentException("first argument to type.__str__ must be a type");
-    return gc::make_tracked<String>("<type '" + self->name() + "'>");
+    return gc::make_guarded<String>("<type '" + self->name() + "'>");
 }
 String* TypeObject::toString() {
     return dynamic_cast<String*>(TypeObject::toStringOp({ this }));

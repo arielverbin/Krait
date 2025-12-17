@@ -28,7 +28,7 @@ Object* Float::toStringOp(const CallArgs& args) {
     std::stringstream ss;
     ss.precision(15);
     ss << self->value_;
-    return gc::make_tracked<String>(ss.str());
+    return gc::make_guarded<String>(ss.str());
 }
 String* Float::toString() {
     return static_cast<String*>(Float::toStringOp({ this }));
@@ -54,7 +54,7 @@ Object* Float::addOp(const CallArgs& args) {
             "float.__add__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
     double a = utils::getNumericValue<double>(args[0]);
     double b = utils::getNumericValue<double>(args[1]);
-    return gc::make_tracked<Float>(a + b);
+    return gc::make_guarded<Float>(a + b);
 }
 Object* Float::add(Object* another) {
     return Float::addOp({ this, another });
@@ -69,7 +69,7 @@ Object* Float::subtractOp(const CallArgs& args) {
             "float.__sub__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
     double a = utils::getNumericValue<double>(args[0]);
     double b = utils::getNumericValue<double>(args[1]);
-    return gc::make_tracked<Float>(a - b);
+    return gc::make_guarded<Float>(a - b);
 }
 Object* Float::subtract(Object* another) {
     return Float::subtractOp({ this, another });
@@ -84,7 +84,7 @@ Object* Float::multiplyOp(const CallArgs& args) {
             "float.__mul__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
     double a = utils::getNumericValue<double>(args[0]);
     double b = utils::getNumericValue<double>(args[1]);
-    return gc::make_tracked<Float>(a * b);
+    return gc::make_guarded<Float>(a * b);
 }
 Object* Float::multiply(Object* another) {
     return Float::multiplyOp({ this, another });
@@ -102,7 +102,7 @@ Object* Float::divideOp(const CallArgs& args) {
 
     if (b == 0) throw except::DivisionByZeroException(*args[0]);
 
-    return gc::make_tracked<Float>(a / b);
+    return gc::make_guarded<Float>(a / b);
 }
 Object* Float::divide(Object* another) {
     return Float::divideOp({ this, another });
@@ -119,7 +119,7 @@ Object* Float::moduluOp(const CallArgs& args) {
     double b = utils::getNumericValue<double>(args[1]);
     if (b == 0) throw except::DivisionByZeroException(*args[0]);
 
-    return gc::make_tracked<Float>(std::fmod(a, b));
+    return gc::make_guarded<Float>(std::fmod(a, b));
 }
 Object* Float::modulu(Object* another) {
     return Float::moduluOp({ this, another });
@@ -136,7 +136,7 @@ Object* Float::negateOp(const CallArgs& args) {
     if (!a)
         throw except::InvalidArgumentException(
             "float.__neg__ expects an float argument");
-    return gc::make_tracked<Float>(-a->value_);
+    return gc::make_guarded<Float>(-a->value_);
 }
 Object* Float::negate() {
     return Float::negateOp({ this });

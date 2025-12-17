@@ -21,7 +21,7 @@ Object* Integer::toStringOp(const CallArgs& args) {
     auto self = dynamic_cast<Integer*>(args[0]);
     if (!self)
         throw except::InvalidArgumentException("first argument to integer.__str__ must be an integer");
-    return gc::make_tracked<String>(std::to_string(self->value_));
+    return gc::make_guarded<String>(std::to_string(self->value_));
 }
 String* Integer::toString() {
     return static_cast<String*>(Integer::toStringOp({ this }));
@@ -51,7 +51,7 @@ Object* Integer::addOp(const CallArgs& args) {
     if (!a || !b)
         throw except::NotImplementedException(
             "integer.__add__ expects both arguments to be integers");
-    return gc::make_tracked<Integer>(a->value_ + b->value_);
+    return gc::make_guarded<Integer>(a->value_ + b->value_);
 }
 Object* Integer::add(Object* another) {
     return Integer::addOp({ this, another });
@@ -69,7 +69,7 @@ Object* Integer::subtractOp(const CallArgs& args) {
     if (!a || !b)
         throw except::NotImplementedException(
             "integer.__sub__ expects both arguments to be integers");
-    return gc::make_tracked<Integer>(a->value_ - b->value_);
+    return gc::make_guarded<Integer>(a->value_ - b->value_);
 }
 Object* Integer::subtract(Object* another) {
     return Integer::subtractOp({ this, another });
@@ -87,7 +87,7 @@ Object* Integer::multiplyOp(const CallArgs& args) {
     if (!a || !b)
         throw except::NotImplementedException(
             "integer.__mul__ expects both arguments to be integers");
-    return gc::make_tracked<Integer>(a->value_ * b->value_);
+    return gc::make_guarded<Integer>(a->value_ * b->value_);
 }
 Object* Integer::multiply(Object* another) {
     return Integer::multiplyOp({ this, another });
@@ -108,7 +108,7 @@ Object* Integer::divideOp(const CallArgs& args) {
 
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
 
-    return gc::make_tracked<Integer>(a->value_ / b->value_);
+    return gc::make_guarded<Integer>(a->value_ / b->value_);
 }
 Object* Integer::divide(Object* another) {
     return Integer::divideOp({ this, another });
@@ -129,7 +129,7 @@ Object* Integer::moduluOp(const CallArgs& args) {
             
     if (b->value_ == 0) throw except::DivisionByZeroException(*a);
 
-    return gc::make_tracked<Integer>(a->value_ % b->value_);
+    return gc::make_guarded<Integer>(a->value_ % b->value_);
 }
 Object* Integer::modulu(Object* another) {
     return Integer::moduluOp({ this, another });
@@ -147,7 +147,7 @@ Object* Integer::negateOp(const CallArgs& args) {
     if (!a)
         throw except::InvalidArgumentException(
             "integer.__neg__ expects an integer argument");
-    return gc::make_tracked<Integer>(-a->value_);
+    return gc::make_guarded<Integer>(-a->value_);
 }
 Object* Integer::negate() {
     return Integer::negateOp({ this });

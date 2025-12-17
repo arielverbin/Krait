@@ -8,7 +8,7 @@
 #include "core/builtins/KraitBuiltins.hpp"
 using namespace core;
 
-Scope::Scope() : Object(KraitBuiltins::scopeType, false) {}
+Scope::Scope() : Object(KraitBuiltins::scopeType) {}
 
 // Scope* Scope::getScope() { return this; }
 
@@ -61,7 +61,7 @@ Object* Scope::toStringOp(const CallArgs& args) {
         }
     }
     oss << "}";
-    return gc::make_tracked<String>(oss.str());
+    return gc::make_guarded<String>(oss.str());
 }
 String* Scope::toString() {
     return static_cast<String*>(Scope::toStringOp({ this }));
@@ -83,17 +83,22 @@ Boolean* Scope::toBool() {
 }
 
 Object* Scope::equalOp(const CallArgs& args) {
-    return nullptr;
+    UNREFERENCED(args);
+    throw except::NotImplementedException(
+            "scope.__eq__ is not implemented");
 }
+
 Object* Scope::equal(Object* another) {
-    return nullptr;
+    return Scope::equalOp({ this, another });
 }
 
 Object* Scope::notEqualOp(const CallArgs& args) {
-    return nullptr;
+    UNREFERENCED(args);
+    throw except::NotImplementedException(
+            "scope.__neq__ is not implemented");
 }
 Object* Scope::notEqual(Object* another) {
-    return nullptr;
+    return Scope::notEqualOp({ this, another });
 }
 
 std::vector<gc::GCTrackable*> Scope::referencees() {
@@ -109,8 +114,8 @@ std::vector<gc::GCTrackable*> Scope::referencees() {
     return refs;
 }
 
-#ifdef KRAIT_TESTING
+#ifdef KRAIT_DEBUGGING
 size_t Scope::length() {
     return scopeMembers_.size();
 }
-#endif
+#endif // KRAIT_DEBUGGING

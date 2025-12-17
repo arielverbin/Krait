@@ -20,11 +20,19 @@ core::Object* UnaryOp::evaluate(runtime::Frame& state) const {
 }
 
 core::Object* UnaryOp::negate(runtime::Frame& state) const {
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
     core::Object* o = exp_->evaluate(state);
+    guard.protect(o);
+
     return o->negate();
 }
 
 core::Object* UnaryOp::logicalNot(runtime::Frame& state) const {
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
     core::Object* o = exp_->evaluate(state);
+    guard.protect(o);
+
     return core::Boolean::get(!(*(o->toBool())));
 }

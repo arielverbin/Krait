@@ -17,7 +17,7 @@ void GCPool::add(GCTrackable* trackable) {
 }
 
 void GCPool::remove(GCTrackable* trackable) {
-    elements_.erase(std::remove(elements_.begin(), elements_.end(), trackable), elements_.end());
+    elements_.erase(trackable);
 }
 
 std::vector<gc::GCTrackable*> GCPool::referencees() {

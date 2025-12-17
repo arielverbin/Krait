@@ -16,10 +16,10 @@ public:
 
     virtual size_t size() = 0;
 
-#ifdef KRAIT_TESTING
+#ifdef KRAIT_DEBUGGING
     const char* file;
     unsigned int line;
-#endif // KRAIT_TESTING
+#endif // KRAIT_DEBUGGING
 
     virtual ~GCTrackable() = default;
 

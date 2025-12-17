@@ -9,6 +9,9 @@ using namespace interpreter;
 
 
 Interpreter::Interpreter() {
+    // Initialize the global evaluation context
+    runtime::EvalContext::initGlobalContext();
+
     // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
 
@@ -18,6 +21,7 @@ Interpreter::Interpreter() {
     
     // Initialize the global scope.
     state_->pushNewScope();
+    runtime::EvalContext::pushContext(state_->context());
 
     // Expose buildin types.
     state_->defineVariable("none", core::KraitBuiltins::noneType);
@@ -30,7 +34,10 @@ Interpreter::Interpreter() {
     state_->defineVariable("classmethod", core::KraitBuiltins::classMethodType);
     state_->defineVariable("int", core::KraitBuiltins::intType);
 
+    #ifdef KRAIT_DEBUGGING
     state_->defineVariable("collect_garbage", gc::make_tracked<core::Function>(gc::GarbageCollector::collect_garbage));
+    state_->defineVariable("gc_info", gc::make_tracked<core::Function>(gc::GarbageCollector::gc_info));
+    #endif // KRAIT_DEBUGGING
 }
 
 runtime::Frame& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
@@ -39,5 +46,12 @@ runtime::Frame& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> comma
 }
 
 Interpreter::~Interpreter() {
+    runtime::EvalContext::popContext();  // the global frame's evaluation context
+
+    state_->popLastScope();
     delete state_;
+
+    runtime::EvalContext::popContext();  // the global evaluation context
+
+    gc::GarbageCollector::instance().flush();
 }

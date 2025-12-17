@@ -11,8 +11,12 @@ using namespace semantics;
 Print::Print(std::shared_ptr<ASTNode> expression): expression_(std::move(expression)) {}
 
 core::Object* Print::evaluate(runtime::Frame& state) const {
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
     core::Object* obj = expression_->evaluate(state);
+    guard.protect(obj);
     core::String* string = obj->toString();
+    guard.protect(string);
     
     std::cout << static_cast<std::string>(*string) << std::endl;
 

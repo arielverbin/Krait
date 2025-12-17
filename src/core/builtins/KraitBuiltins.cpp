@@ -26,9 +26,12 @@ TypeObject* KraitBuiltins::floatType = nullptr;
 TypeObject* KraitBuiltins::boolType = nullptr;
 TypeObject* KraitBuiltins::stringType = nullptr;
 
+core::Boolean* KraitBuiltins::trueObj= nullptr;
+core::Boolean* KraitBuiltins::falseObj= nullptr;
+core::None* KraitBuiltins::noneObj= nullptr;
+
 void KraitBuiltins::declateTypeType() {
-    typeType = gc::make_tracked<TypeObject>("type", nullptr);
-    gc::GarbageCollector::instance().defineRoot(typeType);
+    typeType = gc::make_guarded<TypeObject>("type", nullptr);
     
     // re-initialize type's type object
     typeType->type_ = typeType;
@@ -36,8 +39,7 @@ void KraitBuiltins::declateTypeType() {
 }
 
 void KraitBuiltins::initializeScopeType() {
-    scopeType = gc::make_tracked<TypeObject>("scope", nullptr);
-    gc::GarbageCollector::instance().defineRoot(scopeType);
+    scopeType = gc::make_guarded<TypeObject>("scope", nullptr);
 
     // type 'scope' and type 'type' were initialized before type 'scope'. 
     // which means their scope's type is nullptr, so we need to re-initialize it.
@@ -48,118 +50,117 @@ void KraitBuiltins::initializeScopeType() {
 }
 
 void KraitBuiltins::initializeFunctionType() {
-    functionType = gc::make_tracked<TypeObject>("function", nullptr);
-    gc::GarbageCollector::instance().defineRoot(functionType);
+    functionType = gc::make_guarded<TypeObject>("function", nullptr);
 
     // __get__ member of Function needs to be LazyValue, since we can't initialize a Function yet, as
     // function is just now being initialized
     functionType->setAttribute("__get__", core::LazyValue([]() -> Function* {
-        return gc::make_tracked<Function>(Function::getOp);
+        return gc::make_guarded<Function>(Function::getOp);
     }));
-    functionType->setAttribute("__call__", gc::make_tracked<Function>(Function::callOp));
-    functionType->setAttribute("__str__", gc::make_tracked<Function>(Function::toStringOp));
+    functionType->setAttribute("__call__", gc::make_guarded<Function>(Function::callOp));
+    functionType->setAttribute("__str__", gc::make_guarded<Function>(Function::toStringOp));
 }
 
 void KraitBuiltins::initializeTypeType() {
-    KraitBuiltins::typeType->setAttribute("__str__", gc::make_tracked<Function>(TypeObject::toStringOp));
-    KraitBuiltins::typeType->setAttribute("__call__", gc::make_tracked<Function>(TypeObject::callOp));
+    KraitBuiltins::typeType->setAttribute("__str__", gc::make_guarded<Function>(TypeObject::toStringOp));
+    KraitBuiltins::typeType->setAttribute("__call__", gc::make_guarded<Function>(TypeObject::callOp));
 }
 
 void KraitBuiltins::initializeMethodType() {
-    methodType = gc::make_tracked<TypeObject>("method", Method::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(methodType);
+    methodType = gc::make_guarded<TypeObject>("method", Method::createNewOp);
 
-    methodType->setAttribute("__call__", gc::make_tracked<Function>(Method::callOp));
-    methodType->setAttribute("__str__", gc::make_tracked<Function>(Method::toStringOp));
+    methodType->setAttribute("__call__", gc::make_guarded<Function>(Method::callOp));
+    methodType->setAttribute("__str__", gc::make_guarded<Function>(Method::toStringOp));
 }
 
 void KraitBuiltins::initializeClassMethodType() {
-    classMethodType = gc::make_tracked<TypeObject>("classmethod", nullptr);
-    gc::GarbageCollector::instance().defineRoot(classMethodType);
+    classMethodType = gc::make_guarded<TypeObject>("classmethod", nullptr);
     
     // we need to initialize __new__, which is a classmethod, after initializing 'classmethod' type.
-    classMethodType->setAttribute("__new__", gc::make_tracked<core::ClassMethod>(
-        gc::make_tracked<core::Function>(ClassMethod::createNewOp))
+    classMethodType->setAttribute("__new__", gc::make_guarded<core::ClassMethod>(
+        gc::make_guarded<core::Function>(ClassMethod::createNewOp))
     );
 
-    classMethodType->setAttribute("__get__", gc::make_tracked<Function>(ClassMethod::getOp));
+    classMethodType->setAttribute("__get__", gc::make_guarded<Function>(ClassMethod::getOp));
 }
 
 void KraitBuiltins::initializeNoneType() {
-    noneType = gc::make_tracked<TypeObject>("none", None::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(noneType);
+    noneType = gc::make_guarded<TypeObject>("none", None::createNewOp);
 
-    noneType->setAttribute("__str__", gc::make_tracked<Function>(None::toStringOp));
-    noneType->setAttribute("__bool__", gc::make_tracked<Function>(None::toBoolOp));
-    noneType->setAttribute("__eq__", gc::make_tracked<Function>(None::equalOp));
-    noneType->setAttribute("__neq__", gc::make_tracked<Function>(None::notEqualOp));
+    noneType->setAttribute("__str__", gc::make_guarded<Function>(None::toStringOp));
+    noneType->setAttribute("__bool__", gc::make_guarded<Function>(None::toBoolOp));
+    noneType->setAttribute("__eq__", gc::make_guarded<Function>(None::equalOp));
+    noneType->setAttribute("__neq__", gc::make_guarded<Function>(None::notEqualOp));
 }
 
 void KraitBuiltins::initializeIntType() {
-    intType = gc::make_tracked<TypeObject>("int", Integer::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(intType);
+    intType = gc::make_guarded<TypeObject>("int", Integer::createNewOp);
 
-    intType->setAttribute("__str__", gc::make_tracked<Function>(Integer::toStringOp));
-    intType->setAttribute("__bool__", gc::make_tracked<Function>(Integer::toBoolOp));
-    intType->setAttribute("__add__", gc::make_tracked<Function>(Integer::addOp));
-    intType->setAttribute("__sub__", gc::make_tracked<Function>(Integer::subtractOp));
-    intType->setAttribute("__mult__", gc::make_tracked<Function>(Integer::multiplyOp));
-    intType->setAttribute("__div__", gc::make_tracked<Function>(Integer::divideOp));
-    intType->setAttribute("__mod__", gc::make_tracked<Function>(Integer::moduluOp));
-    intType->setAttribute("__neg__", gc::make_tracked<Function>(Integer::negateOp));
-    intType->setAttribute("__ge__", gc::make_tracked<Function>(Integer::greaterEqualOp));
-    intType->setAttribute("__gt__", gc::make_tracked<Function>(Integer::greaterOp));
-    intType->setAttribute("__le__", gc::make_tracked<Function>(Integer::lesserEqualOp));
-    intType->setAttribute("__lt__", gc::make_tracked<Function>(Integer::lesserOp));
-    intType->setAttribute("__eq__", gc::make_tracked<Function>(Integer::equalOp));
-    intType->setAttribute("__neq__", gc::make_tracked<Function>(Integer::notEqualOp));
+    intType->setAttribute("__str__", gc::make_guarded<Function>(Integer::toStringOp));
+    intType->setAttribute("__bool__", gc::make_guarded<Function>(Integer::toBoolOp));
+    intType->setAttribute("__add__", gc::make_guarded<Function>(Integer::addOp));
+    intType->setAttribute("__sub__", gc::make_guarded<Function>(Integer::subtractOp));
+    intType->setAttribute("__mult__", gc::make_guarded<Function>(Integer::multiplyOp));
+    intType->setAttribute("__div__", gc::make_guarded<Function>(Integer::divideOp));
+    intType->setAttribute("__mod__", gc::make_guarded<Function>(Integer::moduluOp));
+    intType->setAttribute("__neg__", gc::make_guarded<Function>(Integer::negateOp));
+    intType->setAttribute("__ge__", gc::make_guarded<Function>(Integer::greaterEqualOp));
+    intType->setAttribute("__gt__", gc::make_guarded<Function>(Integer::greaterOp));
+    intType->setAttribute("__le__", gc::make_guarded<Function>(Integer::lesserEqualOp));
+    intType->setAttribute("__lt__", gc::make_guarded<Function>(Integer::lesserOp));
+    intType->setAttribute("__eq__", gc::make_guarded<Function>(Integer::equalOp));
+    intType->setAttribute("__neq__", gc::make_guarded<Function>(Integer::notEqualOp));
 }
 
 void KraitBuiltins::initializeFloatType() {
-    floatType = gc::make_tracked<TypeObject>("float", Float::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(floatType);
+    floatType = gc::make_guarded<TypeObject>("float", Float::createNewOp);
 
-    floatType->setAttribute("__str__", gc::make_tracked<Function>(Float::toStringOp));
-    floatType->setAttribute("__bool__", gc::make_tracked<Function>(Float::toBoolOp));
-    floatType->setAttribute("__add__", gc::make_tracked<Function>(Float::addOp));
-    floatType->setAttribute("__sub__", gc::make_tracked<Function>(Float::subtractOp));
-    floatType->setAttribute("__mult__", gc::make_tracked<Function>(Float::multiplyOp));
-    floatType->setAttribute("__div__", gc::make_tracked<Function>(Float::divideOp));
-    floatType->setAttribute("__mod__", gc::make_tracked<Function>(Float::moduluOp));
-    floatType->setAttribute("__neg__", gc::make_tracked<Function>(Float::negateOp));
-    floatType->setAttribute("__ge__", gc::make_tracked<Function>(Float::greaterEqualOp));
-    floatType->setAttribute("__gt__", gc::make_tracked<Function>(Float::greaterOp));
-    floatType->setAttribute("__le__", gc::make_tracked<Function>(Float::lesserEqualOp));
-    floatType->setAttribute("__lt__", gc::make_tracked<Function>(Float::lesserOp));
-    floatType->setAttribute("__eq__", gc::make_tracked<Function>(Float::equalOp));
-    floatType->setAttribute("__neq__", gc::make_tracked<Function>(Float::notEqualOp));
+    floatType->setAttribute("__str__", gc::make_guarded<Function>(Float::toStringOp));
+    floatType->setAttribute("__bool__", gc::make_guarded<Function>(Float::toBoolOp));
+    floatType->setAttribute("__add__", gc::make_guarded<Function>(Float::addOp));
+    floatType->setAttribute("__sub__", gc::make_guarded<Function>(Float::subtractOp));
+    floatType->setAttribute("__mult__", gc::make_guarded<Function>(Float::multiplyOp));
+    floatType->setAttribute("__div__", gc::make_guarded<Function>(Float::divideOp));
+    floatType->setAttribute("__mod__", gc::make_guarded<Function>(Float::moduluOp));
+    floatType->setAttribute("__neg__", gc::make_guarded<Function>(Float::negateOp));
+    floatType->setAttribute("__ge__", gc::make_guarded<Function>(Float::greaterEqualOp));
+    floatType->setAttribute("__gt__", gc::make_guarded<Function>(Float::greaterOp));
+    floatType->setAttribute("__le__", gc::make_guarded<Function>(Float::lesserEqualOp));
+    floatType->setAttribute("__lt__", gc::make_guarded<Function>(Float::lesserOp));
+    floatType->setAttribute("__eq__", gc::make_guarded<Function>(Float::equalOp));
+    floatType->setAttribute("__neq__", gc::make_guarded<Function>(Float::notEqualOp));
 }
 
 void KraitBuiltins::initializeBoolType() {
-    boolType = gc::make_tracked<TypeObject>("bool", Boolean::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(boolType);
+    boolType = gc::make_guarded<TypeObject>("bool", Boolean::createNewOp);
 
-    boolType->setAttribute("__str__", gc::make_tracked<Function>(Boolean::toStringOp));
-    boolType->setAttribute("__bool__", gc::make_tracked<Function>(Boolean::toBoolOp));
-    boolType->setAttribute("__eq__", gc::make_tracked<Function>(Boolean::equalOp));
-    boolType->setAttribute("__neq__", gc::make_tracked<Function>(Boolean::notEqualOp));
+    boolType->setAttribute("__str__", gc::make_guarded<Function>(Boolean::toStringOp));
+    boolType->setAttribute("__bool__", gc::make_guarded<Function>(Boolean::toBoolOp));
+    boolType->setAttribute("__eq__", gc::make_guarded<Function>(Boolean::equalOp));
+    boolType->setAttribute("__neq__", gc::make_guarded<Function>(Boolean::notEqualOp));
 }
 
 void KraitBuiltins::initializeStringType() {
-    stringType = gc::make_tracked<TypeObject>("string", String::createNewOp);
-    gc::GarbageCollector::instance().defineRoot(stringType);
+    stringType = gc::make_guarded<TypeObject>("string", String::createNewOp);
 
-    stringType->setAttribute("__str__", gc::make_tracked<Function>(String::toStringOp));
-    stringType->setAttribute("__bool__", gc::make_tracked<Function>(String::toBoolOp));
-    stringType->setAttribute("__add__", gc::make_tracked<Function>(String::addOp));
-    stringType->setAttribute("__mult__", gc::make_tracked<Function>(String::multiplyOp));
-    stringType->setAttribute("__eq__", gc::make_tracked<Function>(String::equalOp));
-    stringType->setAttribute("__neq__", gc::make_tracked<Function>(String::notEqualOp));
+    stringType->setAttribute("__str__", gc::make_guarded<Function>(String::toStringOp));
+    stringType->setAttribute("__bool__", gc::make_guarded<Function>(String::toBoolOp));
+    stringType->setAttribute("__add__", gc::make_guarded<Function>(String::addOp));
+    stringType->setAttribute("__mult__", gc::make_guarded<Function>(String::multiplyOp));
+    stringType->setAttribute("__eq__", gc::make_guarded<Function>(String::equalOp));
+    stringType->setAttribute("__neq__", gc::make_guarded<Function>(String::notEqualOp));
 }
 
 void KraitBuiltins::initializedFrameType() {
-    frameType = gc::make_tracked<TypeObject>("frame", nullptr);
-    gc::GarbageCollector::instance().defineRoot(frameType);
+    frameType = gc::make_guarded<TypeObject>("frame", nullptr);
+}
+
+void KraitBuiltins::initializeConsts() {
+    trueObj = gc::make_guarded<Boolean>(true);
+    falseObj = gc::make_guarded<Boolean>(false);
+    noneObj = gc::make_guarded<None>();
+
+    // TODO: add integer initialization up to 516 as optimization
 }
 
 void KraitBuiltins::initializeBuiltins() {
@@ -181,4 +182,7 @@ void KraitBuiltins::initializeBuiltins() {
     initializeIntType();
     initializeFloatType();
     initializeStringType();
+
+    // initialize const non-type objects (like True and False)
+    initializeConsts();
 }

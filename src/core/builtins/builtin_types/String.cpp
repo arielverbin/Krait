@@ -23,7 +23,7 @@ Object* String::addOp(const CallArgs& args) {
     auto first = dynamic_cast<String*>(args[0]);
     auto second = dynamic_cast<String*>(args[1]);
     if (first && second) {
-        return gc::make_tracked<String>(first->value_ + second->value_);
+        return gc::make_guarded<String>(first->value_ + second->value_);
     }
 
     throw except::NotImplementedException(
@@ -50,7 +50,7 @@ Object* String::multiplyOp(const CallArgs& args) {
         for (long i = 0; i < count; ++i) {
             result += self->value_;
         }
-        return gc::make_tracked<String>(std::move(result));
+        return gc::make_guarded<String>(std::move(result));
     }
 
     throw except::NotImplementedException(

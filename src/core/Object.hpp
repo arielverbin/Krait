@@ -36,9 +36,10 @@ protected:
     Object* getTypeAttribute(const std::string& varName);
     Object* findAttribute(const std::string& varName);
     friend class KraitBuiltins;
+    friend class Interpreter;
 
 public:
-    Object(TypeObject *type, bool initScope = true);
+    Object(TypeObject *type);
     
     Object(const Object&) = delete;
     Object& operator=(const Object&) = delete;

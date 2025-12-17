@@ -31,9 +31,9 @@ public:
 
     std::vector<gc::GCTrackable*> referencees() override;
 
-    #ifdef KRAIT_TESTING
+    #ifdef KRAIT_DEBUGGING
     size_t length();
-    #endif // KRAIT_TESTING
+    #endif // KRAIT_DEBUGGING
 
     virtual size_t size() override { return sizeof(Scope); }
     virtual ~Scope() = default;

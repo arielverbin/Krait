@@ -11,10 +11,8 @@ using namespace core;
 None::None() : Object(KraitBuiltins::noneType) {}
 
 None* None::getNone() {
-    static None* none_ = gc::make_tracked<None>();
-    // TODO: move that to KraitBuiltins
-    gc::GarbageCollector::instance().defineRoot(none_);
-    return none_;
+    if (KraitBuiltins::noneObj == nullptr) throw except::RuntimeError("none not initialized");
+    return KraitBuiltins::noneObj;
 }
 
 Object* None::toStringOp(const CallArgs& args) {
@@ -23,7 +21,7 @@ Object* None::toStringOp(const CallArgs& args) {
             "none.__str__ requires 1 argument (received " + std::to_string(args.size()) + ")");
     }
     // Always represent None as "None"
-    static String* noneStr = gc::make_tracked<String>("None");
+    static String* noneStr = gc::make_guarded<String>("None");
     return noneStr;
 }
 String* None::toString() {

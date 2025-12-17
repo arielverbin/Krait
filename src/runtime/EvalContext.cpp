@@ -1,4 +1,5 @@
 #include "EvalContext.hpp"
+#include "core/gc/GarbageCollector.hpp"
 #include "exceptions/exceptions.hpp"
 using namespace runtime;
 
@@ -12,26 +13,44 @@ EvalContext::EvalGuard EvalContext::Guard() {
     return EvalGuard(*this);
 }
 
-EvalContext::EvalGuard EvalContext::Guard() {
-    return EvalGuard(*this);
+void EvalContext::push(gc::GCTrackable* obj) {
+    evalStack_.push_back(obj);
+}
+
+void EvalContext::pop() {
+    evalStack_.pop_back();
 }
 
 EvalContext::EvalGuard::EvalGuard(EvalContext& context)
     : context_(context), stackSize_(context_.evalStack_.size()) {
 }
 
-void EvalContext::EvalGuard::protect(core::Object* obj) {
+void EvalContext::EvalGuard::protect(gc::GCTrackable* obj) {
     if (obj != nullptr) {
         context_.evalStack_.push_back(obj);
     }
 }
 
 EvalContext::EvalGuard::~EvalGuard() {
-    if (context_.evalStack_.size() < stackSize_) throw except::RuntimeError("wtf");
-
     context_.evalStack_.resize(stackSize_);
 }
 
-void EvalContext::push(EvalContext* ec) { evalContexts_.push(ec); }
-void EvalContext::pop() { evalContexts_.pop(); }
-EvalContext& EvalContext::current() { return *evalContexts_.top(); }
+void EvalContext::pushContext(EvalContext* ec) { evalContexts_.push(ec); }
+void EvalContext::popContext() {
+    if (evalContexts_.empty()) throw except::RuntimeError("evaluation context is empty");
+
+    evalContexts_.pop();
+}
+
+EvalContext* EvalContext::initGlobalContext() {
+    EvalContext* globalContext_ = gc::make_tracked<EvalContext>();
+    gc::GarbageCollector::instance().defineRoot(globalContext_);
+    evalContexts_.push(globalContext_);
+    return globalContext_;
+}
+
+EvalContext& EvalContext::current() {
+    if (evalContexts_.empty()) throw except::RuntimeError("evaluation context is empty");
+
+    return *evalContexts_.top();
+}

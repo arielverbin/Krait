@@ -20,7 +20,7 @@ Object* ClassMethod::getOp(const CallArgs& args) {
         throw except::InvalidArgumentException("first argument to classmethod.__get__ must be a classmethod");
     
     auto owner = dynamic_cast<core::Object*>(args[2]);
-    return gc::make_tracked<Method>(owner, self->function_);
+    return gc::make_guarded<Method>(owner, self->function_);
 }
 Object* ClassMethod::get(Object* instance, Object* owner) {
     return ClassMethod::getOp( { this, instance, owner });
@@ -44,5 +44,5 @@ Object* ClassMethod::createNewOp(const CallArgs& args) {
     auto value = dynamic_cast<Function*>(args[1]);
     if (!value) throw except::TypeError("classmethod.__new__ expects argument to be a function");  
 
-    return gc::make_tracked<ClassMethod>(value);
+    return gc::make_guarded<ClassMethod>(value);
 }

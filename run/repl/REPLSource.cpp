@@ -9,8 +9,12 @@ using namespace run;
 
 REPLSource::REPLSource() : analyzer_(), eof_(false) {
     std::cout << BOLDMAGENTA << "🐍 Krait " 
-    << RESET << "(v1.0.1) " 
-    << GREY << "/ REPL session started "
+    << RESET << "(v1.0.1" 
+    #ifdef KRAIT_DEBUGGING
+    << CYAN << " DEBUG" << RESET
+    #endif // KRAIT_DEBUGGING
+    << ")"
+    << GREY << " / REPL session started "
     << RESET << std::endl;
 }
 

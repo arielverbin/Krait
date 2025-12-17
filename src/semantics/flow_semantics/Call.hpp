@@ -5,8 +5,9 @@
 #include "semantics/ASTNode.hpp"
 #include "../../utils/utils.hpp"
 
+namespace core { class Function; }
+
 namespace semantics {
-class Function;
 
 class Call : public ASTNode {
 public:

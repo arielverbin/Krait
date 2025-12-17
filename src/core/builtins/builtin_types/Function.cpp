@@ -36,15 +36,7 @@ Object* Function::callOp(const CallArgs& args) {
         return self->nativeFunc_(CallArgs(args.begin() + 1, args.end()));
     }
 
-    size_t expected = self->params_.size();
-    size_t received = args.size() - 1;
-    if (received != expected) {
-        throw except::InvalidArgumentException(
-            "function call with incorrect number of arguments (expected " + std::to_string(expected) +
-            " args, got " + std::to_string(received) + ")");
-    }
-
-    return semantics::Call::makeCall(self, args);
+    return semantics::Call::makeCall(self, CallArgs(args.begin() + 1, args.end()));
 }
 
 Object* Function::call(const CallArgs& args) {
@@ -63,7 +55,7 @@ Object* Function::toStringOp(const CallArgs& args) {
 
     std::ostringstream oss;
     oss <<"<" + self->type()->name() + " at "  << self << " (" << (self->isBuiltIn_ ? "" : "non ") << "built-in)>";
-    return gc::make_tracked<String>(oss.str());
+    return gc::make_guarded<String>(oss.str());
 }
 String* Function::toString() {
     return dynamic_cast<String*>(Function::toStringOp({ this }));
@@ -86,7 +78,7 @@ Object* Function::getOp(const CallArgs& args) {
     // don't bind to None type
     if (instance->type() == KraitBuiltins::noneType) return self;
 
-    return gc::make_tracked<Method>(instance, self);
+    return gc::make_guarded<Method>(instance, self);
 }
 
 Object* Function::get(Object* instance, Object* owner) {

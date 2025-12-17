@@ -13,13 +13,9 @@ Boolean::operator bool() const {
 }
 
 Boolean* Boolean::get(bool value) {
-    static Boolean* true_ = gc::make_tracked<Boolean>(true);
-    static Boolean* false_ = gc::make_tracked<Boolean>(false);
+     if (KraitBuiltins::trueObj == nullptr || KraitBuiltins::falseObj == nullptr) throw except::RuntimeError("boolean not initialized");
 
-    // TODO: move it to KraitBuiltins
-    gc::GarbageCollector::instance().defineRoot(true_);
-    gc::GarbageCollector::instance().defineRoot(false_);
-    return value ? true_ : false_;
+    return value ? KraitBuiltins::trueObj : KraitBuiltins::falseObj;
 }
 
 Object* Boolean::toStringOp(const CallArgs& args) {
@@ -30,8 +26,8 @@ Object* Boolean::toStringOp(const CallArgs& args) {
     if (!self)
         throw except::TypeError("first argument to boolean.__str__ must be a boolean");
     
-    String* trueStr = gc::make_tracked<String>("True");
-    String* falseStr = gc::make_tracked<String>("False");
+    String* trueStr = gc::make_guarded<String>("True");
+    String* falseStr = gc::make_guarded<String>("False");
     return *self ? trueStr : falseStr;
 }
 String* Boolean::toString() {

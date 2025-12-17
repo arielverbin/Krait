@@ -4,11 +4,11 @@ import shutil
 import re
 
 class GCDebuggerModule:
-    pattern = re.compile(
-        r"gc::make_tracked<(?P<type>[^>]+)>\((?P<args>[^)]*)"
-    )
+    pattern = r"gc::{}<(?P<type>[^>]+)>\((?P<args>[^)]*)"
 
-    def preprocess(self, filename, data):
+    def get_replacer(self, func_name):
+        pattern = re.compile(self.pattern.format(func_name))
+        
         def replacer(match):
             t = match.group("type").strip()
             args = match.group("args").strip()
@@ -21,10 +21,17 @@ class GCDebuggerModule:
             if args:
                 new_args += f", {args}"
 
-            return f"gc::make_tracked<{t}>({self.pattern.sub(replacer, new_args)}"
+            return f"gc::{func_name}<{t}>({pattern.sub(replacer, new_args)}"
+        
+        return replacer
+    
+    def match_and_replace(self, func_name, data):
+        pattern = re.compile(self.pattern.format(func_name))
+        return pattern.sub(self.get_replacer(func_name), data)
 
-        return self.pattern.sub(replacer, data)
-
+    def preprocess(self, filename, data):
+        data = self.match_and_replace("make_tracked", data)
+        return self.match_and_replace("make_guarded", data)
 
 class Preprocessor:
     def __init__(self, modules):

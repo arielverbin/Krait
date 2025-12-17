@@ -1,123 +1,137 @@
+False
+None
+gc_info()
+
+def main():
+    class Const:
+        def __init__(self, value):
+            self.value = value
+
+        def diff(self, var):
+            return Const(0)
+
+        def __str__(self):
+            return str(self.value)
+
+    def Const___add__(self, other):
+        return Add(self, other)
+
+    def Const___mul__(self, other):
+        return Mul(self, other)
+
+    Const.__add__ = Const___add__
+    Const.__mult__ = Const___mul__
+
+    class Var:
+        def __init__(self, name):
+            self.name = name
+
+        def diff(self, var):
+            if self.name == var.name:
+                return Const(1)
+            return Const(0)
+
+        def __str__(self):
+            return self.name
+
+    def Var___add__(self, other):
+        return Add(self, other)
+
+    def Var___mul__(self, other):
+        return Mul(self, other)
+
+    Var.__add__ = Var___add__
+    Var.__mult__ = Var___mul__
+
+    class Add:
+        def __init__(self, left, right):
+            self.left = left
+            self.right = right
+
+        def diff(self, var):
+            return Add(self.left.diff(var), self.right.diff(var))
+
+        def __str__(self):
+            return "(" + str(self.left) + " + " + str(self.right) + ")"
+
+    def Add___add__(self, other):
+        return Add(self, other)
+
+    def Add___mul__(self, other):
+        return Mul(self, other)
+
+    Add.__add__ = Add___add__
+    Add.__mult__ = Add___mul__
+
+    class Mul:
+        def __init__(self, left, right):
+            self.left = left
+            self.right = right
+
+        def diff(self, var):
+            return Add(
+                Mul(self.left.diff(var), self.right),
+                Mul(self.left, self.right.diff(var))
+            )
+
+        def __str__(self):
+            return "(" + str(self.left) + " * " + str(self.right) + ")"
+
+    def Mul___add__(self, other):
+        return Add(self, other)
+
+    def Mul___mul__(self, other):
+        return Mul(self, other)
+
+    Mul.__add__ = Mul___add__
+    Mul.__mult__ = Mul___mul__
+
+    # --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
+    x = Var("x")
+    expr = Const(2) * x * x + Const(3) * x + Const(5)
+
+    print("Expr: " + str(expr))
+    d = expr.diff(x)
+    print("Diff: " + str(d))
+
+    x = 10
+    while x < 10:
+        x = x + 1
+
+    print(x)
+
+    def getSummer(value):
+        def summer(another):
+            def summer2(another_2):
+                return value + another + another_2
+            return summer2
+        return summer
+
+    s = getSummer(10)
+    print(s(5)(100))
+    print(s(8)(100))
+    print(getSummer(20)(1)(100))
+
+    # --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
+    x = Var("x")
+    expr = Const(2) * x * x + Const(3) * x + Const(5)
+
+    print("Expr: " + str(expr))
+    d = expr.diff(x)
+    print("Diff: " + str(d))
+    s = getSummer(10)
+    print(s(5)(100))
+    print(s(8)(100))
+    print(getSummer(20)(1)(100))
+    collect_garbage(False)
+
+main()
+
+collect_garbage(False)
+collect_garbage(False)
+collect_garbage(False)
+
+gc_info()
+main = 1
 collect_garbage(True)
-class Const:
-    def __init__(self, value):
-        self.value = value
-
-    def diff(self, var):
-        return Const(0)
-
-    def __str__(self):
-        return str(self.value)
-
-def Const___add__(self, other):
-    return Add(self, other)
-
-def Const___mul__(self, other):
-    return Mul(self, other)
-
-Const.__add__ = Const___add__
-Const.__mult__ = Const___mul__
-
-class Var:
-    def __init__(self, name):
-        self.name = name
-
-    def diff(self, var):
-        if self.name == var.name:
-            return Const(1)
-        return Const(0)
-
-    def __str__(self):
-        return self.name
-
-def Var___add__(self, other):
-    return Add(self, other)
-
-def Var___mul__(self, other):
-    return Mul(self, other)
-
-Var.__add__ = Var___add__
-Var.__mult__ = Var___mul__
-
-class Add:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def diff(self, var):
-        return Add(self.left.diff(var), self.right.diff(var))
-
-    def __str__(self):
-        return "(" + str(self.left) + " + " + str(self.right) + ")"
-
-def Add___add__(self, other):
-    return Add(self, other)
-
-def Add___mul__(self, other):
-    return Mul(self, other)
-
-Add.__add__ = Add___add__
-Add.__mult__ = Add___mul__
-
-class Mul:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def diff(self, var):
-        return Add(
-            Mul(self.left.diff(var), self.right),
-            Mul(self.left, self.right.diff(var))
-        )
-
-    def __str__(self):
-        return "(" + str(self.left) + " * " + str(self.right) + ")"
-
-def Mul___add__(self, other):
-    return Add(self, other)
-
-def Mul___mul__(self, other):
-    return Mul(self, other)
-
-Mul.__add__ = Mul___add__
-Mul.__mult__ = Mul___mul__
-
-# --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
-x = Var("x")
-expr = Const(2) * x * x + Const(3) * x + Const(5)
-
-print("Expr: " + str(expr))
-d = expr.diff(x)
-print("Diff: " + str(d))
-
-x = 10
-while x < 10:
-    x = x + 1
-
-print(x)
-
-def getSummer(value):
-    def summer(another):
-        def summer2(another_2):
-            return value + another + another_2
-        return summer2
-    return summer
-
-s = getSummer(10)
-print(s(5)(100))
-print(s(8)(100))
-print(getSummer(20)(1)(100))
-collect_garbage(True)
-
-# --- Test: (2 * x * x + 3 * x + 5).diff(x) ---
-x = Var("x")
-expr = Const(2) * x * x + Const(3) * x + Const(5)
-
-print("Expr: " + str(expr))
-d = expr.diff(x)
-print("Diff: " + str(d))
-s = getSummer(10)
-print(s(5)(100))
-print(s(8)(100))
-print(getSummer(20)(1)(100))
-collect_garbage(True)
+gc_info()

@@ -15,8 +15,8 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 }
 
 #define ASSIGNVAR(name, val)            ms(Assign)(ms(Variable)(name), val)
-#define INT(n)                          ms(Const)(gc::make_tracked<Integer>(n))
-#define STR(s)                          ms(Const)(gc::make_tracked<String>(s))
+#define INT(n)                          ms(Const)(gc::make_guarded<Integer>(n))
+#define STR(s)                          ms(Const)(gc::make_guarded<String>(s))
 #define BOOL(b)                         ms(Const)(Boolean::get(b))
 #define VAR(name)                       ms(Variable)(name)
 #define PRINT(expr)                     ms(Print)(expr)

@@ -4,6 +4,7 @@
 using namespace semantics;
 
 core::Object* Pass::evaluate(runtime::Frame& state) const {
+    // runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
     UNREFERENCED(state);
 
     return core::None::getNone();
