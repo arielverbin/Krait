@@ -34,6 +34,8 @@ namespace core {
 #define __FUNC__ "__func__"
 #define __SELF__ "__self__"
 #define __CLOSURE__ "__closure__"
+#define __GETITEM__ "__getitem__"
+#define __SETITEM__ "__setitem__"
 
 } // namespace consts
 
