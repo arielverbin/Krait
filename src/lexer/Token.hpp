@@ -28,7 +28,7 @@ enum class TokenType {
     MOD,         // '%'
 
     // punctuation
-    LPAREN, RPAREN,
+    LPAREN, RPAREN, LBRACKET, RBRACKET, 
     COLON, COMMA, AT,
 
     // comparison operators

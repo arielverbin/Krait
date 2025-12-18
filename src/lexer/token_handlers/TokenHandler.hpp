@@ -118,6 +118,9 @@ public:
     GroupingHandler(LexerContext& context);
     bool match() const override;
     std::optional<Token> emit() const override;
+private:
+    const std::vector<std::pair<char, TokenType>> openings_;
+    const std::vector<std::pair<char, TokenType>> closings_;
 };
 
 /**
