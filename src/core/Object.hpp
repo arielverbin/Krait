@@ -53,6 +53,8 @@ public:
     virtual Object* getAttribute(const std::string& varName);
     virtual void setAttribute(const std::string& varName, AttributeEntry value);
     virtual bool hasAttribute(const std::string& varName);
+    virtual Object* getItem(Object* index);
+    virtual Object* setItem(Object* index, Object* value);
 
     virtual String* toString();
     virtual Boolean* toBool();
@@ -92,3 +94,4 @@ public:
 } // namespace core
 
 #endif // CORE_OBJECT_HPP
+

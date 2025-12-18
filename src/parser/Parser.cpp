@@ -31,6 +31,7 @@
 #include "semantics/operation_semantics/UnaryOp.hpp"
 #include "semantics/operation_semantics/BinaryOp.hpp"
 #include "semantics/operation_semantics/AccessProperty.hpp"
+#include "semantics/operation_semantics/AccessIndex.hpp"
 
 namespace parser {
 
@@ -224,9 +225,14 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePostfix(std::shared_ptr<semanti
             left = std::make_shared<semantics::AccessProperty>(left, previous().value());
         }
 
-        else {
-            break;
+        else if (match(lexer::TokenType::LBRACKET)) {
+            // Index access
+            std::shared_ptr<semantics::ASTNode> index = parseExpression(0);
+            expect(lexer::TokenType::RBRACKET, "Expect ']' after expression");
+            left = std::make_shared<semantics::AccessIndex>(left, index);
         }
+        
+        else break;
     }
     return left;
 }

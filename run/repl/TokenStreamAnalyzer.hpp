@@ -14,7 +14,9 @@ public:
     for (auto& token : tokens) {
         switch (token.type()) {
             case lexer::TokenType::LPAREN:       ++groupingLevel_; break;
+            case lexer::TokenType::LBRACKET:     ++groupingLevel_; break;
             case lexer::TokenType::RPAREN:       --groupingLevel_; break;
+            case lexer::TokenType::RBRACKET:     --groupingLevel_; break;
             case lexer::TokenType::INDENT:       ++indentStack_; break;
             case lexer::TokenType::DEDENT:       --indentStack_; break;
             case lexer::TokenType::COLON:        lastWasColon_ = true; break;
@@ -28,7 +30,7 @@ public:
   }
 
   bool statementComplete() const {
-    return groupingLevel_ == 0 && indentStack_ == 0 && (!lastWasColon_) && (!decoratorDefinition_);
+    return groupingLevel_ <= 0 && indentStack_ <= 0 && (!lastWasColon_) && (!decoratorDefinition_);
   }
 
   std::vector<lexer::Token> consume() {
