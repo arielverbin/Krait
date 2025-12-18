@@ -180,7 +180,7 @@ Object* Object::call(const CallArgs& args) {
         Object* attribute = getTypeAttribute(__CALL__);
         if (!attribute) throw except::NotImplementedException("'" __CALL__ "' does not exists for type '" + type()->name() + "'");
         // TODO: if attribute == this, prevent loop
-        attribute->call({ args });
+        return attribute->call({ args });
     } catch (const semantics::ReturnSignal& ret) {
         return ret.value();
     }
