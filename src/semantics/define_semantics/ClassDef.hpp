@@ -7,11 +7,12 @@
 
 namespace semantics {
 
-class ClassDef : public ASTNode {
+class ClassDef : public BindableASTNode {
 public:
     ClassDef(std::string className, std::shared_ptr<ASTNode> body);
 
-    virtual core::Object* evaluate(runtime::Frame& state) const override;
+    virtual core::Object* compute(runtime::Frame& state) const override;
+    virtual std::string name() const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {
