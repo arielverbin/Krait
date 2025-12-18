@@ -2,6 +2,9 @@
 #define CORE_FLOAT_HPP
 
 #include "core/Object.hpp"
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/TypeObject.hpp"
+#include "exceptions/exceptions.hpp"
 #include "utils/utils.hpp"
 
 namespace core {
@@ -55,6 +58,18 @@ public:
 
 private:
     double value_;
+
+    // helper function to convert Integer/Float objects to c++ type.
+    template<typename T>
+    static T getNumericValue(core::Object* o) {
+        core::Float* f = dynamic_cast<core::Float*>(o);
+        if (f) return static_cast<T>(*f);
+
+        core::Integer* i = dynamic_cast<core::Integer*>(o);
+        if (i) return static_cast<T>(*i);
+
+        throw except::NotImplementedException("expected a numeric type (got: '" + o->type()->name() + "')");
+    }
 };
 
 } // namespace core

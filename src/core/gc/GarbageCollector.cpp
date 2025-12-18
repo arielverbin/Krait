@@ -16,7 +16,8 @@ GarbageCollector& GarbageCollector::instance() {
 
 void GarbageCollector::trackObject(gc::GCTrackable *obj) {
     if (trackedObjects_.contains(obj)) {
-        throw except::RuntimeError("object was tracked twice");
+        // should never happen
+        throw std::runtime_error("object was tracked twice");
     }
 
     #ifdef KRAIT_DEBUGGING
@@ -29,7 +30,7 @@ void GarbageCollector::trackObject(gc::GCTrackable *obj) {
         std::cout << "[GC] Tracking trackable";
     }
     std::cout << " (defined in " << obj->file << ":" << obj->line << ")";
-    std::cout << std::endl; fflush(stdout);
+    std::cout << std::endl;
     #endif // KRAIT_DEBUGGING
 
     trackedObjects_.insert(obj);
@@ -75,7 +76,7 @@ size_t GarbageCollector::sweep(bool verbose) {
                 #ifdef KRAIT_DEBUGGING
                 std::cout << " (defined in " << obj->file << ":" << obj->line << ")";
                 #endif // KRAIT_DEBUGGING
-                std::cout << std::endl; fflush(stdout);
+                std::cout << std::endl;
             }
 
             deleteCounter += 1;
@@ -126,10 +127,10 @@ GarbageCollector::~GarbageCollector() {
 }
 
 void GarbageCollector::call() {
+    #if KRAIT_DEBUGGING // for the debug version, we call the GC each time !
     size_t bytesBefore = bytesAllocated_;
-
-    #ifndef KRAIT_DEBUGGING // for the debug version, we call the GC each time !
-    if ((bytesAllocated_ > byteThreshold_))
+    #else
+    if (bytesAllocated_ > byteThreshold_)
     #endif // KRAIT_DEBUGGING
     {
         size_t deleteCounter = mark_and_sweep(/*verbose=*/false);
@@ -137,10 +138,12 @@ void GarbageCollector::call() {
         #ifdef KRAIT_DEBUGGING
         std::cout << "[GC] Cleaned " << (bytesBefore - bytesAllocated_)
             << " bytes across " << deleteCounter << " deleted objects." << std::endl;
+        #else
+        UNREFERENCED(deleteCounter);
         #endif // KRAIT_DEBUGGING
 
         // update threshold
-        byteThreshold_ = bytesAllocated_ * 2;
+        byteThreshold_ = bytesAllocated_ * 10;
     }
 }
 
@@ -154,8 +157,8 @@ core::Object* GarbageCollector::collect_garbage(const core::CallArgs& args) {
     
     size_t deleteCounter = GarbageCollector::instance().mark_and_sweep(*verbose);
     
-    std::cout << "Successfully cleaned " << deleteCounter << " objects." << std::endl; fflush(stdout);
-
+    std::cout << "[GC] Successfully cleaned " << deleteCounter << " objects." << std::endl;
+    
     return core::None::getNone();
 }
 

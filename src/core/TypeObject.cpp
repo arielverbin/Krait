@@ -11,7 +11,7 @@ using namespace core;
 TypeObject::TypeObject(std::string name, Function::NativeFunc creator) 
     : Object(KraitBuiltins::typeType), name_(std::move(name)) {
         if (creator != nullptr) {
-            setAttribute("__new__", gc::make_guarded<core::ClassMethod>(gc::make_guarded<core::Function>(creator)));
+            setAttribute(__NEW__, gc::make_guarded<core::ClassMethod>(gc::make_guarded<core::Function>(creator)));
         }
 }
 
@@ -44,7 +44,7 @@ Object* TypeObject::callOp(const CallArgs& args) {
     
     Object* newInstance = self->createNew(CallArgs(args.begin() + 1, args.end()));
 
-    if (self->hasAttribute("__init__"))
+    if (self->hasAttribute(__INIT__))
         newInstance->initialize(CallArgs(args.begin() + 1, args.end()));
     
     return newInstance;

@@ -9,8 +9,8 @@ using namespace core;
 
 Method::Method(Object* instance, Object* callable)
     : Object(KraitBuiltins::methodType), instance_(instance), callable_(callable) {
-        setAttribute("__function__", callable_);
-        setAttribute("__self__", instance_);
+        setAttribute(__FUNC__, callable_);
+        setAttribute(__SELF__, instance_);
     }
 
 Object* Method::callOp(const CallArgs& args) {

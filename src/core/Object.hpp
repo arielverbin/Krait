@@ -7,6 +7,7 @@
 #include <memory>
 #include <variant>
 #include "core/gc/GCTrackable.hpp"
+#include "core/consts.hpp"
 #include "utils/utils.hpp"
 
 namespace core {

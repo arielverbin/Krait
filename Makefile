@@ -49,6 +49,8 @@ TEST_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(TEST_OBJ_DIR)/%.o,$(TEST_SRCS))
 ALL_TEST_MODULES := $(filter-out lib, $(notdir $(wildcard tests/*)))
 ALL_TEST_BINS  := $(foreach mod,$(ALL_TEST_MODULES),$(TEST_BUILD_DIR)/test_$(mod))
 
+PREPROCESS_STAMP := $(BUILD_DIR)/.preprocess.stamp
+
 # ============================================================================
 # Build rules for tests
 # ----------------------------------------------------------------------------
@@ -83,7 +85,7 @@ test:
 # Build rules for release target
 # ----------------------------------------------------------------------------
 # Link the main executable from Main.cpp and the sources from src.
-RELEASE_BIN: $(RELEASE_OBJS) $(RELEASE_MAIN_OBJ)
+$(RELEASE_BIN): $(RELEASE_OBJS) $(RELEASE_MAIN_OBJ)
 	@mkdir -p $(dir $@)
 	$(CXX) $(RELEASE_CXXFLAGS) $^ -lreadline -o $@
 
@@ -124,8 +126,7 @@ debug:
 	@$(MAKE) $(DEBUG_BIN) || (echo "[!] Build failed, reverting changes..." && $(PYTHON) ./debug_preprocessor.py revert && exit 1)
 	@echo "[v] Build completed successfully, reverting changes..."
 	@$(PYTHON) ./debug_preprocessor.py revert
-	@find $(SRC_DIR) -type f -exec touch {} +
-	@find $(RUN_DIR) -type f -exec touch {} +
+	@find $(BUILD_DIR) -exec touch {} +
 
 # ============================================================================
 # Phony Targets

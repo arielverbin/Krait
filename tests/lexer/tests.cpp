@@ -306,4 +306,31 @@ TEST_CASE("Empty strings") {
         "IDENTIFIER(one), ASSIGN(=), STRING(), NEWLINE(\\n), IDENTIFIER(data), ASSIGN(=), STRING(x), STRING(), STRING(), NEWLINE(\\n), EOF()");
 }
 
+TEST_CASE("Class definition") {
+    const std::string code =
+        "class A:\n"
+        "    def func():\n"
+        "        pass\n"
+        "    if True:\n"
+        "        x = 10\n";
+    auto tokens = lexer::Lexer().tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "CLASS(class), IDENTIFIER(A), COLON(:), NEWLINE(\\n), INDENT(), DEF(def), "
+        "IDENTIFIER(func), LPAREN((), RPAREN()), COLON(:), NEWLINE(\\n), INDENT(), PASS(pass), "
+        "NEWLINE(\\n), DEDENT(), IF(if), TRUE(True), COLON(:), NEWLINE(\\n), "
+        "INDENT(), IDENTIFIER(x), ASSIGN(=), NUMBER(10), NEWLINE(\\n), DEDENT(), DEDENT(), EOF()");
+}
+
+TEST_CASE("Attribute access") {
+    const std::string code =
+        "x.var = 3\n"
+        "x.var.val = y.value.v + v.val.x()\n";
+    auto tokens = lexer::Lexer().tokenize(code);
+    REQUIRE(stringifyTokens(tokens) ==
+        "IDENTIFIER(x), DOT(.), IDENTIFIER(var), ASSIGN(=), NUMBER(3), NEWLINE(\\n), "
+        "IDENTIFIER(x), DOT(.), IDENTIFIER(var), DOT(.), IDENTIFIER(val), ASSIGN(=), IDENTIFIER(y), "
+        "DOT(.), IDENTIFIER(value), DOT(.), IDENTIFIER(v), PLUS(+), IDENTIFIER(v), DOT(.), "
+        "IDENTIFIER(val), DOT(.), IDENTIFIER(x), LPAREN((), RPAREN()), NEWLINE(\\n), EOF()");
+}
+
 #endif // KRAIT_TESTING

@@ -66,4 +66,7 @@ TEST_EXPRESSION(31)
 TEST_EXPRESSION(32)
 TEST_EXPRESSION(33)
 
+// class defintions, property access
+TEST_EXPRESSION(34)
+
 #endif // KRAIT_TESTING

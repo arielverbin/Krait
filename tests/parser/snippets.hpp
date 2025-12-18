@@ -476,5 +476,35 @@ std::shared_ptr<ASTNode> expressionTest33Result() {
     );
 }
 
+// 34) Basic class definition
+std::string expressionTest34 = R"(
+class A:
+    def __init__(self, mem):
+        print "In init with: " + str(mem)
+        self.mem = mem
+
+    def __str__(self):
+        return "A OBJ mem: " + str(self.mem)
+
+a = A(12)
+print a
+)";
+std::shared_ptr<ASTNode> expressionTest34Result() {
+    return CODE(
+        CLASS("A", CODE(
+            FUNC("__init__", STRARR("self", "mem"), CODE(
+                PRINT(ADD(STR("In init with: "), CALL(VAR("str"), ARGS(VAR("mem"))))),
+                ASSIGN(PROPERTY(VAR("self"), "mem"), VAR("mem"))
+            )),
+            FUNC("__str__", STRARR("self"), CODE(
+                RETURN(ADD(STR("A OBJ mem: "), CALL(VAR("str"), ARGS(PROPERTY(VAR("self"), "mem")))))
+            ))
+        )),
+
+        ASSIGNVAR("a", CALL(VAR("A"), ARGS(INT(12)))),
+        PRINT(VAR("a"))
+    );
+}
+
 #endif // TESTS_PARSER_SNIPPETS_HPP
 #endif // KRAIT_TESTING

@@ -57,7 +57,8 @@ core::Object* Frame::getVariable(std::string varName) {
 
 void Frame::defineVariable(std::string varName, core::Object* value) {
     if (scopeStack_.empty()) {
-        throw except::RuntimeError("program runs without a scope.");
+        // should never happen
+        throw std::runtime_error("program runs without a scope.");
     }
 
     (*scopeStack_.back()).setMember(varName, value);

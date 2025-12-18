@@ -35,14 +35,14 @@ Interpreter::Interpreter() {
     state_->defineVariable("int", core::KraitBuiltins::intType);
 
     #ifdef KRAIT_DEBUGGING
+    // Expose garbage collector utilities
     state_->defineVariable("collect_garbage", gc::make_tracked<core::Function>(gc::GarbageCollector::collect_garbage));
     state_->defineVariable("gc_info", gc::make_tracked<core::Function>(gc::GarbageCollector::gc_info));
     #endif // KRAIT_DEBUGGING
 }
 
-runtime::Frame& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
-    command->evaluate(*state_);
-    return *state_;
+core::Object* Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
+    return command->evaluate(*state_);
 }
 
 Interpreter::~Interpreter() {

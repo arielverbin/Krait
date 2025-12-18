@@ -151,4 +151,33 @@ TEST_CASE("Interprets functions without arguments correctly") {
     REQUIRE(buffer.str() == "Hello, world!\n");
 }
 
+TEST_CASE("Interprets basic property access properly") {
+    // Redirect std::cout
+    std::ostringstream buffer;
+    std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
+
+    interpreter::Interpreter i;
+    i.interpret(CODE(getBasicAccessPropertyCode()));
+
+    // Restore std::cout
+    std::cout.rdbuf(old_buf);
+
+    REQUIRE(buffer.str() == "10\n100\n");
+}
+
+TEST_CASE("Interprets basic class definition properly") {
+    // Redirect std::cout
+    std::ostringstream buffer;
+    std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
+
+    interpreter::Interpreter i;
+    i.interpret(CODE(getBasicClassCode()));
+
+    // Restore std::cout
+    std::cout.rdbuf(old_buf);
+
+    REQUIRE(buffer.str() == "In init with: 12\nA OBJ mem: 12\n");
+}
+
+
 #endif // KRAIT_TESTING

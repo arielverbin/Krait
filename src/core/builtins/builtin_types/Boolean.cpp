@@ -13,7 +13,10 @@ Boolean::operator bool() const {
 }
 
 Boolean* Boolean::get(bool value) {
-     if (KraitBuiltins::trueObj == nullptr || KraitBuiltins::falseObj == nullptr) throw except::RuntimeError("boolean not initialized");
+     if (KraitBuiltins::trueObj == nullptr || KraitBuiltins::falseObj == nullptr) {
+        // should never happen
+        throw std::runtime_error("boolean not initialized");
+     }
 
     return value ? KraitBuiltins::trueObj : KraitBuiltins::falseObj;
 }

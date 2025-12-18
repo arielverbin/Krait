@@ -37,7 +37,10 @@ EvalContext::EvalGuard::~EvalGuard() {
 
 void EvalContext::pushContext(EvalContext* ec) { evalContexts_.push(ec); }
 void EvalContext::popContext() {
-    if (evalContexts_.empty()) throw except::RuntimeError("evaluation context is empty");
+    if (evalContexts_.empty()) {
+        // should never happen
+        throw std::runtime_error("evaluation context is empty");
+    }
 
     evalContexts_.pop();
 }
@@ -50,7 +53,10 @@ EvalContext* EvalContext::initGlobalContext() {
 }
 
 EvalContext& EvalContext::current() {
-    if (evalContexts_.empty()) throw except::RuntimeError("evaluation context is empty");
+    if (evalContexts_.empty()) {
+        // should never happen
+        throw std::runtime_error("evaluation context is empty");
+    }
 
     return *evalContexts_.top();
 }

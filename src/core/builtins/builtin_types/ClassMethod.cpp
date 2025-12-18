@@ -7,7 +7,7 @@
 using namespace core;
 
 ClassMethod::ClassMethod(Function* function) : Object(KraitBuiltins::classMethodType), function_(function) {
-    setAttribute("__function__", function_);
+    setAttribute(__FUNC__, function_);
 }
 
 Object* ClassMethod::getOp(const CallArgs& args) {

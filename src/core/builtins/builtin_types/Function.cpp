@@ -20,7 +20,7 @@ Function::Function(std::shared_ptr<semantics::ASTNode> body,
                    runtime::Frame* closure)
     : Object(KraitBuiltins::functionType),
     isBuiltIn_(false), body_(body), params_(params), closure_(closure) {
-        setAttribute("__closure__", closure_);
+        setAttribute(__CLOSURE__, closure_);
     }
 
 Object* Function::callOp(const CallArgs& args) {

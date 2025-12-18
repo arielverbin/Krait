@@ -4,7 +4,6 @@
 #include <cmath>
 #include "core/TypeObject.hpp"
 #include "core/gc/GarbageCollector.hpp"
-#include "core/builtins/builtin_types/utils.hpp"
 #include "core/builtins/builtin_types/Integer.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
 #include "exceptions/exceptions.hpp"
@@ -52,8 +51,8 @@ Object* Float::addOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "float.__add__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
     return gc::make_guarded<Float>(a + b);
 }
 Object* Float::add(Object* another) {
@@ -67,8 +66,8 @@ Object* Float::subtractOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "float.__sub__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
     return gc::make_guarded<Float>(a - b);
 }
 Object* Float::subtract(Object* another) {
@@ -82,8 +81,8 @@ Object* Float::multiplyOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "float.__mul__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
     return gc::make_guarded<Float>(a * b);
 }
 Object* Float::multiply(Object* another) {
@@ -97,8 +96,8 @@ Object* Float::divideOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "float.__div__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     if (b == 0) throw except::DivisionByZeroException(*args[0]);
 
@@ -115,8 +114,8 @@ Object* Float::moduluOp(const CallArgs& args) {
     if (args.size() != 2)
         throw except::InvalidArgumentException(
             "float.__mod__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
     if (b == 0) throw except::DivisionByZeroException(*args[0]);
 
     return gc::make_guarded<Float>(std::fmod(a, b));
@@ -147,8 +146,8 @@ Object* Float::greaterEqualOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__ge__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a >= b);
 }
@@ -161,8 +160,8 @@ Object* Float::greaterOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__gt__ requires exactly 2 arguments (received " + std:: to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a > b);
 }
@@ -175,8 +174,8 @@ Object* Float::lesserEqualOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__le__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a <= b);
 }
@@ -189,8 +188,8 @@ Object* Float::lesserOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__lt__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a < b);
 }
@@ -203,8 +202,8 @@ Object* Float::equalOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__eq__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a == b);
 }
@@ -217,8 +216,8 @@ Object* Float::notEqualOp(const CallArgs& args) {
         throw except::InvalidArgumentException(
             "float.__ne__ requires exactly 2 arguments (received " + std::to_string(args.size()) + ")");
 
-    double a = utils::getNumericValue<double>(args[0]);
-    double b = utils::getNumericValue<double>(args[1]);
+    double a = Float::getNumericValue<double>(args[0]);
+    double b = Float::getNumericValue<double>(args[1]);
 
     return Boolean::get(a != b);
 }

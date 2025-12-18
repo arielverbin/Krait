@@ -2,27 +2,6 @@
 #ifndef TESTS_COMMANDS_HPP
 #define TESTS_COMMANDS_HPP
 
-#include "core/builtins/builtin_types/Integer.hpp"
-#include "core/builtins/builtin_types/String.hpp"
-#include "core/builtins/builtin_types/None.hpp"
-#include "core/builtins/builtin_types/Boolean.hpp"
-
-#include "semantics/define_semantics/Assign.hpp"
-#include "semantics/define_semantics/FunctionDef.hpp"
-#include "semantics/flow_semantics/Call.hpp"
-#include "semantics/Print.hpp"
-#include "semantics/Const.hpp"
-#include "semantics/Variable.hpp"
-#include "semantics/operation_semantics/BinaryOp.hpp"
-#include "semantics/operation_semantics/UnaryOp.hpp"
-#include "semantics/flow_semantics/If.hpp"
-#include "semantics/flow_semantics/While.hpp"
-#include "semantics/flow_semantics/Pass.hpp"
-#include "semantics/flow_semantics/Code.hpp"
-#include "semantics/signal_semantics/Return.hpp"
-#include "semantics/signal_semantics/Break.hpp"
-#include "semantics/signal_semantics/Continue.hpp"
-
 #include <vector>
 
 #include "utils.hpp"
@@ -364,6 +343,42 @@ std::vector<std::shared_ptr<ASTNode>> getNoArgFunctionTestCode() {
         /** 
          * Expected Output:
          * Hello, world!
+         */
+    };
+}
+
+std::vector<std::shared_ptr<ASTNode>> getBasicAccessPropertyCode() {
+    return {
+        ASSIGNVAR("x", INT(10)),
+        ASSIGN(PROPERTY(VAR("x"), "value"), INT(100)),
+        PRINT(VAR("x")),
+        PRINT(PROPERTY(VAR("x"), "value")),
+        /** 
+         * Expected Output:
+         * 10
+         * 100
+         */
+    };
+}
+
+std::vector<std::shared_ptr<ASTNode>> getBasicClassCode() {
+    return {
+        CLASS("A", CODE(
+            FUNC("__init__", STRARR("self", "mem"), CODE(
+                PRINT(ADD(STR("In init with: "), CALL(VAR("str"), ARGS(VAR("mem"))))),
+                ASSIGN(PROPERTY(VAR("self"), "mem"), VAR("mem"))
+            )),
+            FUNC("__str__", STRARR("self"),
+                RETURN(ADD(STR("A OBJ mem: "), CALL(VAR("str"), ARGS(PROPERTY(VAR("self"), "mem")))))
+            )
+        )),
+
+        ASSIGNVAR("a", CALL(VAR("A"), ARGS(INT(12)))),
+        PRINT(VAR("a"))
+        /** 
+         * Expected Output:
+         * In init with: 12
+         * A OBJ mem: 12
          */
     };
 }
