@@ -12,7 +12,7 @@ core::Object* AccessIndex::evaluate(runtime::Frame& state) const {
     core::Object* index = index_->evaluate(state);
     guard.protect(index);
 
-    return object->getItem({index});
+    return object->getItem(index);
 }
 
 void AccessIndex::assign(runtime::Frame& state, core::Object* value)  {
@@ -23,5 +23,5 @@ void AccessIndex::assign(runtime::Frame& state, core::Object* value)  {
     core::Object* index = index_->evaluate(state);
     guard.protect(index);
 
-    object->setItem({index, value});
+    object->setItem(index, value);
 }
