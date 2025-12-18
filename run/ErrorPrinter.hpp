@@ -9,13 +9,13 @@
 class ErrorPrinter {
 public:
     static std::string format(const std::string& source, const except::SyntaxError& err) {
-        int lineNumber = err.line();
-        int column = err.column();
+        size_t lineNumber = err.line();
+        size_t column = err.column();
         
         // Split source into lines
         std::istringstream stream(source);
         std::string line;
-        int currentLine = 1;
+        size_t currentLine = 1;
         
         while (std::getline(stream, line)) {
             if (currentLine == lineNumber) {
@@ -34,7 +34,7 @@ public:
 
         // Print the caret (^) under the right column
         error << std::string(std::to_string(lineNumber).size(), ' ') << " | "
-                << std::string(column - 1, ' ') << "^" << RESET << "\n";
+                << std::string(column > 0 ? column - 1 : 0, ' ') << "^" << RESET << "\n";
 
         return error.str();
     }

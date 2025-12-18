@@ -29,7 +29,7 @@ enum class TokenType {
 
     // punctuation
     LPAREN, RPAREN,
-    COLON, COMMA,
+    COLON, COMMA, AT,
 
     // comparison operators
     EQ, NEQ, LT, LTE, GT, GTE,

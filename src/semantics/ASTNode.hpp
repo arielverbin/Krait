@@ -25,6 +25,16 @@ public:
     virtual ~AssignableASTNode() = default;
 };
 
+class BindableASTNode : public ASTNode {
+protected:
+    virtual core::Object* compute(runtime::Frame& state) const = 0;
+public:
+    virtual std::string name() const = 0;
+    virtual core::Object* evaluate(runtime::Frame& state) const final;
+
+    virtual ~BindableASTNode() = default;
+};
+
 } // namespace semantics
 
 #endif // SEMANTICS_AST_NODE_HPP

@@ -12,6 +12,8 @@ OperatorHandler::OperatorHandler(LexerContext& context)
         {"/", TokenType::SLASH}, {"=", TokenType::ASSIGN}, {"<", TokenType::LT},
         {">", TokenType::GT}, {"!", TokenType::NOT}, {":", TokenType::COLON},
         {"%", TokenType::MOD}, {",", TokenType::COMMA}, {".", TokenType::DOT},
+
+        {"@", TokenType::AT},
     }) {}
 
 bool OperatorHandler::match() const {

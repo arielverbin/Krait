@@ -21,6 +21,7 @@
 
 #include "semantics/define_semantics/ClassDef.hpp"
 #include "semantics/define_semantics/FunctionDef.hpp"
+#include "semantics/define_semantics/Decorator.hpp"
 #include "semantics/define_semantics/Assign.hpp"
 
 #include "semantics/signal_semantics/Break.hpp"
@@ -106,6 +107,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
     if (match(lexer::TokenType::PASS))     return parsePass();
     if (match(lexer::TokenType::BREAK))    return parseBreak();
     if (match(lexer::TokenType::CONTINUE)) return parseContinue();
+    if (match(lexer::TokenType::AT))       return parseDecorator();
 
     auto expr = parseExpression(0);
     expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
@@ -284,6 +286,19 @@ std::shared_ptr<semantics::ASTNode> Parser::parseClassDef() {
     }
 
     return std::make_shared<semantics::ClassDef>(className, std::move(body));
+}
+
+std::shared_ptr<semantics::ASTNode> Parser::parseDecorator() {
+    auto decorator = parseExpression();
+    expect(lexer::TokenType::NEWLINE, "Expected newline after decorator");
+    auto decorated = parseStatement();
+
+    auto bindableDecorated = std::dynamic_pointer_cast<semantics::BindableASTNode>(decorated);
+    if (!bindableDecorated) {
+        throw except::SyntaxError("Decorator can only be applied to bindables (functions or classes)",
+            peek().line(), peek().column());
+    }
+    return std::make_shared<semantics::Decorator>(decorator, bindableDecorated);
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parsePrint() {

@@ -7,7 +7,11 @@ using namespace semantics;
 FunctionDef::FunctionDef(std::string funcName, std::vector<std::string> params, std::shared_ptr<ASTNode> code)
     : funcName_(std::move(funcName)), params_(std::move(params)), code_(std::move(code)) {}
 
-core::Object* FunctionDef::evaluate(runtime::Frame& state) const {
+std::string FunctionDef::name() const {
+    return funcName_;
+}
+
+core::Object* FunctionDef::compute(runtime::Frame& state) const {
     runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
 
     // Create a duplicated frame for the function
@@ -18,9 +22,5 @@ core::Object* FunctionDef::evaluate(runtime::Frame& state) const {
     
     core::Function* func = gc::make_tracked<core::Function>(code_, params_, funcEnv);
 
-    // Store the function in the environment
-    state.defineVariable(funcName_, func);
-
-    // return None as function definitions do not return a value
-    return core::None::getNone();
+    return func;
 }

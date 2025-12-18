@@ -64,6 +64,7 @@ private:
     std::shared_ptr<semantics::ASTNode> parseBreak();
     std::shared_ptr<semantics::ASTNode> parsePass();
     std::shared_ptr<semantics::ASTNode> parseContinue();
+    std::shared_ptr<semantics::ASTNode> parseDecorator();
 
     // Token utilities
     bool isAtEnd() const;

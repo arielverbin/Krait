@@ -10,7 +10,11 @@ using namespace semantics;
 ClassDef::ClassDef(std::string className, std::shared_ptr<ASTNode> body)
     : className_(std::move(className)), body_(std::move(body)) {}
 
-core::Object* ClassDef::evaluate(runtime::Frame& state) const {
+std::string ClassDef::name() const {
+    return className_;
+}
+
+core::Object* ClassDef::compute(runtime::Frame& state) const {
     runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
 
     auto cls = gc::make_tracked<core::TypeObject>(className_, core::KraitClass::createNewOp);
@@ -20,10 +24,6 @@ core::Object* ClassDef::evaluate(runtime::Frame& state) const {
     state.pushScope(cls->getScope());
     body_->evaluate(state);
     state.popLastScope();
-    
-    // Store the class in the environment
-    state.defineVariable(className_, cls);
 
-    // return None as class definitions do not return a value
-    return core::None::getNone();
+    return cls;
 }

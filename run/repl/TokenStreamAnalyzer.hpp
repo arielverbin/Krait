@@ -9,6 +9,8 @@ namespace run {
 class TokenStreamAnalyzer {
 public:
   void feed(std::vector<lexer::Token> tokens) {
+    decoratorDefinition_ = (tokens.size() > 0 && tokens[0].type() == lexer::TokenType::AT);
+
     for (auto& token : tokens) {
         switch (token.type()) {
             case lexer::TokenType::LPAREN:       ++groupingLevel_; break;
@@ -26,7 +28,7 @@ public:
   }
 
   bool statementComplete() const {
-    return groupingLevel_ == 0 && indentStack_ == 0 && (!lastWasColon_);
+    return groupingLevel_ == 0 && indentStack_ == 0 && (!lastWasColon_) && (!decoratorDefinition_);
   }
 
   std::vector<lexer::Token> consume() {
@@ -41,10 +43,12 @@ private:
   int groupingLevel_ = 0;
   int indentStack_ = 0;
   bool lastWasColon_ = false;
+  bool decoratorDefinition_ = false;
 
   void resetState() {
     groupingLevel_ = 0;
     lastWasColon_ = false;
+    decoratorDefinition_ = false;
     indentStack_ = 0;
   }
 };
