@@ -4,10 +4,13 @@ using namespace semantics;
 
 Code::Code(std::vector<std::shared_ptr<ASTNode>> stmts) : statements(std::move(stmts)) {}
 
-std::shared_ptr<core::Object> Code::evaluate(runtime::Environment& state) const {
+core::Object* Code::evaluate(runtime::Frame& state) const {
+    // runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
+    core::Object* result = core::None::getNone();
     for (auto& stmt : statements) {
-        stmt->evaluate(state);
+        result = stmt->evaluate(state);
     }
 
-    return core::None::getNone();
+    return result;
 }

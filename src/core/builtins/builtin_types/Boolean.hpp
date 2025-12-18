@@ -6,33 +6,28 @@
 
 namespace core {
 
-class Boolean : public utils::EnableSharedFromThis<Object, Boolean> {
+class Boolean : public Object {
 public:
     Boolean(bool value);
     // Singleton access
-    static std::shared_ptr<Boolean> get(bool value);
+    static Boolean* get(bool value);
     operator bool() const;
-    std::string _type_() override;
 
     // Operations supported (optimization)
-    std::shared_ptr<String> toString() override;
-    std::shared_ptr<Boolean> toBool() override;
-    std::shared_ptr<Object> logicalAnd(std::shared_ptr<Object> other) override;
-    std::shared_ptr<Object> logicalOr(std::shared_ptr<Object> other) override;
-    std::shared_ptr<Object> logicalNot() override;
-    std::shared_ptr<Object> equal(std::shared_ptr<Object> another) override;
-    std::shared_ptr<Object> notEqual(std::shared_ptr<Object> another) override;
-
+    String* toString() override;
+    Boolean* toBool() override;
+    Object* equal(Object* another) override;
+    Object* notEqual(Object* another) override;
 
     // Operations supported
-    static std::shared_ptr<Object> toStringOp(const CallArgs& args);
-    static std::shared_ptr<Object> toBoolOp(const CallArgs& args);
-    static std::shared_ptr<Object> logicalAndOp(const CallArgs& args);
-    static std::shared_ptr<Object> logicalOrOp(const CallArgs& args);
-    static std::shared_ptr<Object> logicalNotOp(const CallArgs& args);
-    static std::shared_ptr<Object> equalOp(const CallArgs& args);
-    static std::shared_ptr<Object> notEqualOp(const CallArgs& args);
+    static Object* toStringOp(const CallArgs& args);
+    static Object* toBoolOp(const CallArgs& args);
+    static Object* equalOp(const CallArgs& args);
+    static Object* notEqualOp(const CallArgs& args);
 
+    static Object* createNewOp(const CallArgs& args);
+
+    virtual size_t size() override { return sizeof(Boolean); }
     virtual ~Boolean() = default;
 
 private:

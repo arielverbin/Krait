@@ -6,16 +6,18 @@
 namespace semantics {
 
 enum UnaryOpType {
-    Neg,
-    Not,
+    Neg, Not,
 };
 
 class UnaryOp : public ASTNode {
 public:
-    using Method = std::shared_ptr<core::Object> (core::Object::*)();
+    using Method = core::Object* (UnaryOp::*)(runtime::Frame& state) const;
     UnaryOp(UnaryOpType type, std::shared_ptr<ASTNode> exp);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
+
+    core::Object* negate(runtime::Frame& state) const;
+    core::Object* logicalNot(runtime::Frame& state) const;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

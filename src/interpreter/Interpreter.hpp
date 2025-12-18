@@ -4,16 +4,17 @@
 #include <vector>
 #include "semantics/ASTNode.hpp"
 #include "semantics/flow_semantics/Code.hpp"
-#include "runtime/Environment.hpp"
+#include "core/Object.hpp"
 
 namespace interpreter {
 class Interpreter {
 public:
     Interpreter();
-    runtime::Environment& interpret(std::shared_ptr<semantics::ASTNode> command);
+    core::Object* interpret(std::shared_ptr<semantics::ASTNode> command);
+    ~Interpreter();
 
 private:
-    std::shared_ptr<runtime::Environment> state_;
+    runtime::Frame* state_;
     std::vector<std::shared_ptr<semantics::ASTNode>> commands_;
 };
 

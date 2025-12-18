@@ -39,7 +39,7 @@ public:
         return error.str();
     }
 
-    static std::string format(const std::string& source, const except::RuntimeError& err) {
+    static std::string format(const std::string& source, const except::KraitException& err) {
         UNREFERENCED(source);
 
         std::ostringstream error;

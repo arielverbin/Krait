@@ -1,6 +1,8 @@
 #include "Parser.hpp"
 #include "exceptions/exceptions.hpp"
 
+#include "core/gc/GarbageCollector.hpp"
+
 #include "core/builtins/builtin_types/Integer.hpp"
 #include "core/builtins/builtin_types/Float.hpp"
 #include "core/builtins/builtin_types/String.hpp"
@@ -17,6 +19,7 @@
 #include "semantics/flow_semantics/Pass.hpp"
 #include "semantics/flow_semantics/Call.hpp"
 
+#include "semantics/define_semantics/ClassDef.hpp"
 #include "semantics/define_semantics/FunctionDef.hpp"
 #include "semantics/define_semantics/Assign.hpp"
 
@@ -94,13 +97,14 @@ std::shared_ptr<semantics::ASTNode> Parser::parse(std::vector<lexer::Token>& tok
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parseStatement() {
-    if (match(lexer::TokenType::IF))    return parseIf();
-    if (match(lexer::TokenType::WHILE)) return parseWhile();
-    if (match(lexer::TokenType::DEF))   return parseFunctionDef();
-    if (match(lexer::TokenType::PRINT)) return parsePrint();
-    if (match(lexer::TokenType::RETURN)) return parseReturn();
-    if (match(lexer::TokenType::PASS)) return parsePass();
-    if (match(lexer::TokenType::BREAK)) return parseBreak();
+    if (match(lexer::TokenType::IF))       return parseIf();
+    if (match(lexer::TokenType::WHILE))    return parseWhile();
+    if (match(lexer::TokenType::DEF))      return parseFunctionDef();
+    if (match(lexer::TokenType::CLASS))    return parseClassDef();
+    if (match(lexer::TokenType::PRINT))    return parsePrint();
+    if (match(lexer::TokenType::RETURN))   return parseReturn();
+    if (match(lexer::TokenType::PASS))     return parsePass();
+    if (match(lexer::TokenType::BREAK))    return parseBreak();
     if (match(lexer::TokenType::CONTINUE)) return parseContinue();
 
     auto expr = parseExpression(0);
@@ -131,12 +135,12 @@ std::shared_ptr<semantics::ASTNode> Parser::parseExpression(int minBp) {
 std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
     if (match(lexer::TokenType::INT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::Integer>(std::stoi(number)));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::Integer>(std::stoi(number))));
     }
 
     if (match(lexer::TokenType::FLOAT)) {
         const auto& number = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::Float>(std::stod(number)));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::Float>(std::stod(number))));
     }
 
     if (match(lexer::TokenType::TRU)) {
@@ -153,7 +157,7 @@ std::shared_ptr<semantics::ASTNode> Parser::parsePrimary() {
 
     if (match(lexer::TokenType::STRING)) {
         const auto& varName = previous().value();
-        return std::make_shared<semantics::Const>(std::make_shared<core::String>(varName));
+        return std::make_shared<semantics::Const>(createConst(gc::make_tracked<core::String>(varName)));
     }
 
     if (match(lexer::TokenType::IDENTIFIER)) {
@@ -266,6 +270,22 @@ std::shared_ptr<semantics::ASTNode> Parser::parseFunctionDef() {
     return std::make_shared<semantics::FunctionDef>(funcName, params, std::move(body));
 }
 
+std::shared_ptr<semantics::ASTNode> Parser::parseClassDef() {
+    expect(lexer::TokenType::IDENTIFIER, "Expected class name after 'class'");
+    auto className = previous().value();
+
+    expect(lexer::TokenType::COLON, "Expected ':' after class name");
+    expect(lexer::TokenType::NEWLINE, "Expected newline after ':'");
+    expect(lexer::TokenType::INDENT, "Expected indent after newline");
+
+    std::shared_ptr<semantics::Code> body = std::make_shared<semantics::Code>();
+    while (!match(lexer::TokenType::DEDENT) && !check(lexer::TokenType::END_OF_FILE)) {
+        body->statements.push_back(parseStatement());
+    }
+
+    return std::make_shared<semantics::ClassDef>(className, std::move(body));
+}
+
 std::shared_ptr<semantics::ASTNode> Parser::parsePrint() {
     auto expression = parseExpression();
     expect(lexer::TokenType::NEWLINE, "Expected newline after print statement");
@@ -299,6 +319,9 @@ std::shared_ptr<semantics::ASTNode> Parser::parseIf() {
 }
 
 std::shared_ptr<semantics::ASTNode> Parser::parseReturn() {
+    if (match(lexer::TokenType::NEWLINE))
+        return std::make_shared<semantics::Return>();
+
     auto returnValue = parseExpression();
     expect(lexer::TokenType::NEWLINE, "Expected newline after statement");
 
@@ -412,6 +435,11 @@ semantics::UnaryOpType Parser::mapUnaryOp(const lexer::Token& token) const {
         default:
             throw except::SyntaxError("Unexpected token type for unary operator", token.line(), token.column());
     }
+}
+
+core::Object* Parser::createConst(core::Object* obj) {
+    gc::GCPool::instance().add(obj);
+    return obj;
 }
 
 } // namespace parser

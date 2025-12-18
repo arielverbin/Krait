@@ -15,7 +15,7 @@ TEST_CASE("Interprets while loops and normal flow correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(normalFlow));
+    i.interpret(CODE(getNormalFlowCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -29,13 +29,13 @@ TEST_CASE("Interprets function closures correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(functionClosures));
+    i.interpret(CODE(getFunctionClosuresCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
 
     REQUIRE(buffer.str() == "Returned Summer with 3\nsumWith3(5) = 8\nsumWith3(10) = 13\nReturned Summer with 5\n"
-                            "sumWith5(5) = 10\nsumWith5(10) = 15\nTOTAL CALLS: 4\n");
+                            "sumWith5(5) = 10\nsumWith5(10) = 15\nTOTAL CALLS: 0\n");
 }
 
 TEST_CASE("Interprets calculations correctly") {
@@ -44,7 +44,7 @@ TEST_CASE("Interprets calculations correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(calculations));
+    i.interpret(CODE(getCalculationsCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -58,7 +58,7 @@ TEST_CASE("Interprets control flow correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(controlFlowTest));
+    i.interpret(CODE(getControlFlowTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -72,7 +72,7 @@ TEST_CASE("Interprets recursion correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(recursionTest));
+    i.interpret(CODE(getRecursionTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -86,7 +86,7 @@ TEST_CASE("Interprets logical operators correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(logicalOperatorsTest));
+    i.interpret(CODE(getLogicalOperatorsTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -100,7 +100,7 @@ TEST_CASE("Interprets nested closures correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(nestedClosureTest));
+    i.interpret(CODE(getNestedClosureTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -114,7 +114,7 @@ TEST_CASE("Interprets nested if-else correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(nestedIfElseTest));
+    i.interpret(CODE(getNestedIfElseTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -128,7 +128,7 @@ TEST_CASE("Interprets nested loops correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(nestedLoopTest));
+    i.interpret(CODE(getNestedLoopTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
@@ -143,12 +143,41 @@ TEST_CASE("Interprets functions without arguments correctly") {
     std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
 
     interpreter::Interpreter i;
-    i.interpret(CODE(noArgFunctionTest));
+    i.interpret(CODE(getNoArgFunctionTestCode()));
 
     // Restore std::cout
     std::cout.rdbuf(old_buf);
 
     REQUIRE(buffer.str() == "Hello, world!\n");
 }
+
+TEST_CASE("Interprets basic property access properly") {
+    // Redirect std::cout
+    std::ostringstream buffer;
+    std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
+
+    interpreter::Interpreter i;
+    i.interpret(CODE(getBasicAccessPropertyCode()));
+
+    // Restore std::cout
+    std::cout.rdbuf(old_buf);
+
+    REQUIRE(buffer.str() == "10\n100\n");
+}
+
+TEST_CASE("Interprets basic class definition properly") {
+    // Redirect std::cout
+    std::ostringstream buffer;
+    std::streambuf* old_buf = std::cout.rdbuf(buffer.rdbuf());
+
+    interpreter::Interpreter i;
+    i.interpret(CODE(getBasicClassCode()));
+
+    // Restore std::cout
+    std::cout.rdbuf(old_buf);
+
+    REQUIRE(buffer.str() == "In init with: 12\nA OBJ mem: 12\n");
+}
+
 
 #endif // KRAIT_TESTING

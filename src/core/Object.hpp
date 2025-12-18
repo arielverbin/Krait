@@ -3,64 +3,88 @@
 
 #include <string>
 #include <map>
+#include <functional>
+#include <memory>
 #include <variant>
+#include "core/gc/GCTrackable.hpp"
+#include "core/consts.hpp"
 #include "utils/utils.hpp"
 
 namespace core {
 
-class TypeObject;
+class KraitBuiltins;
+class Object;
+struct LazyValue {
+    std::function<core::Object*()> creator;
+    std::vector<core::Object*> args;
+
+    LazyValue(std::function<core::Object*()> fn): creator(std::move(fn)) {}
+};
+
+
+class TypeObject; class Scope;
 class String; class Boolean;
-using MemberEntry = std::variant<std::shared_ptr<Object>, utils::LazyValue>;
-using CallArgs = std::vector<std::shared_ptr<Object>>;
 
-class Object {
+using CallArgs = std::vector<Object*>;
+using AttributeEntry = std::variant<core::Object*, core::LazyValue>;
+
+class Object : public gc::GCTrackable {
 protected:
-    std::unordered_map<std::string, MemberEntry> members_;
-    std::shared_ptr<TypeObject> type_;
+    TypeObject* type_;
+    Scope* members_;
 
-    virtual std::shared_ptr<Object> getAttributeRaw(const std::string& varName);
-    virtual std::shared_ptr<Object> getTypeAttribute(const std::string& varName);
-    virtual bool hasAttribute(const std::string& varName);
+    Object* getAttributeRaw(const std::string& varName, Object* instance = nullptr);
+    Object* getTypeAttribute(const std::string& varName);
+    Object* findAttribute(const std::string& varName);
+    friend class KraitBuiltins;
+    friend class Interpreter;
 
 public:
-    Object(std::shared_ptr<TypeObject> type);
-    virtual std::shared_ptr<Object> _shared_from_this() = 0;
+    Object(TypeObject *type);
     
     Object(const Object&) = delete;
     Object& operator=(const Object&) = delete;
     Object(Object&&) = delete;
     Object& operator=(Object&&) = delete;
 
-    virtual std::shared_ptr<TypeObject> type();
-    virtual std::string _type_();
+    TypeObject* type();
+    virtual Scope* getScope(); // for Scope class, this function returns 'this'
 
-    // TODO: KraitClass will implement those by checking their members for "_str_" etc.
-    virtual std::shared_ptr<String> toString();
-    virtual std::shared_ptr<Boolean> toBool();
+    virtual Object* getAttribute(const std::string& varName);
+    virtual void setAttribute(const std::string& varName, AttributeEntry value);
+    virtual bool hasAttribute(const std::string& varName);
 
-    virtual std::shared_ptr<Object> add(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> subtract(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> multiply(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> divide(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> modulu(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> negate();
+    virtual String* toString();
+    virtual Boolean* toBool();
 
-    virtual std::shared_ptr<Object> greaterEqual(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> greater(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> lesserEqual(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> lesser(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> equal(std::shared_ptr<Object> another);
-    virtual std::shared_ptr<Object> notEqual(std::shared_ptr<Object> another);
+    virtual Object* add(Object* another);
+    virtual Object* reversedAdd(Object* another);
+    virtual Object* subtract(Object* another);
+    virtual Object* reversedSubtract(Object* another);
+    virtual Object* multiply(Object* another);
+    virtual Object* reversedMultiply(Object* another);
+    virtual Object* divide(Object* another);
+    virtual Object* reversedDivide(Object* another);
+    virtual Object* modulu(Object* another);
+    virtual Object* reversedModulu(Object* another);
+    virtual Object* negate();
 
-    virtual std::shared_ptr<Object> logicalAnd(std::shared_ptr<Object> other);
-    virtual std::shared_ptr<Object> logicalOr(std::shared_ptr<Object> other);
-    virtual std::shared_ptr<Object> logicalNot();
+    virtual Object* greaterEqual(Object* another);
+    virtual Object* greater(Object* another);
+    virtual Object* lesserEqual(Object* another);
+    virtual Object* lesser(Object* another);
+    virtual Object* equal(Object* another);
+    virtual Object* notEqual(Object* another);
 
-    virtual std::shared_ptr<Object> call(const CallArgs& args);
-    virtual std::shared_ptr<Object> get(std::shared_ptr<Object> instance);
+    virtual Object* call(const CallArgs& args);
+    virtual Object* get(Object* instance, Object* owner);
 
-    virtual std::shared_ptr<Object> getAttribute(const std::string& varName);
-    virtual void setAttribute(const std::string& varName, MemberEntry value);
+    // class support
+    virtual Object* createNew(const CallArgs& args);
+    virtual Object* initialize(const CallArgs& args);
+
+    // garbage collector support
+    std::vector<gc::GCTrackable*> referencees() override;
 
     virtual ~Object() = default;
 };

@@ -11,6 +11,7 @@
 #include "semantics/operation_semantics/BinaryOp.hpp"
 #include "semantics/operation_semantics/UnaryOp.hpp"
 #include "parser/ParserContext.hpp"
+#include "core/gc/GCPool.hpp"
 
 namespace parser {
 
@@ -56,6 +57,7 @@ private:
     // Prase statements starting with a keyword
     std::shared_ptr<semantics::ASTNode> parseWhile();
     std::shared_ptr<semantics::ASTNode> parseFunctionDef();
+    std::shared_ptr<semantics::ASTNode> parseClassDef();
     std::shared_ptr<semantics::ASTNode> parsePrint();
     std::shared_ptr<semantics::ASTNode> parseIf();
     std::shared_ptr<semantics::ASTNode> parseReturn();
@@ -80,6 +82,8 @@ private:
     // Map between tokens and operator types
     semantics::BinaryOpType mapBinaryOp(const lexer::Token& type) const;
     semantics::UnaryOpType mapUnaryOp(const lexer::Token& type) const;
+
+    core::Object* createConst(core::Object* obj);
 };
 
 } // namespace parser

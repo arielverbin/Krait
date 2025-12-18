@@ -15,8 +15,13 @@ void FileSource::readScript() {
         std::stringstream buffer;
         buffer << file_.rdbuf();
         script_ = buffer.str();
+
+        if (!script_.empty() && script_.back() != '\n') {
+            script_ += '\n';
+        }
+
     } else {
-        script_ = utils::empty;
+        script_ = "\n";
     }
 }
 

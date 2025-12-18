@@ -10,7 +10,7 @@ class Assign : public ASTNode {
 public:
     Assign(std::shared_ptr<AssignableASTNode> target, std::shared_ptr<ASTNode> source);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

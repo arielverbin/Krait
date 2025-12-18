@@ -12,7 +12,7 @@ public:
     Code() = default;
     Code(std::vector<std::shared_ptr<ASTNode>> stmts);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

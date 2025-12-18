@@ -1,15 +1,57 @@
 #include <iostream>
 #include "Interpreter.hpp"
 #include "core/builtins/KraitBuiltins.hpp"
+#include "core/TypeObject.hpp"
+#include "core/gc/GarbageCollector.hpp"
+#include "core/builtins/builtin_types/Function.hpp"
+
 using namespace interpreter;
 
-Interpreter::Interpreter() : state_(std::make_shared<runtime::Environment>()) {
+
+Interpreter::Interpreter() {
+    // Initialize the global evaluation context
+    runtime::EvalContext::initGlobalContext();
+
+    // Initialize builtin types (int, bool, function, etc...)
     core::KraitBuiltins::initializeBuiltins();
+
+    // Define the global environment as its mark&sweep root
+    state_ = new runtime::Frame();
+    gc::GarbageCollector::instance().defineRoot(state_);
+    
     // Initialize the global scope.
     state_->pushNewScope();
+    runtime::EvalContext::pushContext(state_->context());
+
+    // Expose buildin types.
+    state_->defineVariable("none", core::KraitBuiltins::noneType);
+    state_->defineVariable("bool", core::KraitBuiltins::boolType);
+    state_->defineVariable("float", core::KraitBuiltins::floatType);
+    state_->defineVariable("str", core::KraitBuiltins::stringType);
+    state_->defineVariable("function", core::KraitBuiltins::functionType);
+    state_->defineVariable("type", core::KraitBuiltins::typeType);
+    state_->defineVariable("method", core::KraitBuiltins::methodType);
+    state_->defineVariable("classmethod", core::KraitBuiltins::classMethodType);
+    state_->defineVariable("int", core::KraitBuiltins::intType);
+
+    #ifdef KRAIT_DEBUGGING
+    // Expose garbage collector utilities
+    state_->defineVariable("collect_garbage", gc::make_tracked<core::Function>(gc::GarbageCollector::collect_garbage));
+    state_->defineVariable("gc_info", gc::make_tracked<core::Function>(gc::GarbageCollector::gc_info));
+    #endif // KRAIT_DEBUGGING
 }
 
-runtime::Environment& Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
-    command->evaluate(*state_);
-    return *state_;
+core::Object* Interpreter::interpret(std::shared_ptr<semantics::ASTNode> command) {
+    return command->evaluate(*state_);
+}
+
+Interpreter::~Interpreter() {
+    runtime::EvalContext::popContext();  // the global frame's evaluation context
+
+    state_->popLastScope();
+    delete state_;
+
+    runtime::EvalContext::popContext();  // the global evaluation context
+
+    gc::GarbageCollector::instance().flush();
 }

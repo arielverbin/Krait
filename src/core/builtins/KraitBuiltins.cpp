@@ -1,119 +1,188 @@
 #include "KraitBuiltins.hpp"
 
-#include "core/builtins/builtin_types/BoundMethod.hpp"
+#include "core/gc/GarbageCollector.hpp"
+#include "core/builtins/builtin_types/Method.hpp"
+#include "core/builtins/builtin_types/ClassMethod.hpp"
+#include "core/builtins/builtin_types/Scope.hpp"
 #include "core/builtins/builtin_types/Function.hpp"
 #include "core/builtins/builtin_types/Boolean.hpp"
 #include "core/builtins/builtin_types/Integer.hpp"
 #include "core/builtins/builtin_types/String.hpp"
 #include "core/builtins/builtin_types/Float.hpp"
 #include "core/builtins/builtin_types/None.hpp"
+#include "core/consts.hpp"
 #include "core/TypeObject.hpp"
-#include "utils/utils.hpp"
 using namespace core;
 
-std::shared_ptr<TypeObject> KraitBuiltins::functionType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::boundMethodType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::noneType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::intType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::floatType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::boolType = nullptr;
-std::shared_ptr<TypeObject> KraitBuiltins::stringType = nullptr;
+TypeObject* KraitBuiltins::typeType = nullptr;
+TypeObject* KraitBuiltins::functionType = nullptr;
+TypeObject* KraitBuiltins::classMethodType = nullptr;
+TypeObject* KraitBuiltins::methodType = nullptr;
+TypeObject* KraitBuiltins::scopeType = nullptr;
+TypeObject* KraitBuiltins::frameType = nullptr;
+TypeObject* KraitBuiltins::noneType = nullptr;
+TypeObject* KraitBuiltins::intType = nullptr;
+TypeObject* KraitBuiltins::floatType = nullptr;
+TypeObject* KraitBuiltins::boolType = nullptr;
+TypeObject* KraitBuiltins::stringType = nullptr;
+
+core::Boolean* KraitBuiltins::trueObj= nullptr;
+core::Boolean* KraitBuiltins::falseObj= nullptr;
+core::None* KraitBuiltins::noneObj= nullptr;
+
+void KraitBuiltins::declateTypeType() {
+    typeType = gc::make_guarded<TypeObject>("type", nullptr);
+    
+    // re-initialize type's type object
+    typeType->type_ = typeType;
+    typeType->setAttribute(__CLASS__, typeType);
+}
+
+void KraitBuiltins::initializeScopeType() {
+    scopeType = gc::make_guarded<TypeObject>("scope", nullptr);
+
+    // type 'scope' and type 'type' were initialized before type 'scope'. 
+    // which means their scope's type is nullptr, so we need to re-initialize it.
+    KraitBuiltins::typeType->getScope()->type_ = scopeType;
+    KraitBuiltins::typeType->getScope()->setAttribute(__CLASS__, scopeType);
+    scopeType->getScope()->type_ = scopeType;
+    scopeType->getScope()->setAttribute(__CLASS__, scopeType);
+}
 
 void KraitBuiltins::initializeFunctionType() {
-    functionType = std::make_shared<TypeObject>("function");
+    functionType = gc::make_guarded<TypeObject>("function", nullptr);
+
     // __get__ member of Function needs to be LazyValue, since we can't initialize a Function yet, as
     // function is just now being initialized
-    functionType->setAttribute("__get__", utils::LazyValue([]() -> std::shared_ptr<Function> {
-        return std::make_shared<Function>(Function::getOp, 2);
+    functionType->setAttribute(__GET__, core::LazyValue([]() -> Function* {
+        return gc::make_guarded<Function>(Function::getOp);
     }));
-    // number of arguments for __call__ does not matter, it is being checked by `self`.
-    functionType->setAttribute("__call__", std::make_shared<Function>(Function::callOp, 0, false));
-    functionType->setAttribute("__str__", std::make_shared<Function>(Function::toStringOp, 1));
+    functionType->setAttribute(__CALL__, gc::make_guarded<Function>(Function::callOp));
+    functionType->setAttribute(__STR__, gc::make_guarded<Function>(Function::toStringOp));
+}
+
+void KraitBuiltins::initializeTypeType() {
+    KraitBuiltins::typeType->setAttribute(__STR__, gc::make_guarded<Function>(TypeObject::toStringOp));
+    KraitBuiltins::typeType->setAttribute(__CALL__, gc::make_guarded<Function>(TypeObject::callOp));
 }
 
 void KraitBuiltins::initializeMethodType() {
-    boundMethodType = std::make_shared<TypeObject>("method");
-    // number of arguments for __call__ does not matter, it is being checked by `self`.
-    boundMethodType->setAttribute("__call__", std::make_shared<Function>(BoundMethod::callOp, 0, false));
-    boundMethodType->setAttribute("__str__", std::make_shared<Function>(BoundMethod::toStringOp, 1));
+    methodType = gc::make_guarded<TypeObject>("method", Method::createNewOp);
+
+    methodType->setAttribute(__CALL__, gc::make_guarded<Function>(Method::callOp));
+    methodType->setAttribute(__STR__, gc::make_guarded<Function>(Method::toStringOp));
+}
+
+void KraitBuiltins::initializeClassMethodType() {
+    classMethodType = gc::make_guarded<TypeObject>("classmethod", nullptr);
+    
+    // we need to initialize __new__, which is a classmethod, after initializing 'classmethod' type.
+    classMethodType->setAttribute(__NEW__, gc::make_guarded<core::ClassMethod>(
+        gc::make_guarded<core::Function>(ClassMethod::createNewOp))
+    );
+
+    classMethodType->setAttribute(__GET__, gc::make_guarded<Function>(ClassMethod::getOp));
 }
 
 void KraitBuiltins::initializeNoneType() {
-    noneType = std::make_shared<TypeObject>("none");
-    noneType->setAttribute("__str__", std::make_shared<Function>(None::toStringOp, 1));
-    noneType->setAttribute("__bool__", std::make_shared<Function>(None::toBoolOp, 1));
-    noneType->setAttribute("__eq__", std::make_shared<Function>(None::equalOp, 2));
-    noneType->setAttribute("__neq__", std::make_shared<Function>(None::notEqualOp, 2));
+    noneType = gc::make_guarded<TypeObject>("none", None::createNewOp);
+
+    noneType->setAttribute(__STR__, gc::make_guarded<Function>(None::toStringOp));
+    noneType->setAttribute(__BOOL__, gc::make_guarded<Function>(None::toBoolOp));
+    noneType->setAttribute(__EQ__, gc::make_guarded<Function>(None::equalOp));
+    noneType->setAttribute(__NEQ__, gc::make_guarded<Function>(None::notEqualOp));
 }
 
 void KraitBuiltins::initializeIntType() {
-    intType = std::make_shared<TypeObject>("int");
-    intType->setAttribute("__str__", std::make_shared<Function>(Integer::toStringOp, 1));
-    intType->setAttribute("__bool__", std::make_shared<Function>(Integer::toBoolOp, 1));
-    intType->setAttribute("__add__", std::make_shared<Function>(Integer::addOp, 2));
-    intType->setAttribute("__sub__", std::make_shared<Function>(Integer::subtractOp, 2));
-    intType->setAttribute("__mult__", std::make_shared<Function>(Integer::multiplyOp, 2));
-    intType->setAttribute("__div__", std::make_shared<Function>(Integer::divideOp, 2));
-    intType->setAttribute("__mod__", std::make_shared<Function>(Integer::moduluOp, 2));
-    intType->setAttribute("__neg__", std::make_shared<Function>(Integer::negateOp, 1));
-    intType->setAttribute("__ge__", std::make_shared<Function>(Integer::greaterEqualOp, 2));
-    intType->setAttribute("__gt__", std::make_shared<Function>(Integer::greaterOp, 2));
-    intType->setAttribute("__le__", std::make_shared<Function>(Integer::lesserEqualOp, 2));
-    intType->setAttribute("__lt__", std::make_shared<Function>(Integer::lesserOp, 2));
-    intType->setAttribute("__eq__", std::make_shared<Function>(Integer::equalOp, 2));
-    intType->setAttribute("__neq__", std::make_shared<Function>(Integer::notEqualOp, 2));
+    intType = gc::make_guarded<TypeObject>("int", Integer::createNewOp);
+
+    intType->setAttribute(__STR__, gc::make_guarded<Function>(Integer::toStringOp));
+    intType->setAttribute(__BOOL__, gc::make_guarded<Function>(Integer::toBoolOp));
+    intType->setAttribute(__ADD__, gc::make_guarded<Function>(Integer::addOp));
+    intType->setAttribute(__SUB__, gc::make_guarded<Function>(Integer::subtractOp));
+    intType->setAttribute(__MUL__, gc::make_guarded<Function>(Integer::multiplyOp));
+    intType->setAttribute(__DIV__, gc::make_guarded<Function>(Integer::divideOp));
+    intType->setAttribute(__MOD__, gc::make_guarded<Function>(Integer::moduluOp));
+    intType->setAttribute(__NEG__, gc::make_guarded<Function>(Integer::negateOp));
+    intType->setAttribute(__GE__, gc::make_guarded<Function>(Integer::greaterEqualOp));
+    intType->setAttribute(__GT__, gc::make_guarded<Function>(Integer::greaterOp));
+    intType->setAttribute(__LE__, gc::make_guarded<Function>(Integer::lesserEqualOp));
+    intType->setAttribute(__LT__, gc::make_guarded<Function>(Integer::lesserOp));
+    intType->setAttribute(__EQ__, gc::make_guarded<Function>(Integer::equalOp));
+    intType->setAttribute(__NEQ__, gc::make_guarded<Function>(Integer::notEqualOp));
 }
 
 void KraitBuiltins::initializeFloatType() {
-    floatType = std::make_shared<TypeObject>("float");
-    floatType->setAttribute("__str__", std::make_shared<Function>(Float::toStringOp, 1));
-    floatType->setAttribute("__bool__", std::make_shared<Function>(Float::toBoolOp, 1));
-    floatType->setAttribute("__add__", std::make_shared<Function>(Float::addOp, 2));
-    floatType->setAttribute("__sub__", std::make_shared<Function>(Float::subtractOp, 2));
-    floatType->setAttribute("__mult__", std::make_shared<Function>(Float::multiplyOp, 2));
-    floatType->setAttribute("__div__", std::make_shared<Function>(Float::divideOp, 2));
-    floatType->setAttribute("__mod__", std::make_shared<Function>(Float::moduluOp, 2));
-    floatType->setAttribute("__neg__", std::make_shared<Function>(Float::negateOp, 1));
-    floatType->setAttribute("__ge__", std::make_shared<Function>(Float::greaterEqualOp, 2));
-    floatType->setAttribute("__gt__", std::make_shared<Function>(Float::greaterOp, 2));
-    floatType->setAttribute("__le__", std::make_shared<Function>(Float::lesserEqualOp, 2));
-    floatType->setAttribute("__lt__", std::make_shared<Function>(Float::lesserOp, 2));
-    floatType->setAttribute("__eq__", std::make_shared<Function>(Float::equalOp, 2));
-    floatType->setAttribute("__neq__", std::make_shared<Function>(Float::notEqualOp, 2));
+    floatType = gc::make_guarded<TypeObject>("float", Float::createNewOp);
+
+    floatType->setAttribute(__STR__, gc::make_guarded<Function>(Float::toStringOp));
+    floatType->setAttribute(__BOOL__, gc::make_guarded<Function>(Float::toBoolOp));
+    floatType->setAttribute(__ADD__, gc::make_guarded<Function>(Float::addOp));
+    floatType->setAttribute(__SUB__, gc::make_guarded<Function>(Float::subtractOp));
+    floatType->setAttribute(__MUL__, gc::make_guarded<Function>(Float::multiplyOp));
+    floatType->setAttribute(__DIV__, gc::make_guarded<Function>(Float::divideOp));
+    floatType->setAttribute(__MOD__, gc::make_guarded<Function>(Float::moduluOp));
+    floatType->setAttribute(__NEG__, gc::make_guarded<Function>(Float::negateOp));
+    floatType->setAttribute(__GE__, gc::make_guarded<Function>(Float::greaterEqualOp));
+    floatType->setAttribute(__GT__, gc::make_guarded<Function>(Float::greaterOp));
+    floatType->setAttribute(__LE__, gc::make_guarded<Function>(Float::lesserEqualOp));
+    floatType->setAttribute(__LT__, gc::make_guarded<Function>(Float::lesserOp));
+    floatType->setAttribute(__EQ__, gc::make_guarded<Function>(Float::equalOp));
+    floatType->setAttribute(__NEQ__, gc::make_guarded<Function>(Float::notEqualOp));
 }
 
 void KraitBuiltins::initializeBoolType() {
-    boolType = std::make_shared<TypeObject>("bool");
-    boolType->setAttribute("__str__", std::make_shared<Function>(Boolean::toStringOp, 1));
-    boolType->setAttribute("__bool__", std::make_shared<Function>(Boolean::toBoolOp, 1));
-    boolType->setAttribute("__and__", std::make_shared<Function>(Boolean::logicalAndOp, 2));
-    boolType->setAttribute("__or__", std::make_shared<Function>(Boolean::logicalOrOp, 2));
-    boolType->setAttribute("__not__", std::make_shared<Function>(Boolean::logicalNotOp, 1));
-    boolType->setAttribute("__eq__", std::make_shared<Function>(Boolean::equalOp, 2));
-    boolType->setAttribute("__neq__", std::make_shared<Function>(Boolean::notEqualOp, 2));
+    boolType = gc::make_guarded<TypeObject>("bool", Boolean::createNewOp);
+
+    boolType->setAttribute(__STR__, gc::make_guarded<Function>(Boolean::toStringOp));
+    boolType->setAttribute(__BOOL__, gc::make_guarded<Function>(Boolean::toBoolOp));
+    boolType->setAttribute(__EQ__, gc::make_guarded<Function>(Boolean::equalOp));
+    boolType->setAttribute(__NEQ__, gc::make_guarded<Function>(Boolean::notEqualOp));
 }
 
 void KraitBuiltins::initializeStringType() {
-    stringType = std::make_shared<TypeObject>("string");
-    stringType->setAttribute("__str__", std::make_shared<Function>(String::toStringOp, 1));
-    stringType->setAttribute("__bool__", std::make_shared<Function>(String::toBoolOp, 1));
-    stringType->setAttribute("__add__", std::make_shared<Function>(String::addOp, 2));
-    stringType->setAttribute("__mult__", std::make_shared<Function>(String::multiplyOp, 2));
-    stringType->setAttribute("__eq__", std::make_shared<Function>(String::equalOp, 2));
-    stringType->setAttribute("__neq__", std::make_shared<Function>(String::notEqualOp, 2));
+    stringType = gc::make_guarded<TypeObject>("string", String::createNewOp);
+
+    stringType->setAttribute(__STR__, gc::make_guarded<Function>(String::toStringOp));
+    stringType->setAttribute(__BOOL__, gc::make_guarded<Function>(String::toBoolOp));
+    stringType->setAttribute(__ADD__, gc::make_guarded<Function>(String::addOp));
+    stringType->setAttribute(__MUL__, gc::make_guarded<Function>(String::multiplyOp));
+    stringType->setAttribute(__EQ__, gc::make_guarded<Function>(String::equalOp));
+    stringType->setAttribute(__NEQ__, gc::make_guarded<Function>(String::notEqualOp));
+}
+
+void KraitBuiltins::initializedFrameType() {
+    frameType = gc::make_guarded<TypeObject>("frame", nullptr);
+}
+
+void KraitBuiltins::initializeConsts() {
+    trueObj = gc::make_guarded<Boolean>(true);
+    falseObj = gc::make_guarded<Boolean>(false);
+    noneObj = gc::make_guarded<None>();
+
+    // TODO: add integer initialization up to 516 as optimization
 }
 
 void KraitBuiltins::initializeBuiltins() {
 
-    // Initialize 'type' builtins
-    TypeObject::typeType->setAttribute("__str__", std::make_shared<Function>(TypeObject::toStringOp, 1));
-
-    // Initialize builtin types
+    // Declare the fundemental object - 'type' type.
+    declateTypeType();
+    
+    // Initialize builtin types - function's type and type's type must be first and in that order
+    initializeScopeType();
     initializeFunctionType();
+    initializeTypeType();
+
+    // rest of types,
+    initializeClassMethodType();
     initializeMethodType();
+    initializedFrameType();
     initializeNoneType();
     initializeBoolType();
     initializeIntType();
     initializeFloatType();
     initializeStringType();
+
+    // initialize const non-type objects (like True and False)
+    initializeConsts();
 }

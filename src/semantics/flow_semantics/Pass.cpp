@@ -3,7 +3,8 @@
 #include "core/builtins/builtin_types/None.hpp"
 using namespace semantics;
 
-std::shared_ptr<core::Object> Pass::evaluate(runtime::Environment& state) const {
+core::Object* Pass::evaluate(runtime::Frame& state) const {
+    // runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
     UNREFERENCED(state);
 
     return core::None::getNone();

@@ -7,9 +7,9 @@
 namespace semantics {
 class Const : public ASTNode {
 public:
-    Const(std::shared_ptr<core::Object> obj);
+    Const(core::Object* obj);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {
@@ -20,7 +20,7 @@ public:
     virtual ~Const() = default;
     
 private:
-    std::shared_ptr<core::Object> obj_;
+    core::Object* obj_;
 };
 
 } // namespace semantics

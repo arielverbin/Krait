@@ -5,12 +5,17 @@
 #include "semantics/ASTNode.hpp"
 #include "../../utils/utils.hpp"
 
+namespace core { class Function; }
+
 namespace semantics {
+
 class Call : public ASTNode {
 public:
     Call(std::shared_ptr<ASTNode> callee, std::vector<std::shared_ptr<ASTNode>> args);
 
-    virtual std::shared_ptr<core::Object> evaluate(runtime::Environment& state) const override;
+    virtual core::Object* evaluate(runtime::Frame& state) const override;
+
+    static core::Object* makeCall(core::Function* func, core::CallArgs args);
 
     #ifdef KRAIT_TESTING
     virtual std::string stringify() const override {

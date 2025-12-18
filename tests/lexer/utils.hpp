@@ -68,6 +68,7 @@ std::string tokenTypeToString(lexer::TokenType type) {
         case lexer::TokenType::TRU: return "TRUE";
         case lexer::TokenType::FALS: return "FALSE";
         case lexer::TokenType::NONE: return "NONE";
+        case lexer::TokenType::CLASS: return "CLASS";
 
         default: return "UNKNOWN";
     }

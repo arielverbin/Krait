@@ -4,14 +4,21 @@ using namespace semantics;
 AccessProperty::AccessProperty(std::shared_ptr<ASTNode> expression, std::string memberName)
     : exp_(expression), memberName_(memberName) {}
 
-std::shared_ptr<core::Object> AccessProperty::evaluate(runtime::Environment& state) const {
-    std::shared_ptr<core::Object> object = exp_->evaluate(state);
+core::Object* AccessProperty::evaluate(runtime::Frame& state) const {
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
+    core::Object* object = exp_->evaluate(state);
+    guard.protect(object);
 
     // Retrieve the object's attribute
     return object->getAttribute(memberName_);
 }
 
-void AccessProperty::assign(runtime::Environment& state, std::shared_ptr<core::Object> value)  {
-    std::shared_ptr<core::Object> object = exp_->evaluate(state);
+void AccessProperty::assign(runtime::Frame& state, core::Object* value)  {
+    runtime::EvalContext::EvalGuard guard = runtime::EvalContext::current().Guard();
+
+    core::Object* object = exp_->evaluate(state);
+    guard.protect(object);
+    
     object->setAttribute(memberName_, value);
 }

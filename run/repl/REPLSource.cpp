@@ -9,8 +9,12 @@ using namespace run;
 
 REPLSource::REPLSource() : analyzer_(), eof_(false) {
     std::cout << BOLDMAGENTA << "🐍 Krait " 
-    << RESET << "(v1.0.1) " 
-    << GREY << "/ REPL session started "
+    << RESET << "(v1.0.1" 
+    #ifdef KRAIT_DEBUGGING
+    << CYAN << " DEBUG" << RESET
+    #endif // KRAIT_DEBUGGING
+    << ")"
+    << GREY << " / REPL session started "
     << RESET << std::endl;
 }
 
@@ -21,6 +25,8 @@ std::string REPLSource::getLine(bool notComplete) {
     if (*input) add_history(input);
 
     std::string line(input);
+    free(input);
+
     if (line == "exit") {
         eof_ = true;
         std::cout << BOLDMAGENTA << "GOODBYE " << RESET 
@@ -65,4 +71,8 @@ const std::string& REPLSource::source() {
 
 bool REPLSource::eof() const {
     return eof_;
+}
+
+REPLSource::~REPLSource() {
+    clear_history();
 }

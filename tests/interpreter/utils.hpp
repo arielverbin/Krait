@@ -3,7 +3,32 @@
 #define TESTS_INTERPRETER_UTILS_HPP
 
 #include <vector>
+
+#include "core/builtins/builtin_types/Integer.hpp"
+#include "core/builtins/builtin_types/String.hpp"
+#include "core/builtins/builtin_types/None.hpp"
+#include "core/builtins/builtin_types/Boolean.hpp"
+
+#include "semantics/define_semantics/Assign.hpp"
+#include "semantics/define_semantics/ClassDef.hpp"
+#include "semantics/define_semantics/FunctionDef.hpp"
+#include "semantics/flow_semantics/Call.hpp"
+#include "semantics/Print.hpp"
+#include "semantics/Const.hpp"
+#include "semantics/Variable.hpp"
+#include "semantics/operation_semantics/AccessProperty.hpp"
+#include "semantics/operation_semantics/BinaryOp.hpp"
+#include "semantics/operation_semantics/UnaryOp.hpp"
+#include "semantics/flow_semantics/If.hpp"
+#include "semantics/flow_semantics/While.hpp"
+#include "semantics/flow_semantics/Pass.hpp"
+#include "semantics/flow_semantics/Code.hpp"
+#include "semantics/signal_semantics/Return.hpp"
+#include "semantics/signal_semantics/Break.hpp"
+#include "semantics/signal_semantics/Continue.hpp"
+
 #include "semantics/ASTNode.hpp"
+#include "core/gc/GarbageCollector.hpp"
 #include "lexer/Lexer.hpp"
 
 #define ms(OBJECT) std::make_shared<OBJECT>
@@ -14,8 +39,9 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 }
 
 #define ASSIGNVAR(name, val)            ms(Assign)(ms(Variable)(name), val)
-#define INT(n)                          ms(Const)(ms(Integer)(n))
-#define STR(s)                          ms(Const)(ms(String)(s))
+#define ASSIGN(assignable, val)         ms(Assign)(assignable, val)
+#define INT(n)                          ms(Const)(gc::make_guarded<Integer>(n))
+#define STR(s)                          ms(Const)(gc::make_guarded<String>(s))
 #define BOOL(b)                         ms(Const)(Boolean::get(b))
 #define VAR(name)                       ms(Variable)(name)
 #define PRINT(expr)                     ms(Print)(expr)
@@ -26,8 +52,8 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 #define NOT(expr)                       ms(UnaryOp)(UnaryOpType::Not, expr)
 #define GEQ(lhs, rhs)                   ms(BinaryOp)(BinaryOpType::GreaterEqual, lhs, rhs)
 #define LEQ(lhs, rhs)                   ms(BinaryOp)(BinaryOpType::LesserEqual, lhs, rhs)
-#define LT(lhs, rhs)                    NOT(GEQ(lhs, rhs))
-#define GT(lhs, rhs)                    NOT(LEQ(lhs, rhs))
+#define LT(lhs, rhs)                    ms(BinaryOp)(BinaryOpType::LesserThan, lhs, rhs)
+#define GT(lhs, rhs)                    ms(BinaryOp)(BinaryOpType::GreaterThan, lhs, rhs)
 #define EQ(lhs, rhs)                    ms(BinaryOp)(BinaryOpType::Equal, lhs, rhs)   
 #define OR(lhs, rhs)                    ms(BinaryOp)(BinaryOpType::Or, lhs, rhs)
 #define AND(lhs, rhs)                   ms(BinaryOp)(BinaryOpType::And, lhs, rhs)
@@ -44,6 +70,8 @@ std::vector<std::shared_ptr<semantics::ASTNode>> make_ast_vector(T&&... args) {
 #define RETURN(expr)                    ms(Return)(expr)
 #define BREAK()                         ms(Break)()
 #define CONTINUE()                      ms(Continue)()
+#define CLASS(clsName, body)            ms(semantics::ClassDef)(clsName, body)
+#define PROPERTY(a, attName)            ms(semantics::AccessProperty)(a, attName)
 
 #endif // TESTS_INTERPRETER_UTILS_HPP
 #endif // KRAIT_TESTING

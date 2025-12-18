@@ -4,7 +4,6 @@
 
 #define CATCH_CONFIG_MAIN
 #include "tests/lib/catch.hpp"
-#include "tests/interpreter/commands.hpp"
 #include "tests/interpreter/utils.hpp"
 #include "parser/Parser.hpp"
 
@@ -16,6 +15,7 @@
 
 #define TEST_EXPRESSION(num) \
 TEST_CASE("Parses expressions correctly (" #num ")") { \
+    runtime::EvalContext::initGlobalContext(); \
     auto tokens = lexer::Lexer().tokenize(expressionTest##num); \
     try { \
         auto ast = parser::Parser().parse(tokens); \
@@ -24,6 +24,7 @@ TEST_CASE("Parses expressions correctly (" #num ")") { \
         printSyntaxError(err, expressionTest##num); \
         REQUIRE(false); \
     } \
+    runtime::EvalContext::popContext(); \
 }
 
 // Expressions, precedence and associativity
@@ -64,5 +65,8 @@ TEST_EXPRESSION(30)
 TEST_EXPRESSION(31)
 TEST_EXPRESSION(32)
 TEST_EXPRESSION(33)
+
+// class defintions, property access
+TEST_EXPRESSION(34)
 
 #endif // KRAIT_TESTING
