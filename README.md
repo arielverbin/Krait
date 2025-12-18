@@ -39,9 +39,10 @@ By running `./build/release/krait` without arguments, a REPL shell will open. Us
 ## TODO
 - [x] Member lookup (`obj.field`)
 - [x] Automatic type casting, `__radd__`, `__rmul__` mechanism
-- [ ] Backtrace for runtime errors
-- [ ] `list` datatype
+- [ ] `list` datatype, `list[index]` operator
 - [ ] `for` loops, `in` keyword
 - [x] Support for user-defined types (classes)
+- [x] Support for decorators (`@`)
 - [x] Garbage Collector
 - [ ] Common modules like `sys` and `os`
+- [ ] Support for writing native C/C++ modules
