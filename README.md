@@ -40,7 +40,7 @@ By running `./build/release/krait` without arguments, a REPL shell will open. Us
 - [x] Member lookup (`obj.field`)
 - [x] Automatic type casting, `__radd__`, `__rmul__` mechanism
 - [ ] `list` datatype, `list[index]` operator
-- [ ] `for` loops, `in` keyword
+- [ ] `for` loops, iterables
 - [x] Support for user-defined types (classes)
 - [x] Support for decorators (`@`)
 - [x] Garbage Collector
